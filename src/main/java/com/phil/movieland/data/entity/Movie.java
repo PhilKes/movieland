@@ -93,7 +93,7 @@ public class Movie {
         this.tmdbId=(long) tmdbMovie.getId();
         this.posterUrl=TmdbApiService.POSTER_BASE_URL+tmdbMovie.getPosterPath();
         //TODO pipe description
-        this.description=tmdbMovie.getOverview().substring(0,128);
+        this.description=tmdbMovie.getOverview().substring(0,120)+"...";
         this.date=DateUtils.createDateFromDateString(tmdbMovie.getReleaseDate());
         this.name=tmdbMovie.getTitle();
     }

@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <title>Landon Reservations</title>
+    <title>MovieLand Spring</title>
 
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/ui-darkness/jquery-ui.css"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
@@ -20,45 +20,58 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" href="/">Landon Hotels</a>
+            <a class="navbar-brand" href="/">MovieLand Spring</a>
         </div>
     </div>
 </nav>
 <div class="container">
     <div class="page-header">
-        <h1>Welcome to the Reservations Page</h1>
+        <h1>Program Editor</h1>
     </div>
     <div class="input-group">
-<!--
-        <span class="input-group-addon" id="basic-addon1"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
--->
-        <!--See site.js script-->
+        <span class="input-group-addon" id="basic-addon2"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
         <input type="text" class="form-control" id="movieQuery"/>
+
+        <span class="input-group-addon" id="basic-addon1"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+        <input type="text" class="form-control" id="datepicker" aria-describedby="basic-addon1"/>
     </div>
+    <br>
 
     <table class="table table-striped table-bordered">
         <tr>
             <td>Poster</td>
             <td>Movie</td>
-            <td>Description</td>
+            <td>Shows</td>
         </tr>
         <tr th:each="movie: ${movies}">
             <td width="15%">
                 <img style="display:block;" th:src="${movie.posterUrl}" />
             </td>
-            <td th:text="${movie.name}">Movie</td>
-            <td th:text="${movie.description}">Description</td>
+            <td>
+                <b><h4 th:text="${movie.name}"></b></h4><br>
+                <b>Release Date:</b><br>
+                <div th:text="${#dates.format(movie.date, 'dd.MM.yyyy')}"></div><br>
+                <b>Description:</b><br>
+                <div th:text="${movie.description}"></div><br>
+            </td>
+
+            <!--TODO ADD NEW SHOWS TO DATE-->
+            <td width="20%">
+                <div th:each="show: ${showService.getShowsForMovieDate(movie, param.date)}">
+                    <b th:text="${#dates.format(show.date, 'HH:mm')}"></b>
+                </div>
+            </td>
 <!--
             <td th:text="${userReservation.}!=null? ${roomReservation.lastName} + ', ' + ${roomReservation.firstName} : 'VACANT'">Full Name</td>
 -->
-        </tr>
+        </div>
     </table>
 </div>
 <footer class="footer navbar-inverse navbar-fixed-bottom">
     <div class="container">
         <div class="row">
             <div class="col-md-4"></div>
-            <div class="col-md-4"><p class="text-muted">@Copyright 2017 Frank Moley</p></div>
+            <div class="col-md-4"><p class="text-muted">@Copyright Phil Key</p></div>
         </div>
     </div>
 </footer>
