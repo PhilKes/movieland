@@ -1,5 +1,6 @@
 package com.phil.movieland.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.phil.movieland.utils.DateUtils;
 import com.phil.movieland.utils.TmdbApiService;
 import info.movito.themoviedbapi.model.MovieDb;
@@ -32,6 +33,7 @@ public class Movie {
     private Long tmdbId;
 
     @Transient //Ignore for Persistence in Database
+    @JsonIgnore
     private MovieDb tmdbMovie;
 
     //Additional info, actors,... from TMDB
@@ -93,7 +95,11 @@ public class Movie {
         this.tmdbId=(long) tmdbMovie.getId();
         this.posterUrl=TmdbApiService.POSTER_BASE_URL+tmdbMovie.getPosterPath();
         //TODO pipe description
-        this.description=tmdbMovie.getOverview().substring(0,120)+"...";
+
+        this.description=tmdbMovie.getOverview();
+        if(description.length()>120){
+            description=description.substring(0,120)+"...";
+        }
         this.date=DateUtils.createDateFromDateString(tmdbMovie.getReleaseDate());
         this.name=tmdbMovie.getTitle();
     }
