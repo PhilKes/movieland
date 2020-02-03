@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/ui-darkness/jquery-ui.css"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/site.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css">
 
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -48,7 +49,7 @@
                 <img style="display:block;" th:src="${movie.posterUrl}" />
             </td>
             <td>
-                <b><h4 th:text="${movie.name}"></b></h4><br>
+                <b><h4 th:text="${movie.name}"></h4></b><br>
                 <b>Release Date:</b><br>
                 <div th:text="${#dates.format(movie.date, 'dd.MM.yyyy')}"></div><br>
                 <b>Description:</b><br>
@@ -56,15 +57,41 @@
             </td>
 
             <!--TODO ADD NEW SHOWS TO DATE-->
-            <td width="20%">
+            <td>
                 <div th:each="show: ${showService.getShowsForMovieDate(movie, param.date)}">
-                    <b th:text="${#dates.format(show.date, 'HH:mm')}"></b>
+                    <!--TODO REMOVE TIMES-->
+                    <form action="#" th:action="@{/movies/show}" th:method="DELETE" >
+                        <button style="float: left; " type="submit" class="btn btn-danger btn-xs" >
+                            <span class="glyphicon glyphicon-minus-sign"></span>
+                        </button>
+                        <input type="hidden" name="showid" th:value="${show.showId}" />
+                        <!--TODO how to gloabllay define name,date for all forms-->
+                        <input type="hidden" name="name" th:value="${param.name}" />
+                        <input type="hidden" name="date" th:value="${param.date}"/>
+                        <h4 th:text="${#dates.format(show.date, 'HH:mm')}"></h4>
+                    </form>
                 </div>
+
+                <form th:action="@{/movies/show}" th:method="POST" id="showform">
+                    <div class="form-group" style="min-width: 150px;max-width: 150px;">
+                        <button style="float: left;" type="submit" class="btn btn-success">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                        </button>
+                        <input type="hidden" name="name" th:value="${param.name}" />
+                        <input type="hidden" name="movieid" th:value="${movie.movId}" />
+                        <input type="hidden" name="date" th:value="${param.date}"/>
+                        <div class='input-group date showtimepicker'>
+                            <input type='text' class="form-control" name="time" />
+                            <span class="input-group-addon">
+                         <span class="glyphicon glyphicon-time"></span>
+                         </span>
+                        </div>
+                    </div>
+
+                </form>
+
             </td>
-<!--
-            <td th:text="${userReservation.}!=null? ${roomReservation.lastName} + ', ' + ${roomReservation.firstName} : 'VACANT'">Full Name</td>
--->
-        </div>
+        </tr>
     </table>
 </div>
 <footer class="footer navbar-inverse navbar-fixed-bottom">
@@ -79,6 +106,10 @@
 <script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/momentjs/2.14.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+
 <script src="js/site.js"></script>
 </body>
 </html>

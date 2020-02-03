@@ -44,6 +44,23 @@ public class MovieShowService {
         }
         return shows;
     }
+
+    public void postMovieShow(Long movieId,Date date){
+        MovieShow show=new MovieShow();
+        show.setMovId(movieId);
+        show.setDate(date);
+
+        System.out.println("ADD NEW SHOW");
+        System.out.println("MovId: "+show.getMovId());
+        System.out.println("DateTime: "+show.getDate());
+        movieShowRepository.save(show);
+    }
+
+    public void deleteMovieShow(Long showid){
+        System.out.println("Deleting: "+showid);
+        movieShowRepository.deleteById(showid);
+    }
+
    /* public List<Movie> getAllMovies(){
         List<Movie> movies=movieShowRepository.findAll();
         return loadTmdbMovies(movies);

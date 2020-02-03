@@ -20,7 +20,6 @@ public class MovieShow {
 
     //TODO list of seats, different cinemas
 
-
     public long getShowId() {
         return showId;
     }
