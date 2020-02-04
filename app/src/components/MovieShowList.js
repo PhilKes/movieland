@@ -7,7 +7,7 @@ import {
     FormGroup, Label, InputGroup, InputGroupAddon, Form
 } from 'reactstrap';
 import AppNavbar from '../AppNavbar';
-import MovieModal from "./modal/MovieModal";
+import MovieShowModal from "./modal/MovieShowModal";
 import Moment from 'moment';
 import {faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -82,14 +82,6 @@ class MovieShowList extends Component {
             });
     }
 
-    async fetchMovie(movId) {
-        return await fetch('api/movie/' + movId)
-            .then(response => {
-                console.log("Fetching MovId: "+movId);
-                return response.json();
-            })
-    }
-
     /** Remove movie with movieid=id*/
     async remove(ev) {
         ev.preventDefault();
@@ -103,7 +95,6 @@ class MovieShowList extends Component {
                 'Content-Type': 'application/json'
             }
         }).then(() => {
-            console.log("DELETED");
             let updatedShows = [...this.state.shows].filter(i => i.showId+"" !== id+"");
             updatedShows=updatedShows.sort((a,b)=> Moment(a.date).diff(b.date));
             this.setState({shows: updatedShows});
@@ -111,28 +102,40 @@ class MovieShowList extends Component {
     }
 
 
-    /** Add movie from Modal entered name and reload shows*/
+    /** Add movie from Add Action*/
     addShow(ev) {
         ev.preventDefault();
         const data= new FormData(ev.target);
-
         let date= Moment(this.dateParam+' '+data.get('time'));
-        console.log("Add Show: MovId:"+data.get('movId')+" DateTime: "+date.format('YYYY-MM-DD HH:mm'));
+        let show={movId: data.get('movId'), date: date};
+        this.postShow(show);
+    }
+
+    /** Add movie from Modal entered name*/
+    addShowModal(showModal) {
+        let date= Moment(this.dateParam+' '+showModal.time);
+        let show= {movId: showModal.movId, date: date};
+        this.postShow(show);
+    }
+
+    /** Post show to API and reload shows*/
+    postShow(show){
+        console.log("Add Show: MovId:"+show.movId+" DateTime: "+show.date.format('YYYY-MM-DD HH:mm'));
         fetch(`/api/show`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body:JSON.stringify({movId: data.get('movId'), date:date})
+            body:JSON.stringify({movId: show.movId, date:show.date})
         })
-        .then(response=>response.json())
-        .then(show=>{
-            let shows=this.state.shows;
-            shows.push(show);
-            this.setState({shows:shows});
-        });
-
+            .then(response=>response.json())
+            .then(show=>{
+                /*let shows=this.state.shows;
+                shows.push(show);
+                this.setState({shows:shows});*/
+                this.updateShowList();
+            });
     }
 
     /** Submit search if pressed enter in searchquery field*/
@@ -187,7 +190,6 @@ class MovieShowList extends Component {
                         <InputGroup>
                             <Input type="time"  defaultValue={Moment().format("HH:mm")}
                                 placeholder="time placeholder"
-                                style={{width: 'auto'}}
                                 name="time"
                             />
                             <Input type="hidden" name="movId" value={movies[id].movId}/>
@@ -207,7 +209,7 @@ class MovieShowList extends Component {
                 <AppNavbar/>
                 <Container fluid>
                     <div className="float-right">
-                        <MovieModal onSubmit={this.addShow.bind(this)}/>
+                        <MovieShowModal onSubmit={this.addShowModal.bind(this)}/>
                     </div>
                     <h3>Movie Shows</h3>
                     <FormGroup>
@@ -221,8 +223,8 @@ class MovieShowList extends Component {
                         <thead>
                         <tr>
                             <th width="20%">Poster</th>
-                            <th width="10%">Movie Name</th>
-                            <th width="20%">Times</th>
+                            <th width="30%">Movie Name</th>
+                            <th width="10%">Times</th>
                             <th width="15%">Actions</th>
                         </tr>
                         </thead>

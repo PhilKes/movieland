@@ -60,3 +60,7 @@
 .logo-icon{
   height:60px;
 }
+.modal-movieList{
+  height: 35vh;
+  overflow-y: scroll;
+}
