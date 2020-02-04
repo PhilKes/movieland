@@ -1,17 +1,20 @@
-import React, { Component } from 'react';
-import { Button, ButtonGroup, Container, Table } from 'reactstrap';
+import React, {Component, useState} from 'react';
+import {Button, ButtonGroup, Container, ModalHeader, ModalBody,Modal,ModalFooter,Table} from 'reactstrap';
 import AppNavbar from '../AppNavbar';
 import { Link } from 'react-router-dom';
+import MovieModal from "./modal/MovieModal";
 import Moment from 'moment';
 
-class MovieList extends Component {
 
+
+class MovieList extends Component {
     constructor(props) {
         super(props);
         this.state = {movies: [], isLoading: true};
         this.remove = this.remove.bind(this);
     }
 
+    /** Initial load all movies*/
     componentDidMount() {
         this.setState({isLoading: true});
 
@@ -20,6 +23,7 @@ class MovieList extends Component {
             .then(data => this.setState({movies: data, isLoading: false}));
     }
 
+    /** Remove movie with movieid=id*/
     async remove(id) {
         await fetch(`/api/movie/${id}`, {
             method: 'DELETE',
@@ -33,6 +37,24 @@ class MovieList extends Component {
         });
     }
 
+    /** Add movie from Modal entered name and reload movies*/
+    addMovie(name) {
+        console.log("Add " +name);
+        var result=
+            fetch(`/api/movie`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify({name: name})
+        }).then(function(){
+              return fetch('api/movies')
+                .then(response =>  response.json());
+        });
+        result.then(function(movies){this.setState({movies: movies, isLoading: false});}.bind(this));
+    }
+
+
     render() {
         const {movies, isLoading} = this.state;
 
@@ -42,9 +64,10 @@ class MovieList extends Component {
 
         const movieList = movies.map(movie => {
             const descript = `${movie.description}`;
+
             return <tr key={movie.movId}>
-                <td><img src={movie.posterUrl} className="img-fluid" alt="Responsive image"/></td>
-                <td style={{whiteSpace: 'nowrap'}}>{movie.name}</td>
+                <td><img src={movie.posterUrl} className={'img-fluid'} alt="Responsive image"/></td>
+                <td >{movie.name}</td>
                 <td>{descript}</td>
                 <td>
                    <div key={movie.movId}>{Moment(movie.date).format('DD.MM.YYYY')}</div>
@@ -58,18 +81,20 @@ class MovieList extends Component {
             </tr>
         });
 
+
         return (
+
             <div>
                 <AppNavbar/>
                 <Container fluid>
                     <div className="float-right">
-                        <Button color="success" tag={Link} to="/movies/new">Add Group</Button>
+                        <MovieModal onSubmit={this.addMovie.bind(this)}/>
                     </div>
                     <h3>My JUG Tour</h3>
-                    <Table className="mt-4">
+                    <Table className="mt-5">
                         <thead>
                         <tr>
-                            <th width="20%">Poster</th>
+                            <th width="15%">Poster</th>
                             <th width="6%">Name</th>
                             <th width="25%">Description</th>
                             <th width="15%">Release Date</th>

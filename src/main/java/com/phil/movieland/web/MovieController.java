@@ -60,7 +60,7 @@ public class MovieController {
     }
     
     @PostMapping("/movie")
-    ResponseEntity<Movie> createMovie(@Valid @RequestBody Movie movie) throws URISyntaxException {
+    ResponseEntity<Movie> createMovie(@RequestBody Movie movie) throws URISyntaxException {
         Movie result = movieService.saveMovie(movie);
         return ResponseEntity.created(new URI("/api/movie/" + result.getMovId()))
                 .body(result);

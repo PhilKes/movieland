@@ -43,6 +43,7 @@ public class MovieService {
         if(movie.getTmdbId()==null) {
             setTmdbData(movie);
         }
+        System.out.println("Saving: "+movie.getName());
         return movieRepository.save(movie);
     }
 
