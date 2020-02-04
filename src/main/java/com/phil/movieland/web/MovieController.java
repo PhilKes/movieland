@@ -35,13 +35,13 @@ public class MovieController {
 
     @GetMapping("/movies")
     public Collection<Movie> getMovies(
-            @RequestParam(value="name",required=false)String search,
-            @RequestParam(value="date",required=false)String dateString){
+            @RequestParam(value="name",required=false)String search
+            /*@RequestParam(value="date",required=false)String dateString*/){
         List<Movie> movies= null;
-        if(dateString!=null){
+       /* if(dateString!=null){
             Date date= DateUtils.createDateFromDateString(dateString);
             System.out.println("Query for "+date);
-        }
+        }*/
         if(null==search) {
             System.out.println("No query entered");
             movies=movieService.getAllMovies();
@@ -67,13 +67,13 @@ public class MovieController {
     }
     
     @PutMapping("/movie/{id}")
-    ResponseEntity<Movie> updateGroup(@Valid @RequestBody Movie movie) {
+    ResponseEntity<Movie> updateMovie(@Valid @RequestBody Movie movie) {
         Movie result = movieService.saveMovie(movie);
         return ResponseEntity.ok().body(result);
     }
 
     @DeleteMapping("/movie/{id}")
-    public ResponseEntity<?> deleteGroup(@PathVariable Long id) {
+    public ResponseEntity<?> deleteMovie(@PathVariable Long id) {
         movieService.deleteById(id);
         return ResponseEntity.ok().build();
     }

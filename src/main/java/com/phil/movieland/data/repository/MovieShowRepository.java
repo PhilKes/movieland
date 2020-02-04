@@ -13,4 +13,5 @@ public interface MovieShowRepository extends CrudRepository<MovieShow,Long> {
     List<MovieShow> findAll();
     List<MovieShow> findAllByMovId(long movid);
     List<MovieShow> findAllByMovIdAndDateBetween(long movid,Date dateStart,Date dateEnd);
+    List<MovieShow> findAllByDateBetween(Date dateStart,Date dateEnd);
 }

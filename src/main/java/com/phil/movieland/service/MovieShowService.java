@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MovieShowService {
@@ -32,13 +33,8 @@ public class MovieShowService {
 
     public List<MovieShow> getShowsForMovieDate(Movie movie,String dateString){
         Date date=DateUtils.createDateFromDateString(dateString);
-        Date dateStart=new Date(date.getTime());
-        dateStart.setHours(0);
-        dateStart.setMinutes(0);
-        Date dateEnd=new Date(date.getTime());
-        dateEnd.setHours(23);
-        dateEnd.setMinutes(59);
-        List<MovieShow> shows= movieShowRepository.findAllByMovIdAndDateBetween(movie.getMovId(),dateStart,dateEnd);
+        Date[] betweenDates=getBetweenDates(date);
+        List<MovieShow> shows= movieShowRepository.findAllByMovIdAndDateBetween(movie.getMovId(),betweenDates[0],betweenDates[1]);
         for(MovieShow show : shows) {
             System.out.println("Show at: "+show.getDate());
         }
@@ -61,18 +57,47 @@ public class MovieShowService {
         movieShowRepository.deleteById(showid);
     }
 
+    public List<MovieShow> getShowsForDate(Date date) {
+        System.out.println("Getting MovieShows for: "+date);
+        Date[] betweenDates=getBetweenDates(date);
+        List<MovieShow> shows=movieShowRepository.findAllByDateBetween(betweenDates[0],betweenDates[1]);
+        return shows;
+    }
+
+    private Date[] getBetweenDates(Date date){
+        Date dateStart=new Date(date.getTime());
+        dateStart.setHours(0);
+        dateStart.setMinutes(0);
+        Date dateEnd=new Date(date.getTime());
+        dateEnd.setHours(23);
+        dateEnd.setMinutes(59);
+        return new Date[]{dateStart,dateEnd};
+    }
+
+    public MovieShow saveShow(MovieShow show) {
+        return movieShowRepository.save(show);
+    }
+
+    public Optional<MovieShow> queryShow(Long id) {
+        Optional<MovieShow> show=movieShowRepository.findById(id);
+        return show;
+    }
+
+    public void deleteById(Long id) {
+        movieShowRepository.deleteById(id);
+    }
    /* public List<Movie> getAllMovies(){
-        List<Movie> movies=movieShowRepository.findAll();
-        return loadTmdbMovies(movies);
+        List<Movie> shows=movieShowRepository.findAll();
+        return loadTmdbMovies(shows);
     }
 
     public List<Movie> queryAllMovies(String queryName){
-        List<Movie> movies=movieShowRepository.findAllByNameContains(queryName);
-        return loadTmdbMovies(movies);
+        List<Movie> shows=movieShowRepository.findAllByNameContains(queryName);
+        return loadTmdbMovies(shows);
     }
 
-    private List<Movie> loadTmdbMovies(List<Movie> movies){
-        for(Movie movie : movies) {
+    private List<Movie> loadTmdbMovies(List<Movie> shows){
+        for(Movie movie : shows) {
             if(movie.getTmdbId()== null) {
                 System.out.println("Updating: "+movie.getName());
                 movie.setTmdbMovie(tmdbApiService.getMovieFromTmdb(movie));
@@ -81,7 +106,7 @@ public class MovieShowService {
                 System.out.println("Already loaded: "+movie.getName());
             }
         }
-        return movies;
+        return shows;
 
     }
 

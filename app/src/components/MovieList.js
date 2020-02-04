@@ -1,24 +1,27 @@
 import React, {Component, useState} from 'react';
-import {Button, ButtonGroup, Container, ModalHeader, ModalBody,Modal,ModalFooter,Table} from 'reactstrap';
+import {Button, ButtonGroup, Container, ModalHeader, ModalBody,Modal,ModalFooter,Table,Input} from 'reactstrap';
 import AppNavbar from '../AppNavbar';
 import { Link } from 'react-router-dom';
 import MovieModal from "./modal/MovieModal";
 import Moment from 'moment';
 
 
-
+/** /shows page
+ * Shows Movies + ADD/REMOVE Movies*/
 class MovieList extends Component {
+
     constructor(props) {
         super(props);
         this.state = {movies: [], isLoading: true};
         this.remove = this.remove.bind(this);
+        this.searchQuery="";
     }
 
-    /** Initial load all movies*/
+    /** Initial load all shows*/
     componentDidMount() {
         this.setState({isLoading: true});
 
-        fetch('api/movies')
+        fetch('api/shows')
             .then(response => response.json())
             .then(data => this.setState({movies: data, isLoading: false}));
     }
@@ -37,7 +40,7 @@ class MovieList extends Component {
         });
     }
 
-    /** Add movie from Modal entered name and reload movies*/
+    /** Add movie from Modal entered name and reload shows*/
     addMovie(name) {
         console.log("Add " +name);
         var result=
@@ -48,23 +51,29 @@ class MovieList extends Component {
             },
             body:JSON.stringify({name: name})
         }).then(function(){
-              return fetch('api/movies')
+              return fetch('api/shows?name='+this.searchQuery.value)
                 .then(response =>  response.json());
-        });
+        }.bind(this));
         result.then(function(movies){this.setState({movies: movies, isLoading: false});}.bind(this));
     }
 
+    /** Submit search if pressed enter in searchquery field*/
+    handleKeyPress(ev){
+        if(ev.charCode==13){ //Enter pressed?
+            console.log("Search: "+this.searchQuery.value);
+            fetch('api/shows?name='+this.searchQuery.value)
+                .then(response => response.json())
+                .then(data => this.setState({movies: data}));
+        }
+    }
 
     render() {
         const {movies, isLoading} = this.state;
-
         if (isLoading) {
             return <p>Loading...</p>;
         }
-
         const movieList = movies.map(movie => {
             const descript = `${movie.description}`;
-
             return <tr key={movie.movId}>
                 <td><img src={movie.posterUrl} className={'img-fluid'} alt="Responsive image"/></td>
                 <td >{movie.name}</td>
@@ -74,7 +83,7 @@ class MovieList extends Component {
                 </td>
                 <td>
                     <ButtonGroup>
-                        <Button size="sm" color="primary" tag={Link} to={"/movies/" + movie.movId}>Edit</Button>
+                        <Button size="sm" color="primary" tag={Link} to={"/shows/" + movie.movId}>Edit</Button>
                         <Button size="sm" color="danger" onClick={() => this.remove(movie.movId)}>Delete</Button>
                     </ButtonGroup>
                 </td>
@@ -90,7 +99,8 @@ class MovieList extends Component {
                     <div className="float-right">
                         <MovieModal onSubmit={this.addMovie.bind(this)}/>
                     </div>
-                    <h3>My JUG Tour</h3>
+                    <h3>Movies</h3>
+                    <Input type="text" innerRef={ref=>this.searchQuery=ref} onKeyPress={this.handleKeyPress.bind(this)} />
                     <Table className="mt-5">
                         <thead>
                         <tr>
