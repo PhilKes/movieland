@@ -1,5 +1,5 @@
-import React, {Component, useState} from 'react';
-import {Button, ButtonGroup, Container, ModalHeader, ModalBody,Modal,ModalFooter,Table,Input} from 'reactstrap';
+import React, {Component} from 'react';
+import {Button, ButtonGroup, Container,Table,Input} from 'reactstrap';
 import AppNavbar from '../AppNavbar';
 import { Link } from 'react-router-dom';
 import MovieModal from "./modal/MovieModal";
@@ -21,7 +21,7 @@ class MovieList extends Component {
     componentDidMount() {
         this.setState({isLoading: true});
 
-        fetch('api/shows')
+        fetch('api/movies')
             .then(response => response.json())
             .then(data => this.setState({movies: data, isLoading: false}));
     }

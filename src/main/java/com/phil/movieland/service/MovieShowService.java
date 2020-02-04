@@ -56,6 +56,10 @@ public class MovieShowService {
         System.out.println("Deleting: "+showid);
         movieShowRepository.deleteById(showid);
     }
+     public void deleteAllMovieShows(){
+            System.out.println("Deleting all Shows");
+            movieShowRepository.deleteAll();
+        }
 
     public List<MovieShow> getShowsForDate(Date date) {
         System.out.println("Getting MovieShows for: "+date);

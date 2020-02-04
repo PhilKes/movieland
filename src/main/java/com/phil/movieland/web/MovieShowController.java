@@ -44,6 +44,7 @@ public class MovieShowController {
 
     @PostMapping("/show")
     public ResponseEntity<MovieShow> postMovieShow(@RequestBody MovieShow show) throws URISyntaxException {
+        System.out.println("Post Show( MovId:"+show.getMovId()+" Date: "+show.getDate());
        MovieShow result= movieShowService.saveShow(show);
         return ResponseEntity.created(new URI("/api/show/" + result.getShowId()))
                 .body(result);
@@ -68,4 +69,9 @@ public class MovieShowController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/shows")
+    public ResponseEntity<?> deleteShows() {
+        movieShowService.deleteAllMovieShows();
+        return ResponseEntity.ok().build();
+    }
 }

@@ -11,6 +11,7 @@ class Home extends Component {
                 <AppNavbar/>
                 <Container fluid>
                     <Button color="link"><Link to="/movies">Manage Movies</Link></Button>
+                    <Button color="link"><Link to="/shows">Manage Shows</Link></Button>
                 </Container>
             </div>
         );
