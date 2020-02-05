@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/** Service for Tmdb Api interface*/
 @Service
 public class TmdbApiService {
     public static final String POSTER_BASE_URL="https://image.tmdb.org/t/p/w185/";
@@ -27,7 +28,18 @@ public class TmdbApiService {
                 return results.get(0);
             }
         }
-        MovieDb movieDb= tmdbMovies.getMovie(movie.getTmdbId().intValue(),"en");
-        return movieDb;
+        return tmdbMovies.getMovie(movie.getTmdbId().intValue(),"en");
+    }
+
+    public List<MovieDb> getMoviesFromTmdb(String name){
+        MovieResultsPage resultsPage=tmdbApi.getSearch().searchMovie(name,null,"en",false,0);
+        List<MovieDb> results=resultsPage.getResults();
+        return results;
+    }
+
+    public List<MovieDb> getTop10Movies(){
+
+        //return tmdbApi.getMovies().getTopRatedMovies("en",0).getResults().subList(0,10);
+        return tmdbApi.getMovies().getNowPlayingMovies("en",0,"US").getResults().subList(0,10);
     }
 }

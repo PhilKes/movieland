@@ -32,11 +32,10 @@ public class Movie {
     @Column(name="TMDB_ID")
     private Long tmdbId;
 
+    //Additional info, actors,... from TMDB
     @Transient //Ignore for Persistence in Database
     @JsonIgnore
     private MovieDb tmdbMovie;
-
-    //Additional info, actors,... from TMDB
 
     public long getMovId() {
         return movId;

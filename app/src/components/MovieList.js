@@ -1,18 +1,18 @@
 import React, {Component} from 'react';
-import {Button, ButtonGroup, Container,Table,Input} from 'reactstrap';
+import {Button, ButtonGroup, Container, Table, Input, Alert} from 'reactstrap';
 import AppNavbar from '../AppNavbar';
 import { Link } from 'react-router-dom';
 import MovieModal from "./modal/MovieModal";
 import Moment from 'moment';
 
 
-/** /shows page
+/** /movies page Component
  * Shows Movies + ADD/REMOVE Movies*/
 class MovieList extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {movies: [], isLoading: true};
+        this.state = {movies: [], isLoading: true,error: ""};
         this.remove = this.remove.bind(this);
         this.searchQuery="";
     }
@@ -41,34 +41,49 @@ class MovieList extends Component {
     }
 
     /** Add movie from Modal entered name and reload shows*/
-    addMovie(name) {
-        console.log("Add " +name);
+    addMovie(movie) {
+        console.log("Add " +movie.name);
         var result=
             fetch(`/api/movie`, {
             method: 'POST',
             headers: {
+                'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body:JSON.stringify({name: name})
-        }).then(function(){
-              return fetch('api/shows?name='+this.searchQuery.value)
-                .then(response =>  response.json());
-        }.bind(this));
-        result.then(function(movies){this.setState({movies: movies, isLoading: false});}.bind(this));
+            body:JSON.stringify(movie)
+        }).then(response=> {
+            if (response.ok) {
+                console.log("Ok response")
+                //TODO Catch exception if movie already there
+                return fetch('api/movies?name=' + this.searchQuery.value)
+                    .then(response => response.json())
+                    .then(movies=>{
+                        this.setState({movies: movies, isLoading: false})
+                    });
+
+            }else {
+                console.log("Bad response")
+                return response.json()
+                    .then(err => {
+                        console.log(err.msg);
+                        this.setState({error: err.msg});
+                    });
+            }
+            });
     }
 
     /** Submit search if pressed enter in searchquery field*/
     handleKeyPress(ev){
         if(ev.charCode==13){ //Enter pressed?
             console.log("Search: "+this.searchQuery.value);
-            fetch('api/shows?name='+this.searchQuery.value)
+            fetch('api/movies?name='+this.searchQuery.value)
                 .then(response => response.json())
                 .then(data => this.setState({movies: data}));
         }
     }
 
     render() {
-        const {movies, isLoading} = this.state;
+        const {movies, isLoading, error} = this.state;
         if (isLoading) {
             return <p>Loading...</p>;
         }
@@ -83,7 +98,7 @@ class MovieList extends Component {
                 </td>
                 <td>
                     <ButtonGroup>
-                        <Button size="sm" color="primary" tag={Link} to={"/shows/" + movie.movId}>Edit</Button>
+                       {/* <Button size="sm" color="primary" tag={Link} to={"/shows/" + movie.movId}>Edit</Button>*/}
                         <Button size="sm" color="danger" onClick={() => this.remove(movie.movId)}>Delete</Button>
                     </ButtonGroup>
                 </td>
@@ -99,8 +114,11 @@ class MovieList extends Component {
                     <div className="float-right">
                         <MovieModal onSubmit={this.addMovie.bind(this)}/>
                     </div>
-                    <h3>Movies</h3>
-                    <Input type="text" innerRef={ref=>this.searchQuery=ref} onKeyPress={this.handleKeyPress.bind(this)} />
+                    <h2>Movies</h2><br/>
+                    <Input type="text" placeholder="Search Movies" innerRef={ref=>this.searchQuery=ref} onKeyPress={this.handleKeyPress.bind(this)} /><br/>
+                    <Alert color="danger" isOpen={error.length>0} toggle={()=>this.setState({error: ""})}>
+                        {error}
+                    </Alert>
                     <Table className="mt-5">
                         <thead>
                         <tr>

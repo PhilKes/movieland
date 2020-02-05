@@ -1,17 +1,12 @@
-package com.phil.movieland.web;
+package com.phil.movieland.rest;
 
-import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
-import com.phil.movieland.service.MovieService;
 import com.phil.movieland.service.MovieShowService;
 import com.phil.movieland.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -21,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+/** REST Controller for MovieShows*/
 @RestController
 @RequestMapping("/api")
 public class MovieShowController {

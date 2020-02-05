@@ -15,6 +15,7 @@ import {Link} from "react-router-dom";
 import {faSearch, faClock} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
+/** Modal for adding a new MovieShow with movieId + time*/
 export default class MovieShowModal extends React.Component {
 
     constructor(props) {
@@ -44,6 +45,7 @@ export default class MovieShowModal extends React.Component {
         this.setState({name: event.target.value});
     }
 
+    /** Send movId + time back to page*/
     handleSubmit(ev) {
         ev.preventDefault();
         if (this.state.selMovId.length < 1)
@@ -90,7 +92,6 @@ export default class MovieShowModal extends React.Component {
                                         </InputGroupAddon>
                                         <Input type="time"
                                                defaultValue={Moment().format("HH:mm")}
-                                               placeholder="time placeholder"
                                                style={{width: 'auto'}}
                                                name="time"/>
                                     </InputGroup><br/>
@@ -101,6 +102,7 @@ export default class MovieShowModal extends React.Component {
                                             </InputGroupText>
                                         </InputGroupAddon>
                                         <Input placeholder="Search" type="text"
+                                               placeholder="Search Movies"
                                                value={this.state.name}
                                                onChange={this.handleChangeName}
                                                className="form-control"/>

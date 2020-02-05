@@ -84,6 +84,7 @@ class MovieShowList extends Component {
 
     /** Remove movie with movieid=id*/
     async remove(ev) {
+        //TODO Just edit time, do not completely remove
         ev.preventDefault();
         const data= new FormData(ev.target);
         let id=data.get('showId');
@@ -101,8 +102,7 @@ class MovieShowList extends Component {
         });
     }
 
-
-    /** Add movie from Add Action*/
+    /** Add show from Add Action*/
     addShow(ev) {
         ev.preventDefault();
         const data= new FormData(ev.target);
@@ -111,7 +111,7 @@ class MovieShowList extends Component {
         this.postShow(show);
     }
 
-    /** Add movie from Modal entered name*/
+    /** Add Show from Modal entered name*/
     addShowModal(showModal) {
         let date= Moment(this.dateParam+' '+showModal.time);
         let show= {movId: showModal.movId, date: date};
@@ -138,27 +138,22 @@ class MovieShowList extends Component {
             });
     }
 
-    /** Submit search if pressed enter in searchquery field*/
-    handleKeyPress(ev){
-        if(ev.charCode==13){ //Enter pressed?
-            console.log("Search: "+this.searchQuery.value);
-            fetch('api/shows?name='+this.searchQuery.value)
-                .then(response => response.json())
-                .then(data => this.setState({movies: data}));
-        }
-    }
-
     render() {
         const {shows,movies, isLoading} = this.state;
         if (isLoading) {
             return <p>Loading...</p>;
         }
 
+        /** Generate table rows for each movie containing its shows on dateParam*/
         const movieList = Object.keys(movies).map(id => {
             return <tr key={movies[id].movId}>
                 <td><img src={movies[id].posterUrl} className={'img-fluid'} alt="Responsive image"/></td>
-                <td >{movies[id].name}</td>
-
+                <td>
+                    <div className="row">
+                        <h5>{movies[id].name}</h5>
+                    </div>
+                    <div className="row">{movies[id].description}</div>
+                </td>
                 <td>
                     <Table borderless size="sm">
                         <tbody>
@@ -189,8 +184,9 @@ class MovieShowList extends Component {
                     <Form onSubmit={this.addShow.bind(this)}>
                         <InputGroup>
                             <Input type="time"  defaultValue={Moment().format("HH:mm")}
-                                placeholder="time placeholder"
-                                name="time"
+                                   style={{width: 'auto'}}
+                                    placeholder="time placeholder"
+                                    name="time"
                             />
                             <Input type="hidden" name="movId" value={movies[id].movId}/>
                             <InputGroupAddon addonType="append">
@@ -219,13 +215,13 @@ class MovieShowList extends Component {
                             style={{width: 'auto'}}
                         />
                     </FormGroup>
-                    <Table className="mt-5">
+                    <Table >
                         <thead>
                         <tr>
-                            <th width="20%">Poster</th>
-                            <th width="30%">Movie Name</th>
+                            <th width="200px">Poster</th>
+                            <th width="25%">Movie Name</th>
                             <th width="10%">Times</th>
-                            <th width="15%">Actions</th>
+                            <th width="25%">Actions</th>
                         </tr>
                         </thead>
                         <tbody>

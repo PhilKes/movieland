@@ -1,4 +1,4 @@
-package com.phil.movieland.web;
+package com.phil.movieland.rest;
 
 import com.phil.movieland.service.ReservationService;
 import org.junit.Test;

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+/** Service to interface movieShowRepository */
 @Service
 public class MovieShowService {
 
@@ -90,32 +91,5 @@ public class MovieShowService {
     public void deleteById(Long id) {
         movieShowRepository.deleteById(id);
     }
-   /* public List<Movie> getAllMovies(){
-        List<Movie> shows=movieShowRepository.findAll();
-        return loadTmdbMovies(shows);
-    }
-
-    public List<Movie> queryAllMovies(String queryName){
-        List<Movie> shows=movieShowRepository.findAllByNameContains(queryName);
-        return loadTmdbMovies(shows);
-    }
-
-    private List<Movie> loadTmdbMovies(List<Movie> shows){
-        for(Movie movie : shows) {
-            if(movie.getTmdbId()== null) {
-                System.out.println("Updating: "+movie.getName());
-                movie.setTmdbMovie(tmdbApiService.getMovieFromTmdb(movie));
-                updateMovie(movie);
-            }else{
-                System.out.println("Already loaded: "+movie.getName());
-            }
-        }
-        return shows;
-
-    }
-
-    private void updateMovie(Movie movie) {
-        movieShowRepository.save(movie);
-    }*/
 
 }
