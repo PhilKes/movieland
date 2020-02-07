@@ -7,6 +7,7 @@ import MovieShowList from './components/MovieShowList';
 import LoginComponent from "./components/LoginComponent";
 import AuthenticatedRoute from "./components/AuthenticatedRoute";
 import history from './history';
+import RegisterComponent from "./components/RegisterComponent";
 
 class App extends Component {
     render() {
@@ -20,6 +21,7 @@ class App extends Component {
                     <AuthenticatedRoute path='/shows' exact={true} component={MovieShowList}/>
                     <AuthenticatedRoute path="/movies" exact component={MovieList}/>
                     <Route path='/login' exact={true} component={LoginComponent}/>
+                    <Route path='/register' exact={true} component={RegisterComponent}/>
                 </Switch>
             </Router>
         )

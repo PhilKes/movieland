@@ -38,7 +38,6 @@ class AuthenticationService {
     setupaxiosInterceptors(token) {
         axios.interceptors.request.use(
             (config) => {
-                console.log("Intercepted");
                 if (this.isUserLoggedIn()) {
                     config.headers.authorization = token
                 }
@@ -50,10 +49,8 @@ class AuthenticationService {
     isUserLoggedIn() {
         let token = sessionStorage.getItem("JWT_TOKEN");
         if (token === null) {
-            console.log("not logged in");
             return false
         }
-        console.log("logged in");
         this.setupaxiosInterceptors(this.createJwtAuthHeader(token))
         return true
     }
