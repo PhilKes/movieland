@@ -4,7 +4,10 @@ import AppNavbar from '../AppNavbar';
 import { Link } from 'react-router-dom';
 import MovieModal from "./modal/MovieModal";
 import Moment from 'moment';
+import axios from "axios";
 
+const INSTRUCTOR = 'admin';
+const PASSWORD = 'admin';
 
 /** /movies page Component
  * Shows Movies + ADD/REMOVE Movies*/
@@ -21,20 +24,15 @@ class MovieList extends Component {
     componentDidMount() {
         this.setState({isLoading: true});
 
-        fetch('api/movies')
-            .then(response => response.json())
+        axios.get('api/movies')
+            .then(res => res.data)
             .then(data => this.setState({movies: data, isLoading: false}));
     }
 
     /** Remove movie with movieid=id*/
     async remove(id) {
-        await fetch(`/api/movie/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }).then(() => {
+        await axios.delete(`/api/movie/${id}`)
+            .then(() => {
             let updatedMovies = [...this.state.movies].filter(i => i.movId !== id);
             this.setState({movies: updatedMovies});
         });
@@ -44,41 +42,34 @@ class MovieList extends Component {
     addMovie(movie) {
         console.log("Add " +movie.name);
         var result=
-            fetch(`/api/movie`, {
-            method: 'POST',
-            headers: {
+            axios.post(`/api/movie`, JSON.stringify(movie),
+                {
+                    headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body:JSON.stringify(movie)
-        }).then(response=> {
-            if (response.ok) {
-                console.log("Ok response")
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    console.log(response)
                 //TODO Catch exception if movie already there
-                return fetch('api/movies?name=' + this.searchQuery.value)
-                    .then(response => response.json())
-                    .then(movies=>{
-                        this.setState({movies: movies, isLoading: false})
+                    return axios.get('api/movies?name=' + this.searchQuery.value)
+                        .then(resp => {
+                            this.setState({movies: resp.data, isLoading: false})
                     });
+                })
+                .catch(err => {
+                    console.log(err.response.data.msg);
+                    this.setState({error: err.response.data.msg});
 
-            }else {
-                console.log("Bad response")
-                return response.json()
-                    .then(err => {
-                        console.log(err.msg);
-                        this.setState({error: err.msg});
-                    });
-            }
-            });
+                });
     }
 
     /** Submit search if pressed enter in searchquery field*/
     handleKeyPress(ev){
         if(ev.charCode==13){ //Enter pressed?
             console.log("Search: "+this.searchQuery.value);
-            fetch('api/movies?name='+this.searchQuery.value)
-                .then(response => response.json())
-                .then(data => this.setState({movies: data}));
+            axios.get('api/movies?name=' + this.searchQuery.value)
+                .then(resp => this.setState({movies: resp.data}));
         }
     }
 

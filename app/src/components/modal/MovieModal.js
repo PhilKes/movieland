@@ -10,6 +10,7 @@ import {
     Input,
     Container, Form
 } from 'reactstrap';
+import axios from "axios";
 
 /** Modal for adding a new Movie by name*/
 export default class MovieModal extends React.Component {
@@ -28,8 +29,8 @@ export default class MovieModal extends React.Component {
 
     toggle() {
         if(this.state.name==''){
-            fetch('api/movies/tmdb/top')
-                .then(response => response.json())
+            axios.get('api/movies/tmdb/top')
+                .then(res => res.data)
                 .then(data => this.setState({movies: data}));
         }
         this.setState({
@@ -58,8 +59,8 @@ export default class MovieModal extends React.Component {
     handleKeyPress(ev){
         if(ev.charCode==13){ //Enter pressed?
             console.log("Search: "+this.searchQuery.value);
-            fetch('api/movies/tmdb?name='+this.searchQuery.value)
-                .then(response => response.json())
+            axios.get('api/movies/tmdb?name=' + this.searchQuery.value)
+                .then(res => res.data)
                 .then(data => this.setState({movies: data}));
         }
     }

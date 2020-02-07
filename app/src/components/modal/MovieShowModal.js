@@ -14,6 +14,7 @@ import Moment from "moment";
 import {Link} from "react-router-dom";
 import {faSearch, faClock} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import axios from "axios";
 
 /** Modal for adding a new MovieShow with movieId + time*/
 export default class MovieShowModal extends React.Component {
@@ -30,9 +31,8 @@ export default class MovieShowModal extends React.Component {
     componentDidMount() {
         this.setState({isLoading: true});
 
-        fetch('api/movies')
-            .then(response => response.json())
-            .then(data => this.setState({movies: data, isLoading: false}));
+        axios.get('api/movies')
+            .then(data => this.setState({movies: data.data, isLoading: false}));
     }
 
     toggle() {

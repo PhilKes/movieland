@@ -11,6 +11,7 @@ import MovieShowModal from "./modal/MovieShowModal";
 import Moment from 'moment';
 import {faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 
 /** /shows page
  * Shows MovieShows by Date + ADD/REMOVE Shows*/
@@ -56,49 +57,38 @@ class MovieShowList extends Component {
 
     /** Fetch Shows for date and fetch referenced Movies*/
     updateShowList() {
-        fetch('api/shows?date='+this.dateParam)
-            .then(response => response.json())
-            .then(shows=>{
-                let movies={};
-                shows.reduce(
-                    (chain, show) =>{
-                        // append the promise creating function to the chain
-                        console.log("Fetching ShowId: "+show.showId);
-                        return chain.then(() =>{
+        axios.get('api/shows?date=' + this.dateParam)
+            .then(res => {
+                let promises = [];
+                let movies = {};
+                let shows = res.data;
+                shows.forEach(
+                    (show) => {
                             if(movies[show.movId]==null) {
-                                return fetch('api/movie/' + show.movId)
-                                    .then(response => {
-                                        return response.json();
-                                    })
-                                    .then(movie=>movies[movie.movId]= movie);
+                                promises.push(
+                                    axios.get('api/movie/' + show.movId)
+                                        .then(movie => movies[movie.data.movId] = movie.data));
                             }
-                        })},
-                    // start the promise chain from a resolved promise
-                    Promise.resolve()
-                ).then(() => {
+                    });
+                axios.all(promises).then(res => {
                     shows=shows.sort((a,b)=> Moment(a.date).diff(b.date));
                     this.setState({shows: shows,movies: movies, isLoading: false});
-                });
+                })
             });
     }
 
-    /** Remove movie with movieid=id*/
+    /** Remove movie with movieid=id */
     async remove(ev) {
         //TODO Just edit time, do not completely remove
         ev.preventDefault();
         const data= new FormData(ev.target);
         let id=data.get('showId');
         console.log("Remove Show: "+id);
-        await fetch(`/api/show/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }).then(() => {
-            let updatedShows = [...this.state.shows].filter(i => i.showId+"" !== id+"");
-            updatedShows=updatedShows.sort((a,b)=> Moment(a.date).diff(b.date));
-            this.setState({shows: updatedShows});
+        await axios.delete(`/api/show/${id}`)
+            .then(() => {
+                let updatedShows = [...this.state.shows].filter(i => i.showId + "" !== id + "");
+                updatedShows = updatedShows.sort((a, b) => Moment(a.date).diff(b.date));
+                this.setState({shows: updatedShows});
         });
     }
 
@@ -121,15 +111,14 @@ class MovieShowList extends Component {
     /** Post show to API and reload shows*/
     postShow(show){
         console.log("Add Show: MovId:"+show.movId+" DateTime: "+show.date.format('YYYY-MM-DD HH:mm'));
-        fetch(`/api/show`, {
-            method: 'POST',
-            headers: {
+        axios.post(`/api/show`,
+            JSON.stringify({movId: show.movId, date: show.date}),
+            {
+                headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body:JSON.stringify({movId: show.movId, date:show.date})
-        })
-            .then(response=>response.json())
+                    'Accept': 'application/json'
+                }
+            })
             .then(show=>{
                 /*let shows=this.state.shows;
                 shows.push(show);
@@ -146,6 +135,7 @@ class MovieShowList extends Component {
 
         /** Generate table rows for each movie containing its shows on dateParam*/
         const movieList = Object.keys(movies).map(id => {
+            console.log("Render movie: " + movies[id].name)
             return <tr key={movies[id].movId}>
                 <td><img src={movies[id].posterUrl} className={'img-fluid'} alt="Responsive image"/></td>
                 <td>
