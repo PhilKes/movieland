@@ -12,6 +12,8 @@ import Moment from 'moment';
 import {faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import ErrorPage from "../ErrorPage";
+import LoadingPage from "../LoadingPage";
 
 /** /shows page
  * Shows MovieShows by Date + ADD/REMOVE Shows*/
@@ -19,7 +21,7 @@ class MovieShowList extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {shows: [], isLoading: true};
+        this.state = {shows: [], isLoading: true, timedout: false};
         this.remove = this.remove.bind(this);
         this.searchQuery="";
         this.params =new URLSearchParams(this.props.location.search);
@@ -74,7 +76,8 @@ class MovieShowList extends Component {
                     shows=shows.sort((a,b)=> Moment(a.date).diff(b.date));
                     this.setState({shows: shows,movies: movies, isLoading: false});
                 })
-            });
+            })
+            .catch(err => this.setState({timedout: true}));
     }
 
     /** Remove movie with movieid=id */
@@ -128,9 +131,12 @@ class MovieShowList extends Component {
     }
 
     render() {
-        const {shows,movies, isLoading} = this.state;
+        const {shows, movies, isLoading, timedout} = this.state;
+        if (timedout) {
+            return <ErrorPage/>
+        }
         if (isLoading) {
-            return <p>Loading...</p>;
+            return <LoadingPage/>;
         }
 
         /** Generate table rows for each movie containing its shows on dateParam*/

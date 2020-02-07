@@ -2,10 +2,8 @@ package com.phil.movieland.service;
 
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.Reservation;
-import com.phil.movieland.data.entity.User;
 import com.phil.movieland.data.repository.MovieRepository;
 import com.phil.movieland.data.repository.ReservationRepository;
-import com.phil.movieland.data.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +12,7 @@ import java.util.*;
 @Service
 public class ReservationService {
 
-    private final UserRepository userRepository;
+   /* private final UserRepository userRepository;
     private final MovieRepository movieRepository;
     private final ReservationRepository reservationRepository;
 
@@ -23,7 +21,7 @@ public class ReservationService {
         this.userRepository=roomRepository;
         this.movieRepository=guestRepository;
         this.reservationRepository=reservationRepository;
-    }
+    }*/
 
     public List<Reservation> getReservationsOfUsername(String userName){
         /*Iterable<User> rooms = this.userRepository.findAll();
@@ -57,12 +55,13 @@ public class ReservationService {
                 return o1.getRoomName().compareTo(o2.getRoomName());
             }
         });*/
-        Optional<User> user=userRepository.findFirstByUserName(userName);
+       /* Optional<User> user=userRepository.findFirstByUserName(userName);
         if(user.isEmpty())
             return new ArrayList<>();
         List<Reservation> reservations=reservationRepository.findReservationByUserId(user.get().getUserId());
         System.out.println("Reservations for "+ userName+":");
         reservations.forEach(reservation -> System.out.println(reservations));
-        return reservations;
+        return reservations;*/
+        return null;
     }
 }

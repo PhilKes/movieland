@@ -6,6 +6,7 @@ import com.phil.movieland.service.MovieShowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -68,7 +69,8 @@ public class MovieController {
         return movie.map(response -> ResponseEntity.ok().body(response))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-    
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/movie")
     ResponseEntity<?> createMovie(@RequestBody Movie movie) throws URISyntaxException {
         try {
@@ -80,7 +82,8 @@ public class MovieController {
             return ResponseEntity.badRequest().body("{\"msg\":\""+e.getMessage()+"\"}");
         }
     }
-    
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/movie/{id}")
     ResponseEntity<Movie> updateMovie(@Valid @RequestBody Movie movie) {
         Movie result =null;
@@ -93,6 +96,7 @@ public class MovieController {
         return ResponseEntity.ok().body(result);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/movie/{id}")
     public ResponseEntity<?> deleteMovie(@PathVariable Long id) {
         movieService.deleteById(id);

@@ -4,7 +4,7 @@ import AuthenticatedRoute from "./AuthenticatedRoute";
 class AuthenticationService {
     executeBasicAuthenticationService(username, password) {
         return axios.get('api/auth', {
-                headers: {authorization: this.createBasicAuthToken(username, password)}
+            headers: {authorization: this.createBasicAuthToken(username, password)}
             }
         );
     }
@@ -17,12 +17,28 @@ class AuthenticationService {
         //let basicAuthHeader = 'Basic ' +  window.btoa(username + ":" + password)
         //console.log('registerSuccessfulLogin')
         sessionStorage.setItem("AUTH_USER", username)
-        this.setupAxiosInterceptors(this.createBasicAuthToken(username, password))
+        this.setupaxiosInterceptors(this.createBasicAuthToken(username, password))
     }
 
-    setupAxiosInterceptors(token) {
+    executeJwtAuthenticationService(username, password) {
+        return axios.post('api/auth/signin', {usernameOrEmail: username, password: password});
+    }
+
+    createJwtAuthHeader(token) {
+        return 'Bearer ' + token;
+    }
+
+    registerJwtSuccessfulLogin(token) {
+        //let basicAuthHeader = 'Basic ' +  window.btoa(username + ":" + password)
+        //console.log('registerSuccessfulLogin')
+        sessionStorage.setItem("JWT_TOKEN", token);
+        this.setupaxiosInterceptors(this.createJwtAuthHeader(token))
+    }
+
+    setupaxiosInterceptors(token) {
         axios.interceptors.request.use(
             (config) => {
+                console.log("Intercepted");
                 if (this.isUserLoggedIn()) {
                     config.headers.authorization = token
                 }
@@ -32,11 +48,13 @@ class AuthenticationService {
     }
 
     isUserLoggedIn() {
-        let user = sessionStorage.getItem("AUTH_USER")
-        if (user === null) {
+        let token = sessionStorage.getItem("JWT_TOKEN");
+        if (token === null) {
             console.log("not logged in");
             return false
         }
+        console.log("logged in");
+        this.setupaxiosInterceptors(this.createJwtAuthHeader(token))
         return true
     }
 }

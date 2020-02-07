@@ -6,6 +6,7 @@ import com.phil.movieland.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -37,7 +38,7 @@ public class MovieShowController {
         return shows;
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/show")
     public ResponseEntity<MovieShow> postMovieShow(@RequestBody MovieShow show) throws URISyntaxException {
         System.out.println("Post Show( MovId:"+show.getMovId()+" Date: "+show.getDate());
@@ -59,12 +60,14 @@ public class MovieShowController {
         return ResponseEntity.ok().body(result);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/show/{id}")
     public ResponseEntity<?> deleteShow(@PathVariable Long id) {
         movieShowService.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/shows")
     public ResponseEntity<?> deleteShows() {
         movieShowService.deleteAllMovieShows();

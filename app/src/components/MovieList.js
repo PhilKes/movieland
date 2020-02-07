@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import MovieModal from "./modal/MovieModal";
 import Moment from 'moment';
 import axios from "axios";
+import ErrorPage from "../ErrorPage";
+import LoadingPage from "../LoadingPage";
 
 const INSTRUCTOR = 'admin';
 const PASSWORD = 'admin';
@@ -15,7 +17,7 @@ class MovieList extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {movies: [], isLoading: true,error: ""};
+        this.state = {movies: [], isLoading: true, error: "", timedout: false};
         this.remove = this.remove.bind(this);
         this.searchQuery="";
     }
@@ -26,7 +28,9 @@ class MovieList extends Component {
 
         axios.get('api/movies')
             .then(res => res.data)
-            .then(data => this.setState({movies: data, isLoading: false}));
+            .then(data => this.setState({movies: data, isLoading: false}))
+            .catch(err => this.setState({timedout: true}))
+        ;
     }
 
     /** Remove movie with movieid=id*/
@@ -74,9 +78,12 @@ class MovieList extends Component {
     }
 
     render() {
-        const {movies, isLoading, error} = this.state;
+        const {movies, isLoading, error, timedout} = this.state;
+        if (timedout) {
+            return <ErrorPage/>
+        }
         if (isLoading) {
-            return <p>Loading...</p>;
+            return <LoadingPage/>;
         }
         const movieList = movies.map(movie => {
             const descript = `${movie.description}`;

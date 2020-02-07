@@ -10,7 +10,7 @@ class LoginComponent extends Component {
         super(props)
         this.state = {
             username: 'admin',
-            password: 'admin',
+            password: 'admin123',
             hasLoginFailed: false,
             showSuccessMessage: false
         }
@@ -38,11 +38,12 @@ class LoginComponent extends Component {
              this.setState({hasLoginFailed:true})
          }*/
         AuthService
-            .executeBasicAuthenticationService(this.state.username, this.state.password)
-            .then(() => {
+            .executeJwtAuthenticationService(this.state.username, this.state.password)
+            .then((resp) => {
                 console.log("Successfull login");
-                AuthenticationService.registerSuccessfulLogin(this.state.username, this.state.password)
-                history.push(`/movies`)
+                console.log("Token: " + resp.data.accessToken);
+                AuthenticationService.registerJwtSuccessfulLogin(resp.data.accessToken);
+                history.go(-1);
             }).catch(() => {
             this.setState({showSuccessMessage: false})
             this.setState({hasLoginFailed: true})
