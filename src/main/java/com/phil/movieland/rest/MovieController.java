@@ -96,6 +96,7 @@ public class MovieController {
         return ResponseEntity.ok().body(result);
     }
 
+    //TODO PREAUTHORIZATION??
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/movie/{id}")
     public ResponseEntity<?> deleteMovie(@PathVariable Long id) {

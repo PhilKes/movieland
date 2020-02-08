@@ -16,21 +16,19 @@ class App extends Component {
         super(props);
         this.state = {isLoggedIn: false, currUser: "admin"};
         this.setUserLogin = this.setUserLogin.bind(this);
-        this.loginComponent = React.createRef();
+        //Ref to call methods on navBar from App
+        this.navBar = React.createRef();
     }
 
     setUserLogin(loggedIn, currUser) {
-        console.log("LoggedIn: " + loggedIn);
-        console.log("User:" + currUser)
-        //this.setState({isLoggedIn: loggedIn, currUser: currUser});
-        this.loginComponent.setLoggedIn(loggedIn);
+        this.navBar.current.setLoggedIn(loggedIn, currUser);
+        this.setState({isLoggedIn: loggedIn, currUser: currUser});
     }
 
     render() {
-        console.log("render app")
         return (
             <div>
-                <AppNavbar currUser={this.state.currUser}/>
+                <AppNavbar ref={this.navBar} user={this.state.currUser} loggedIn={this.state.isLoggedIn}/>
                 <Switch>
                     <Route path='/' exact={true} >
                         <Redirect to='/movies' />
@@ -40,7 +38,7 @@ class App extends Component {
                     <AuthenticatedRoute path="/movies" exact component={MovieList}/>
                     <Route path='/login'
                            render={(props) => <LoginComponent onLogin={this.setUserLogin}
-                                                              ref={this.loginComponent} {...props} />}
+                                                              {...props} />}
                     />
 
                     <Route path='/register' exact={true} component={RegisterComponent}/>

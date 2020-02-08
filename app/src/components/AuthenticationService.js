@@ -3,7 +3,6 @@ import AuthenticatedRoute from "./AuthenticatedRoute";
 
 class AuthenticationService {
 
-
     constructor() {
         this.userName = '';
     }
@@ -39,6 +38,11 @@ class AuthenticationService {
         //console.log('registerSuccessfulLogin')
         sessionStorage.setItem("JWT_TOKEN", token);
         this.setupaxiosInterceptors(this.createJwtAuthHeader(token))
+    }
+
+    logoutUser() {
+        sessionStorage.removeItem("JWT_TOKEN");
+        axios.interceptors.request.use(config => config);
     }
 
     setupaxiosInterceptors(token) {

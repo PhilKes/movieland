@@ -3,7 +3,7 @@ import AuthService from "./AuthenticationService";
 import history from '../history';
 import AuthenticationService from "./AuthenticationService";
 import AppNavbar from "../AppNavbar";
-import {Button, Container, FormFeedback, FormGroup, Input, Label} from "reactstrap";
+import {Alert, Button, Container, FormFeedback, FormGroup, Input, Label} from "reactstrap";
 import App from "../App";
 
 class LoginComponent extends Component {
@@ -46,11 +46,14 @@ class LoginComponent extends Component {
                 console.log("Token: " + resp.data.accessToken);
                 /*AuthenticationService.setUserName(this.state.username);*/
                 AuthenticationService.registerJwtSuccessfulLogin(resp.data.accessToken);
-                // this.props.parent.setState({isLoggedIn: true, currUser: this.state.username});
                 //TODO
                 this.props.onLogin(true, this.state.username);
-                //history.go(-1);
-                //history.go(-2);
+                this.setState({showSuccessMessage: true, hasLoginFailed: false});
+                if (window.location.pathname !== this.props.location.state.previous) {
+                    console.log("PUSH old")
+                    //history.push(this.props.location.state.previous);
+                }
+
             }).catch(() => {
             this.setState({showSuccessMessage: false})
             this.setState({hasLoginFailed: true})
@@ -59,30 +62,27 @@ class LoginComponent extends Component {
 
     render() {
         return (
-            <div>
-                <AppNavbar/>
-                <Container fluid>
-                    <h2>Login</h2>
-                    <div className="container">
-                        {this.state.hasLoginFailed && <div className="alert alert-warning">Invalid Credentials</div>}
-                        {this.state.showSuccessMessage && <div>Login Sucessful</div>}
-                        <FormGroup>
-                            <Label>Username</Label>
-                            <Input type="text" name="username"
-                                   className="col-md-4"
-                                   value={this.state.username}
-                                   onChange={this.handleChange}/>
-                            <Label>Password</Label>
-                            <Input type="password" name="password"
-                                   className="col-md-4"
-                                   value={this.state.password}
-                                   onChange={this.handleChange}/><br/>
-                            {/* <FormFeedback invalid>Invalid Credentials!</FormFeedback>*/}
-                            <Button className="btn btn-success" onClick={this.loginClicked}>Login</Button>
-                        </FormGroup>
-                    </div>
-                </Container>
-            </div>
+            <Container fluid>
+                <h2>Login</h2>
+                <div className="container">
+                    {this.state.hasLoginFailed && <Alert color="warning">Invalid Credentials</Alert>}
+                    {this.state.showSuccessMessage && <Alert color="success">Login Successful</Alert>}
+                    <FormGroup>
+                        <Label>Username</Label>
+                        <Input type="text" name="username"
+                               className="col-md-4"
+                               value={this.state.username}
+                               onChange={this.handleChange}/>
+                        <Label>Password</Label>
+                        <Input type="password" name="password"
+                               className="col-md-4"
+                               value={this.state.password}
+                               onChange={this.handleChange}/><br/>
+                        {/* <FormFeedback invalid>Invalid Credentials!</FormFeedback>*/}
+                        <Button className="btn btn-success" onClick={this.loginClicked}>Login</Button>
+                    </FormGroup>
+                </div>
+            </Container>
         )
     }
 }
