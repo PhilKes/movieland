@@ -105,9 +105,6 @@ class MovieList extends Component {
 
 
         return (
-
-            <div>
-                <AppNavbar/>
                 <Container fluid>
                     <div className="float-right">
                         <MovieModal onSubmit={this.addMovie.bind(this)}/>
@@ -132,7 +129,6 @@ class MovieList extends Component {
                         </tbody>
                     </Table>
                 </Container>
-            </div>
         );
     }
 }

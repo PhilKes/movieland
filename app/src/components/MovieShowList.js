@@ -196,9 +196,6 @@ class MovieShowList extends Component {
         });
 
         return (
-
-            <div>
-                <AppNavbar/>
                 <Container fluid>
                     <div className="float-right">
                         <MovieShowModal onSubmit={this.addShowModal.bind(this)}/>
@@ -225,7 +222,6 @@ class MovieShowList extends Component {
                         </tbody>
                     </Table>
                 </Container>
-            </div>
         );
     }
 

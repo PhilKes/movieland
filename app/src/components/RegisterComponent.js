@@ -78,8 +78,6 @@ class RegisterComponent extends Component {
         let {err} = this.state;
         let usernameErr = err === 3 ? (<div>Username already taken</div>) : (<div>At least 4 Characters</div>);
         return (
-            <div>
-                <AppNavbar/>
                 <Container fluid>
                     <h2>Register</h2>
                     <div className="container">
@@ -127,7 +125,6 @@ class RegisterComponent extends Component {
                         </Form>
                     </div>
                 </Container>
-            </div>
         )
     }
 }

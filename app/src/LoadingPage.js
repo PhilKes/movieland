@@ -14,12 +14,9 @@ export default class LoadingPage extends Component {
 
     render() {
         return (
-            <div>
-                <AppNavbar/>
                 <Container fluid>
                     <h4>Loading...</h4>
                 </Container>
-            </div>
         );
 
     }

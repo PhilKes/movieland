@@ -2,6 +2,12 @@ import axios from "axios";
 import AuthenticatedRoute from "./AuthenticatedRoute";
 
 class AuthenticationService {
+
+
+    constructor() {
+        this.userName = '';
+    }
+
     executeBasicAuthenticationService(username, password) {
         return axios.get('api/auth', {
             headers: {authorization: this.createBasicAuthToken(username, password)}
@@ -53,6 +59,13 @@ class AuthenticationService {
         }
         this.setupaxiosInterceptors(this.createJwtAuthHeader(token))
         return true
+    }
+
+    setUserName(username) {
+        this.userName = username;
+        if (this.isUserLoggedIn()) {
+
+        }
     }
 }
 

@@ -4,16 +4,18 @@ import history from '../history';
 import AuthenticationService from "./AuthenticationService";
 import AppNavbar from "../AppNavbar";
 import {Button, Container, FormFeedback, FormGroup, Input, Label} from "reactstrap";
+import App from "../App";
 
 class LoginComponent extends Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             username: 'admin',
             password: 'admin123',
             hasLoginFailed: false,
             showSuccessMessage: false
         }
+
         this.handleChange = this.handleChange.bind(this)
         this.loginClicked = this.loginClicked.bind(this)
     }
@@ -42,8 +44,13 @@ class LoginComponent extends Component {
             .then((resp) => {
                 console.log("Successfull login");
                 console.log("Token: " + resp.data.accessToken);
+                /*AuthenticationService.setUserName(this.state.username);*/
                 AuthenticationService.registerJwtSuccessfulLogin(resp.data.accessToken);
-                history.go(-1);
+                // this.props.parent.setState({isLoggedIn: true, currUser: this.state.username});
+                //TODO
+                this.props.onLogin(true, this.state.username);
+                //history.go(-1);
+                //history.go(-2);
             }).catch(() => {
             this.setState({showSuccessMessage: false})
             this.setState({hasLoginFailed: true})

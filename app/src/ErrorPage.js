@@ -13,13 +13,10 @@ export default class ErrorPage extends Component {
 
     render() {
         return (
-            <div>
-                <AppNavbar/>
                 <Container fluid>
                     <h2>Error</h2>
                     <b>{this.state.message}</b>
                 </Container>
-            </div>
         );
 
     }
