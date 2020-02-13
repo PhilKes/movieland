@@ -1,6 +1,7 @@
 import axios from "axios";
 import AuthenticatedRoute from "./AuthenticatedRoute";
 
+/** Service to generate Authorization request + storing JWT Token*/
 class AuthenticationService {
 
     constructor() {
@@ -9,7 +10,7 @@ class AuthenticationService {
 
     executeBasicAuthenticationService(username, password) {
         return axios.get('api/auth', {
-            headers: {authorization: this.createBasicAuthToken(username, password)}
+                headers: {authorization: this.createBasicAuthToken(username, password)}
             }
         );
     }
@@ -19,12 +20,11 @@ class AuthenticationService {
     }
 
     registerSuccessfulLogin(username, password) {
-        //let basicAuthHeader = 'Basic ' +  window.btoa(username + ":" + password)
-        //console.log('registerSuccessfulLogin')
         sessionStorage.setItem("AUTH_USER", username)
         this.setupaxiosInterceptors(this.createBasicAuthToken(username, password))
     }
 
+    /** Post Signin request, returns response with JWT Token  */
     executeJwtAuthenticationService(username, password) {
         return axios.post('api/auth/signin', {usernameOrEmail: username, password: password});
     }
@@ -33,6 +33,7 @@ class AuthenticationService {
         return 'Bearer ' + token;
     }
 
+    /** Store JWT Token in sessionStorage + add auth header to all future axios requests*/
     registerJwtSuccessfulLogin(token) {
         //let basicAuthHeader = 'Basic ' +  window.btoa(username + ":" + password)
         //console.log('registerSuccessfulLogin')
@@ -65,12 +66,6 @@ class AuthenticationService {
         return true
     }
 
-    setUserName(username) {
-        this.userName = username;
-        if (this.isUserLoggedIn()) {
-
-        }
-    }
 }
 
 export default new AuthenticationService();

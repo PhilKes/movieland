@@ -6,6 +6,7 @@ import AppNavbar from "../AppNavbar";
 import {Alert, Button, Container, FormFeedback, FormGroup, Input, Label} from "reactstrap";
 import App from "../App";
 
+/** Login Page for JWT Authentication generation*/
 class LoginComponent extends Component {
     constructor(props) {
         super(props);
@@ -28,17 +29,8 @@ class LoginComponent extends Component {
         )
     }
 
+    /** Execute Jwt Authentication and forward to last page if successful*/
     loginClicked() {
-        /* if(this.state.username==='admin' && this.state.password==='admin'){
-             /!*AuthService.registerSuccessfulLogin(this.state.username,this.state.password)*!/
-             this.props.history.push(`/movies`);
-             this.setState({showSuccessMessage:true})
-             this.setState({hasLoginFailed:false})
-         }
-         else {
-             this.setState({showSuccessMessage:false})
-             this.setState({hasLoginFailed:true})
-         }*/
         AuthService
             .executeJwtAuthenticationService(this.state.username, this.state.password)
             .then((resp) => {
@@ -46,12 +38,11 @@ class LoginComponent extends Component {
                 console.log("Token: " + resp.data.accessToken);
                 /*AuthenticationService.setUserName(this.state.username);*/
                 AuthenticationService.registerJwtSuccessfulLogin(resp.data.accessToken);
-                //TODO
                 this.props.onLogin(true, this.state.username);
                 this.setState({showSuccessMessage: true, hasLoginFailed: false});
                 if (window.location.pathname !== this.props.location.state.previous) {
-                    console.log("PUSH old")
-                    //history.push(this.props.location.state.previous);
+                    //TODO
+                    history.push(this.props.location.state.previous);
                 }
 
             }).catch(() => {

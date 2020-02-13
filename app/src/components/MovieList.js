@@ -1,5 +1,16 @@
 import React, {Component} from 'react';
-import {Button, ButtonGroup, Container, Table, Input, Alert} from 'reactstrap';
+import {
+    Button,
+    ButtonGroup,
+    Container,
+    Table,
+    Input,
+    Alert,
+    Carousel,
+    CarouselIndicators,
+    CarouselControl, CarouselCaption, CarouselItem, DropdownToggle, ListGroupItem, ListGroup, Row, Col
+} from 'reactstrap';
+import {Card} from "react-bootstrap";
 import AppNavbar from '../AppNavbar';
 import { Link } from 'react-router-dom';
 import MovieModal from "./modal/MovieModal";
@@ -7,9 +18,11 @@ import Moment from 'moment';
 import axios from "axios";
 import ErrorPage from "../ErrorPage";
 import LoadingPage from "../LoadingPage";
+import * as queryString from "query-string";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faUser, faVideo} from "@fortawesome/free-solid-svg-icons";
+import {faInfoCircle} from "@fortawesome/free-solid-svg-icons/faInfoCircle";
 
-const INSTRUCTOR = 'admin';
-const PASSWORD = 'admin';
 
 /** /movies page Component
  * Shows Movies + ADD/REMOVE Movies*/
@@ -17,113 +30,205 @@ class MovieList extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {movies: [], isLoading: true, error: "", timedout: false};
-        this.remove = this.remove.bind(this);
-        this.searchQuery="";
+        this.state = {
+            movies: [],
+            shows: [],
+            isLoading: true,
+            error: "",
+            timedout: false,
+            animating: false,
+            activeIndex: 0
+        };
+
     }
 
     /** Initial load all shows*/
     componentDidMount() {
         this.setState({isLoading: true});
-
+        //TODO get wide screen Posters for carousel
         axios.get('api/movies')
             .then(res => res.data)
-            .then(data => this.setState({movies: data, isLoading: false}))
+            .then(data => {
+                let ids = data.map(movie => movie.tmdbId);
+                axios.get('api/movies/tmdb/images', {
+                    params: {
+                        ids: ids
+                    },
+                    paramsSerializer: params => {
+                        return queryString.stringify(params)
+                    }
+                }).then(resp => {
+                    data = data.map(m => {
+                        //console.log("Img:"+resp.data[m.tmdbId]);
+                        m.backdrop = resp.data[m.tmdbId];
+                        return m;
+                    });
+                    this.getShows();
+                    this.setState({movies: data, isLoading: true});
+                })
+                //
+            })
             .catch(err => this.setState({timedout: true}))
         ;
     }
 
-    /** Remove movie with movieid=id*/
-    async remove(id) {
-        await axios.delete(`/api/movie/${id}`)
-            .then(() => {
-            let updatedMovies = [...this.state.movies].filter(i => i.movId !== id);
-            this.setState({movies: updatedMovies});
-        });
-    }
-
-    /** Add movie from Modal entered name and reload shows*/
-    addMovie(movie) {
-        console.log("Add " +movie.name);
-        var result=
-            axios.post(`/api/movie`, JSON.stringify(movie),
-                {
-                    headers: {
-                'Accept': 'application/json',
-                        'Content-Type': 'application/json'
+    getShows() {
+        axios.get('api/shows/week')
+            .then(res => res.data)
+            .then(shows => {
+                var movieShows = [];
+                console.log(shows)
+                shows.forEach(show => {
+                    let movId = show.movId;
+                    let day = Moment(show.date).format("dd");
+                    let time = Moment(show.date).format("HH:mm");
+                    if (movieShows[movId] == null) {
+                        movieShows[movId] = [];
+                        movieShows[movId]["Mo"] = [];
+                        movieShows[movId]["Di"] = [];
+                        movieShows[movId]["Mi"] = [];
+                        movieShows[movId]["Do"] = [];
+                        movieShows[movId]["Fr"] = [];
+                        movieShows[movId]["Sa"] = [];
+                        movieShows[movId]["So"] = [];
+                        movieShows[movId][day] = [];
+                        movieShows[movId][day][time] = show.showId;
+                    } else if (movieShows[movId][day] == null) {
+                        movieShows[movId][day] = [];
+                        movieShows[movId][day][time] = show.showId;
+                    } else {
+                        movieShows[movId][day][time] = show.showId;
                     }
-                })
-                .then(response => {
-                    console.log(response)
-                //TODO Catch exception if movie already there
-                    return axios.get('api/movies?name=' + this.searchQuery.value)
-                        .then(resp => {
-                            this.setState({movies: resp.data, isLoading: false})
-                    });
-                })
-                .catch(err => {
-                    console.log(err.response.data.msg);
-                    this.setState({error: err.response.data.msg});
-
+                    Object.keys(movieShows).map(key => console.log(key))
+                    console.log("Show Mov:" + movId + " on:" + day + " at:" + time + " Show: " + movieShows[movId][day][time]);
                 });
+                this.setState({shows: movieShows, isLoading: false});
+            })
+        /* .catch(err => {
+             console.log("Get shows failed")
+             this.setState({timedout: true})
+         })*/
+        ;
     }
 
-    /** Submit search if pressed enter in searchquery field*/
-    handleKeyPress(ev){
-        if(ev.charCode==13){ //Enter pressed?
-            console.log("Search: "+this.searchQuery.value);
-            axios.get('api/movies?name=' + this.searchQuery.value)
-                .then(resp => this.setState({movies: resp.data}));
-        }
-    }
+
 
     render() {
-        const {movies, isLoading, error, timedout} = this.state;
+        const {movies, isLoading, error, timedout, shows} = this.state;
         if (timedout) {
             return <ErrorPage/>
         }
         if (isLoading) {
             return <LoadingPage/>;
         }
-        const movieList = movies.map(movie => {
-            const descript = `${movie.description}`;
-            return <tr key={movie.movId}>
-                <td><img src={movie.posterUrl} className={'img-fluid'} alt="Responsive image"/></td>
-                <td >{movie.name}</td>
-                <td>{descript}</td>
-                <td>
-                   <div key={movie.movId}>{Moment(movie.date).format('DD.MM.YYYY')}</div>
-                </td>
-                <td>
-                    <ButtonGroup>
-                       {/* <Button size="sm" color="primary" tag={Link} to={"/shows/" + movie.movId}>Edit</Button>*/}
-                        <Button size="sm" color="danger" onClick={() => this.remove(movie.movId)}>Delete</Button>
-                    </ButtonGroup>
-                </td>
-            </tr>
+        movies.forEach(m => m.src = m.movId);
+        const moviesDisplayed = movies.slice(0, 5);
+        const showcaseList = moviesDisplayed.map(movie => {
+            return (<CarouselItem
+                onExiting={() => this.setState({animating: true})}
+                onExited={() => this.setState({animating: false})}
+                key={movie.movId}>
+                <img src={movie.backdrop} alt={movie.name}/>
+                <CarouselCaption captionText={movie.description} captionHeader={movie.name}/>
+            </CarouselItem>)
         });
 
+        const {activeIndex} = this.state;
+        const {animating} = this.state;
+
+        const next = () => {
+            if (animating) return;
+            const nextIndex = activeIndex === moviesDisplayed.length - 1 ? 0 : activeIndex + 1;
+            this.setState({activeIndex: nextIndex})
+        }
+
+        const previous = () => {
+            if (animating) return;
+            const nextIndex = activeIndex === 0 ? moviesDisplayed.length - 1 : activeIndex - 1;
+            this.setState({activeIndex: nextIndex})
+        }
+
+        const goToIndex = (newIndex) => {
+            if (animating) return;
+            this.setState({activeIndex: newIndex})
+        }
+
+        const movieList = movies.map(movie => {
+            if (shows[movie.movId] == null) {
+                return <Col key={movie.movId}/>;
+            }
+            const showList = Object.keys(shows[movie.movId]).map(day => {
+                    console.log("Day: " + day)
+                    const movieShowList = Object.keys(shows[movie.movId][day]).map(time => {
+                            console.log("Time: " + time)
+                            return (
+                                <ListGroupItem key={time}><a href={"/show/" + shows[movie.movId][day][time]}>
+                                    {time}</a></ListGroupItem>
+                            );
+                        }
+                    );
+                    return (
+                        <td key={movie.movId + "" + day}>
+                            <ListGroup>
+                                <ListGroupItem><h4>{day}</h4></ListGroupItem>
+                                {movieShowList}
+                            </ListGroup>
+                        </td>
+                    );
+                }
+            );
+            const descript = `${movie.description}`;
+            return (<tr key={movie.movId}>
+                <td>
+                    <Card border="light">
+                        <Card.Header as="h5">{movie.name}</Card.Header>
+                        <Card.Body>
+                            <Card.Img variant="top" src={movie.posterUrl} className="card-image text-center"/>
+                            <div style={{width: 185 + "px"}}>
+                                <ButtonGroup style={{display: "flex"}}>
+                                    <Button color="light" style={{flex: 1}}>
+                                        <FontAwesomeIcon icon={faInfoCircle}/>
+                                    </Button>
+                                    <Button color="light" style={{flex: 1}}>
+                                        <FontAwesomeIcon icon={faVideo}/>
+                                    </Button>
+                                </ButtonGroup>
+                            </div>
+                        </Card.Body>
+                    </Card>
+                    <br/>
+                    {/*<img src={movie.posterUrl} className={'img-fluid'} alt="Responsive image"/>*/}
+                </td>
+                <td>
+                    <Table borderless>
+                        <tr>
+                            {showList}
+                        </tr>
+                    </Table>
+                </td>
+            </tr>)
+        });
 
         return (
                 <Container fluid>
-                    <div className="float-right">
-                        <MovieModal onSubmit={this.addMovie.bind(this)}/>
-                    </div>
-                    <h2>Movies</h2><br/>
-                    <Input type="text" placeholder="Search Movies" innerRef={ref=>this.searchQuery=ref} onKeyPress={this.handleKeyPress.bind(this)} /><br/>
-                    <Alert color="danger" isOpen={error.length>0} toggle={()=>this.setState({error: ""})}>
-                        {error}
-                    </Alert>
+                    <h2>Newest Movies</h2><br/>
+                    <Carousel
+                        activeIndex={activeIndex}
+                        next={next}
+                        previous={previous}
+                    >
+                        <CarouselIndicators items={moviesDisplayed} activeIndex={activeIndex}
+                                            onClickHandler={goToIndex}/>
+                        {showcaseList}
+                        <CarouselControl direction="prev" directionText="Previous" onClickHandler={previous}/>
+                        <CarouselControl direction="next" directionText="Next" onClickHandler={next}/>
+                    </Carousel><br/><br/>
+                    <h2>This week</h2>
                     <Table className="mt-5">
-                        <thead>
                         <tr>
-                            <th width="15%">Poster</th>
-                            <th width="6%">Name</th>
-                            <th width="25%">Description</th>
-                            <th width="15%">Release Date</th>
-                            <th width="15%">Actions</th>
+                            <th width="15%"><h4>Movie</h4></th>
+                            <th width="50%"><h4>Shows</h4></th>
                         </tr>
-                        </thead>
                         <tbody>
                         {movieList}
                         </tbody>

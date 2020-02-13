@@ -1,8 +1,4 @@
 import React, {Component} from 'react'
-import AuthService from "./AuthenticationService";
-import history from '../history';
-import AuthenticationService from "./AuthenticationService";
-import AppNavbar from "../AppNavbar";
 import {
     Alert,
     Button,
@@ -28,14 +24,6 @@ class RegisterComponent extends Component {
             err: 0, // 0=no error, 1= password too short, 2= repeat doesnt match, 3= username taken, 4= missing fields
             showSuccessMessage: false
         }
-    }
-
-    handleChange(event) {
-        this.setState(
-            {
-                [event.target.name]: event.target.value
-            }
-        )
     }
 
     registerClicked(ev) {

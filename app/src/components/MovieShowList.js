@@ -212,7 +212,7 @@ class MovieShowList extends Component {
                         <thead>
                         <tr>
                             <th width="200px">Poster</th>
-                            <th width="25%">Movie Name</th>
+                            <th>Movie Name</th>
                             <th width="10%">Times</th>
                             <th width="25%">Actions</th>
                         </tr>

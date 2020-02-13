@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import './App.css';
 import Home from './Home';
 import {Router, Redirect, Route, Switch, withRouter} from 'react-router-dom';
-import MovieList from './components/MovieList';
+import MovieListEdit from './components/MovieListEdit';
 import MovieShowList from './components/MovieShowList';
 import LoginComponent from "./components/LoginComponent";
 import AuthenticatedRoute from "./components/AuthenticatedRoute";
 import history from './history';
 import RegisterComponent from "./components/RegisterComponent";
 import AppNavbar from "./AppNavbar";
+import MovieList from "./components/MovieList";
 
 class App extends Component {
 
@@ -35,7 +36,8 @@ class App extends Component {
                     </Route>
                     {/*<Route path='/movies' exact={true} component={MovieList}/>**/}
                     <AuthenticatedRoute path='/shows' exact={true} component={MovieShowList}/>
-                    <AuthenticatedRoute path="/movies" exact component={MovieList}/>
+                    <AuthenticatedRoute path="/movies/edit" exact component={MovieListEdit}/>
+                    <Route path='/movies' exact component={MovieList}/>
                     <Route path='/login'
                            render={(props) => <LoginComponent onLogin={this.setUserLogin}
                                                               {...props} />}
@@ -43,6 +45,11 @@ class App extends Component {
 
                     <Route path='/register' exact={true} component={RegisterComponent}/>
                 </Switch>
+                <footer className="footer">
+                    <div className="py-2">All images taken from{" "}
+                        <a href="https://www.themoviedb.org/" target="_blank">TMDB</a>
+                    </div>
+                </footer>
             </div>
         )
     }

@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /** REST Controller for Movies*/
 @RestController
@@ -61,6 +58,17 @@ public class MovieController {
     @GetMapping("/movies/tmdb/top")
     public Collection<Movie> getTmdbTopMovies(){
         return movieService.querTmdbTop10Movies();
+    }
+
+    @GetMapping("/movies/tmdb/images")
+    public HashMap<Long, String> getTmdbImages(@RequestParam(value="ids") List<Long> movIds) {
+        HashMap<Long, String> backdrops=new HashMap<>();
+        System.out.println("Requesting backdrops...");
+        for(Long movId : movIds) {
+            //System.out.println("Mov: "+movId);
+            backdrops.put(movId, movieService.getBackdrop(movId));
+        }
+        return backdrops;
     }
 
     @GetMapping("/movie/{id}")

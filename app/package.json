@@ -9,18 +9,20 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",
     "@testing-library/user-event": "^7.2.1",
+    "axios": "latest",
     "bootstrap": "^4.1.3",
     "glyphicons": "^0.2.0",
+    "history": "latest",
     "moment": "^2.24.0",
+    "node": "latest",
+    "query-string": "^6.10.1",
     "react": "^16.12.0",
     "react-bootstrap": "^1.0.0-beta.16",
     "react-cookie": "^3.0.4",
     "react-dom": "^16.12.0",
     "react-router-dom": "^4.3.1",
     "react-scripts": "3.3.1",
-    "reactstrap": "^6.5.0",
-    "history": "latest",
-    "axios": "latest"
+    "reactstrap": "^6.5.0"
   },
   "scripts": {
     "start": "react-scripts start",

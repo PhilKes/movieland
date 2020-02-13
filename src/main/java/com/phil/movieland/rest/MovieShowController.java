@@ -38,6 +38,13 @@ public class MovieShowController {
         return shows;
     }
 
+    @GetMapping("/shows/week")
+    public Collection<MovieShow> getMovieShowsWeek() {
+        List<MovieShow> shows=null;
+        shows=movieShowService.getShowsForWeekOf(new Date());
+        return shows;
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/show")
     public ResponseEntity<MovieShow> postMovieShow(@RequestBody MovieShow show) throws URISyntaxException {

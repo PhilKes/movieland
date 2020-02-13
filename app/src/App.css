@@ -68,3 +68,32 @@
 body{
   padding-top: 50px;
 }
+
+.carousel .carousel-inner img {
+    width: 100%;
+    height: 30em;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.footer {
+    text-align: center;
+    background-color: #1f1e1e;
+    color: white;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.carousel-caption {
+    color: #fff;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+.card-image {
+    height: auto;
+    width: auto;
+    max-width: 185px;
+}

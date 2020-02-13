@@ -103,8 +103,13 @@ public class MovieService {
             }
         }
         else {
-            System.out.println("Already loaded: " + movie.getName());
+            // System.out.println("Already loaded: " + movie.getName());
         }
     }
 
+    public String getBackdrop(Long movId) {
+        String path=tmdbApiService.getBackdrop(movId);
+        ;
+        return path;
+    }
 }
