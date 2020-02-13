@@ -46,7 +46,7 @@ class App extends Component {
                     <Route path='/register' exact={true} component={RegisterComponent}/>
                 </Switch>
                 <footer className="footer">
-                    <div className="py-2">All images taken from{" "}
+                    <div className="py-2">All Movie details and images taken from{" "}
                         <a href="https://www.themoviedb.org/" target="_blank">TMDB</a>
                     </div>
                 </footer>
