@@ -14,7 +14,7 @@
     "glyphicons": "^0.2.0",
     "history": "latest",
     "moment": "^2.24.0",
-    "node": "latest",
+    "node": "12.16.0",
     "query-string": "^6.10.1",
     "react": "^16.12.0",
     "react-bootstrap": "^1.0.0-beta.16",

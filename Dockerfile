@@ -1,9 +1,10 @@
 #### Stage 1: Build the application
-FROM alpine-java:base as build
+FROM openjdk:12-oracle as build
 
 # Set the current working directory inside the image
 WORKDIR /app
 
+EXPOSE 8080
 # Copy maven executable to the image
 COPY mvnw .
 COPY .mvn .mvn
@@ -24,7 +25,7 @@ RUN ./mvnw package -DskipTests
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
 #### Stage 2: A minimal docker image with command to run the app
-FROM openjdk:8-jre-alpine
+FROM openjdk:12-oracle
 
 ARG DEPENDENCY=/app/target/dependency
 
