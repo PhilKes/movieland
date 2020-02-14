@@ -19,7 +19,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
-
+    networks:
+      - backend
+      - frontend
 
   # Frontend Service
   app-client:
@@ -27,12 +29,14 @@ services:
       context: app # Use an image built from the specified dockerfile in the `polling-app-client` directory.
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_BASE_URL: http://127.0.0.1:3000/
+        REACT_APP_API_BASE_URL: http://127.0.0.1:8080/api
     ports:
-      - "3000:3000" # Map the exposed port 80 on the container to port 9090 on the host machine
+      - "3000:80" # Map the exposed port 80 on the container to port 9090 on the host machine
     restart: always
     depends_on:
       - app-server
+    networks:
+       - frontend
 
 
   # Database Service (Mysql)
@@ -48,10 +52,14 @@ services:
       MYSQL_ROOT_PASSWORD: movielandadmin
     volumes:
       - db-data:/var/lib/mysql
-
+    networks:
+      - backend
 
 # Volumes
 volumes:
   db-data:
 
 # Networks to be created to facilitate communication between containers
+networks:
+    backend:
+    frontend:
