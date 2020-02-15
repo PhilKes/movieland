@@ -31,6 +31,7 @@ class MovieShowList extends Component {
 
     /** Initial load all shows*/
     componentDidMount() {
+        document.title = "Manage Shows";
         if(this.dateParam==null || this.dateParam.length<9) {
             this.dateParam= Moment().format("YYYY-MM-DD");
             this.updateDateParam();

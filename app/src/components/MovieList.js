@@ -26,7 +26,7 @@ import TrailerModal from "./modal/TrailerModal";
 
 
 /** /movies page Component
- * Shows Movies + ADD/REMOVE Movies*/
+ * Shows current Movies/Shows of the week*/
 class MovieList extends Component {
 
     constructor(props) {
@@ -46,6 +46,7 @@ class MovieList extends Component {
     /** Initial load all shows*/
     componentDidMount() {
         this.setState({isLoading: true});
+        document.title = "MovieLand Movies";
         //TODO get wide screen Posters for carousel
         axios.get('api/movies')
             .then(res => res.data)
@@ -99,8 +100,7 @@ class MovieList extends Component {
                     } else {
                         movieShows[movId][day][time] = show.showId;
                     }
-                    Object.keys(movieShows).map(key => console.log(key))
-                    console.log("Show Mov:" + movId + " on:" + day + " at:" + time + " Show: " + movieShows[movId][day][time]);
+                    console.log("Mov:" + movId + " on:" + day + " at:" + time + " Show: " + movieShows[movId][day][time]);
                 });
                 this.setState({shows: movieShows, isLoading: false});
             })
@@ -133,6 +133,8 @@ class MovieList extends Component {
             </CarouselItem>)
         });
 
+
+        /** Controls for Carousel */
         const {activeIndex} = this.state;
         const {animating} = this.state;
 

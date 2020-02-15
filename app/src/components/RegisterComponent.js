@@ -24,6 +24,7 @@ class RegisterComponent extends Component {
             err: 0, // 0=no error, 1= password too short, 2= repeat doesnt match, 3= username taken, 4= missing fields
             showSuccessMessage: false
         }
+        document.title = "MovieLand Register";
     }
 
     registerClicked(ev) {

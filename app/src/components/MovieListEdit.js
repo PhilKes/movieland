@@ -11,8 +11,8 @@ import LoadingPage from "../LoadingPage";
 const INSTRUCTOR = 'admin';
 const PASSWORD = 'admin';
 
-/** /movies page Component
- * Shows Movies + ADD/REMOVE Movies*/
+/** /movies/edit page Component
+ * Shows Movies + ADD/REMOVE Movies (only for Admins)*/
 class MovieListEdit extends Component {
 
     constructor(props) {
@@ -22,10 +22,10 @@ class MovieListEdit extends Component {
         this.searchQuery = "";
     }
 
-    /** Initial load all shows*/
+    /** Initial load all movies*/
     componentDidMount() {
+        document.title = "Manage Movies";
         this.setState({isLoading: true});
-
         axios.get('/api/movies')
             .then(res => res.data)
             .then(data => this.setState({movies: data, isLoading: false}))
@@ -33,7 +33,7 @@ class MovieListEdit extends Component {
         ;
     }
 
-    /** Remove movie with movieid=id*/
+    /** Remove movie with movieid*/
     async remove(id) {
         await axios.delete(`/api/movie/${id}`)
             .then(() => {
@@ -56,7 +56,7 @@ class MovieListEdit extends Component {
                 .then(response => {
                     console.log(response)
                     //TODO Catch exception if movie already there
-                    return axios.get('api/movies?name=' + this.searchQuery.value)
+                    return axios.get('/api/movies?name=' + this.searchQuery.value)
                         .then(resp => {
                             this.setState({movies: resp.data, isLoading: false})
                         });
@@ -72,7 +72,7 @@ class MovieListEdit extends Component {
     handleKeyPress(ev) {
         if (ev.charCode == 13) { //Enter pressed?
             console.log("Search: " + this.searchQuery.value);
-            axios.get('api/movies?name=' + this.searchQuery.value)
+            axios.get('/api/movies?name=' + this.searchQuery.value)
                 .then(resp => this.setState({movies: resp.data}));
         }
     }

@@ -11,12 +11,14 @@ import RegisterComponent from "./components/RegisterComponent";
 import AppNavbar from "./AppNavbar";
 import MovieList from "./components/MovieList";
 import MovieShow from "./components/MovieShow";
+import DashboardComponent from "./components/DashboardComponent";
+import AuthenticationService from "./components/AuthenticationService";
 
 class App extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {isLoggedIn: false, currUser: "admin"};
+        this.state = {isLoggedIn: false, currUser: AuthenticationService.getUserName()};
         this.setUserLogin = this.setUserLogin.bind(this);
         //Ref to call methods on navBar from App
         this.navBar = React.createRef();
@@ -36,10 +38,12 @@ class App extends Component {
                         <Redirect to='/movies' />
                     </Route>
                     {/*<Route path='/movies' exact={true} component={MovieList}/>**/}
-                    <AuthenticatedRoute path='/shows' exact={true} component={MovieShowList}/>
-                    <AuthenticatedRoute path="/movies/edit" exact component={MovieListEdit}/>
+                    <AuthenticatedRoute admin={true} path='/shows' exact={true} component={MovieShowList}/>
+                    <AuthenticatedRoute admin={true} path="/movies/edit" exact component={MovieListEdit}/>
 
                     <AuthenticatedRoute path="/show/:showId" exact component={MovieShow}/>
+
+                    <AuthenticatedRoute path="/user/me" exact component={DashboardComponent}/>
 
                     <Route path='/movies' exact component={MovieList}/>
                     <Route path='/login'

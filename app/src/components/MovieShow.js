@@ -25,7 +25,7 @@ import {faInfoCircle} from "@fortawesome/free-solid-svg-icons/faInfoCircle";
 
 
 /** /show/showId page Component
- * Shows MovieShow details + Reservation (if logged in)*/
+ * Shows MovieShow details + Reservations (if logged in)*/
 class MovieShow extends Component {
 
     constructor(props) {
@@ -52,10 +52,13 @@ class MovieShow extends Component {
                 //this.setState({show: data});
                 axios.get('/api/movie/' + show.movId)
                     .then(res => res.data)
-                    .then(mov =>
-                        this.setState({movie: mov, show: show, isLoading: true})
+                    .then(mov => {
+                            document.title = mov.name + " " + Moment(show.date).format("DD.MM HH:mm");
+                            this.setState({movie: mov, show: show, isLoading: true})
+                        }
                     );
 
+                /** Get all reserved seats from all reservations*/
                 axios.get('/api/reservations/show/' + show.showId)
                     .then(res => res.data)
                     .then(reservations => {
@@ -86,6 +89,7 @@ class MovieShow extends Component {
         ;
     }
 
+    /** onClick for seats*/
     selectSeat(idx) {
         let seats = this.state.selectedSeats;
         if (seats[idx] != null) {
@@ -97,6 +101,7 @@ class MovieShow extends Component {
         this.setState({selectedSeats: seats});
     }
 
+    /** returns table rows*/
     createRows(rows, cols) {
         let {reservedSeats, selectedSeats} = this.state;
         var tableRows = [];

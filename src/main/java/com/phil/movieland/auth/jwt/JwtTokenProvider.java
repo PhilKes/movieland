@@ -15,6 +15,7 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private static final Logger logger=LoggerFactory.getLogger(JwtTokenProvider.class);
+    private static final String AUTHORITIES_KEY="authorities";
 
     @Value("${app.jwtSecret}")
     private String jwtSecret;
@@ -31,6 +32,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(Long.toString(userPrincipal.getId()))
+                .claim(AUTHORITIES_KEY, userPrincipal.getAuthorities())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)

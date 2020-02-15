@@ -18,7 +18,10 @@ import {
     faSignOutAlt,
     faAddressCard,
     faTicketAlt,
-    faUserPlus
+    faUserPlus,
+    faFilm,
+    faVideo,
+    faCode, faCodeBranch
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
@@ -30,7 +33,7 @@ class AppNavbar extends Component {
         console.log("constructor")
 
         this.state = {isOpen: false, loggedIn: AuthenticationService.isUserLoggedIn(), user: this.props.user};
-        console.log("logged: " + this.state.loggedIn)
+        console.log("Constr. Logged in : " + this.props.user)
         this.toggle = this.toggle.bind(this);
     }
 
@@ -45,6 +48,7 @@ class AppNavbar extends Component {
     }
 
     setLoggedIn(loggedIn, username) {
+        console.log("Logged in: " + username)
         this.setState({loggedIn: loggedIn, user: username});
     }
 
@@ -56,18 +60,50 @@ class AppNavbar extends Component {
     render() {
 
         let menuItems;
-        if (this.state.loggedIn) {
+        /** Admin menu */
+        if (this.state.loggedIn && AuthenticationService.isAdmin()) {
             menuItems = [
                 <UncontrolledDropdown nav inNavbar key='user' color="dark">
                     <DropdownToggle nav caret>
                         <FontAwesomeIcon icon={faUser}/>{" " + this.state.user}
                     </DropdownToggle>
                     <DropdownMenu right>
-                        <DropdownItem key='profile' onClick={() => history.push('/user/' + this.state.user)}>
+                        <DropdownItem key='profile' onClick={() => history.push('/user/me')}>
                             <FontAwesomeIcon icon={faAddressCard}/> Dashboard
                         </DropdownItem>
                         <DropdownItem key='reservations'
-                                      onClick={() => history.push('/reservations/' + this.state.user)}>
+                                      onClick={() => history.push('/reservations/me')}>
+                            <FontAwesomeIcon icon={faTicketAlt}/> Reservations
+                        </DropdownItem>
+                        <DropdownItem key='shows'
+                                      onClick={() => history.push('/shows')}>
+                            <FontAwesomeIcon icon={faVideo}/> Manage Shows
+                        </DropdownItem>
+                        <DropdownItem key='movies'
+                                      onClick={() => history.push('/movies/edit')}>
+                            <FontAwesomeIcon icon={faFilm}/> Manage Movies
+                        </DropdownItem>
+                        <DropdownItem divider/>
+                        <DropdownItem key='logout' onClick={this.onLogout}>
+                            <FontAwesomeIcon icon={faSignOutAlt}/> Logout
+                        </DropdownItem>
+                    </DropdownMenu>
+                </UncontrolledDropdown>
+            ];
+        }
+        /** User menu */
+        else if (this.state.loggedIn) {
+            menuItems = [
+                <UncontrolledDropdown nav inNavbar key='user' color="dark">
+                    <DropdownToggle nav caret>
+                        <FontAwesomeIcon icon={faUser} size="lg"/> {this.state.user}
+                    </DropdownToggle>
+                    <DropdownMenu right>
+                        <DropdownItem key='profile' onClick={() => history.push('/user/me')}>
+                            <FontAwesomeIcon icon={faAddressCard}/> Dashboard
+                        </DropdownItem>
+                        <DropdownItem key='reservations'
+                                      onClick={() => history.push('/reservations/me')}>
                             <FontAwesomeIcon icon={faTicketAlt}/> Reservations
                         </DropdownItem>
                         <DropdownItem divider/>
@@ -77,7 +113,9 @@ class AppNavbar extends Component {
                     </DropdownMenu>
                 </UncontrolledDropdown>
             ];
-        } else {
+        }
+        /** Offline visitor menu */
+        else {
             menuItems = [
                 <Nav key="notloggedin">
                     <NavItem key="register">
@@ -96,13 +134,15 @@ class AppNavbar extends Component {
                 <Collapse isOpen={this.state.isOpen} navbar>
                     <Nav className="mr-auto" navbar>
                         <NavItem>
-                            <NavLink href="/movies">Movies</NavLink>
+                            <NavLink href="/movies"><FontAwesomeIcon icon={faFilm} size="lg"/> Movies</NavLink>
                         </NavItem>
-                        <NavItem>
+                        {/*<NavItem>
                             <NavLink href="/shows">Shows</NavLink>
-                        </NavItem>
+                        </NavItem>*/}
                         <NavItem>
-                            <NavLink href="https://github.com/PhilKes" target="_blank">GitHub</NavLink>
+                            <NavLink href="https://github.com/PhilKes" target="_blank">
+                                <FontAwesomeIcon size="lg" icon={faCodeBranch}/> GitHub
+                            </NavLink>
                         </NavItem>
                     </Nav>
                     <Nav className="ml-auto" navbar>

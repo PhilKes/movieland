@@ -20,7 +20,6 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-
     private static final Logger logger=LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/user/me")
@@ -43,15 +42,13 @@ public class UserController {
         return new UserIdentityAvailability(isAvailable);
     }
 */
-
+@PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users/{username}")
     public UserProfile getUserProfile(@PathVariable(value="username") String username) {
         User user=userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        UserProfile userProfile=new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt(), 0L, 0L);
-
+    UserProfile userProfile=new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt());
         return userProfile;
     }
-
 
 }

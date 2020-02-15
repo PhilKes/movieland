@@ -45,22 +45,23 @@ public class MovieShowController {
         return shows;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/show")
-    public ResponseEntity<MovieShow> postMovieShow(@RequestBody MovieShow show) throws URISyntaxException {
-        System.out.println("Post Show( MovId:"+show.getMovId()+" Date: "+show.getDate());
-       MovieShow result= movieShowService.saveShow(show);
-        return ResponseEntity.created(new URI("/api/show/" + result.getShowId()))
-                .body(result);
-    }
-
     @GetMapping("/show/{id}")
     ResponseEntity<MovieShow> getShow(@PathVariable Long id) {
-        Optional<MovieShow> show = movieShowService.queryShow(id);
+        Optional<MovieShow> show=movieShowService.queryShow(id);
         return show.map(response -> ResponseEntity.ok().body(response))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/show")
+    public ResponseEntity<MovieShow> postMovieShow(@RequestBody MovieShow show) throws URISyntaxException {
+        System.out.println("Post Show( MovId:"+show.getMovId()+" Date: "+show.getDate());
+        MovieShow result=movieShowService.saveShow(show);
+        return ResponseEntity.created(new URI("/api/show/" + result.getShowId()))
+                .body(result);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/show/{id}")
     ResponseEntity<MovieShow> updateShow(@Valid @RequestBody MovieShow show) {
         MovieShow result = movieShowService.saveShow(show);

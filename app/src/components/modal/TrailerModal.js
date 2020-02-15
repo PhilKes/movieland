@@ -28,8 +28,6 @@ export default class TrailerModal extends React.Component {
         axios.get('/api/movie/trailer/' + this.state.movId)
             .then(res => res.data)
             .then(trailerId => {
-                console.log("MovId: " + this.state.movId)
-                console.log("Youtube: " + trailerId)
                 this.setState({ytId: trailerId, isLoading: false})
             })
             .catch(err => {

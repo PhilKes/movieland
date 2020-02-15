@@ -29,7 +29,7 @@ export default class MovieModal extends React.Component {
 
     toggle() {
         if(this.state.name==''){
-            axios.get('api/movies/tmdb/top')
+            axios.get('/api/movies/tmdb/top')
                 .then(res => res.data)
                 .then(data => this.setState({movies: data}));
         }

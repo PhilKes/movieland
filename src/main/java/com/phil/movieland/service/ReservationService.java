@@ -62,4 +62,8 @@ public class ReservationService {
         reservations.forEach(reservation -> seatRepository.deleteAllByResId(reservation.getResId()));
         reservationRepository.deleteAll();
     }
+
+    public List<Reservation> getAllReservationsOfUser(Long userId) {
+        return reservationRepository.findAllByUserId(userId);
+    }
 }

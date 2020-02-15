@@ -15,104 +15,95 @@ import {
 import {faUserAlt, faUser, faLock} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import LoadingPage from "../LoadingPage";
+import moment from "moment";
 
-/** User Dashboard page*/
-//TODO EVERYTHING
+/** User Dashboard page showing user details, reservations*/
 class DashboardComponent extends Component {
     constructor(props) {
         super(props)
         this.state = {
             err: 0, // 0=no error, 1= password too short, 2= repeat doesnt match, 3= username taken, 4= missing fields
-            showSuccessMessage: false
+            user: null,
+            isLoading: true,
+            reservations: [],
+            shows: [],
+            movies: {}
         }
     }
 
-    registerClicked(ev) {
-        ev.preventDefault();
-        const data = new FormData(ev.target);
-        let pwd = data.get('password'), user = data.get('username'), name = data.get('name');
-        if (pwd.length < 5) {
-            this.setState({err: 1, showSuccessMessage: false});
-            return;
-        }
-        if (user.length < 4 || name.length < 4) {
-            this.setState({err: 4, showSuccessMessage: false});
-            return;
-        }
-        if (pwd !== data.get('repeat')) {
-            console.log("Repaet not matching")
-            this.setState({err: 2, showSuccessMessage: false});
-            return;
-        }
-        axios.post(`/api/auth/signup`, {
-                name: name, username: user, email: user + "@mail.com", password: pwd
-            },
-            {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
+    componentDidMount() {
+        document.title = "My Dashboard";
+        axios.get('/api/user/me')
+            .then(res => res.data)
+            .then(user => this.setState({user: user}))
+            .then(x => {
+                // Get all Reservations of user
+                axios.get('/api/reservations/me')
+                    .then(res => res.data)
+                    .then(reservations => {
+                        this.setState({reservations: reservations});
+                        let promises = [];
+                        let reservationShows = this.state.shows;
+                        reservations.forEach(reservation => {
+                            promises.push(
+                                // Get all shows of reservation
+                                axios.get('/api/show/' + reservation.showId)
+                                    .then(res => res.data)
+                                    .then(show => {
+                                        reservationShows[reservation.resId] = show;
+                                    })
+                            );
+                        });
+                        let movies = this.state.movies;
+                        axios.all(promises)
+                            .then(res => {
+                                let moviePromises = [];
+                                reservationShows.forEach(sh => {
+                                    // Get movie of show
+                                    if (movies[sh.movId] == null) {
+                                        moviePromises.push(
+                                            axios.get('/api/movie/' + sh.movId)
+                                                .then(res => res.data)
+                                                .then(movie => movies[sh.movId] = movie)
+                                        );
+                                    }
+                                })
+                                axios.all(moviePromises)
+                                    .then(() => {
+                                        this.setState({shows: reservationShows, movies: movies, isLoading: false})
+                                    })
+
+                            });
+                    })
             })
-            .then(response => {
-                console.log(response);
-                this.setState({err: 0, showSuccessMessage: true});
-            })
-            .catch(err => {
-                console.log(err.response.data.message);
-                this.setState({err: 3, showSuccessMessage: false});
-            });
     }
+
 
     render() {
-        let {err} = this.state;
-        let usernameErr = err === 3 ? (<div>Username already taken</div>) : (<div>At least 4 Characters</div>);
+        let {err, user, reservations, shows, movies} = this.state;
+        if (this.state.isLoading) {
+            return <LoadingPage/>;
+        }
+        let reservationList = reservations.map(res => {
+            let show = shows[res.resId];
+            let movie = movies[show.movId];
+            return (
+                <div key={res.resId}>
+                    <a href={"/show/" + show.showId}>"{movie.name}"
+                        on {moment(show.date).format("dd DD.MM.YYYY HH:mm")}h</a>
+                </div>
+            );
+        });
+
         return (
             <Container fluid>
-                <h2>Register</h2>
-                <div className="container">
-                    <Form onSubmit={this.registerClicked.bind(this)}>
-                        <FormGroup>
-                            <InputGroup>
-                                <InputGroupAddon addonType="prepend">
-                                    <InputGroupText><FontAwesomeIcon icon={faUserAlt}/></InputGroupText>
-                                </InputGroupAddon>
-                                <Input type="text" name="name" placeholder="Full Name"
-                                       className="col-md-4" required invalid={err === 4}/>
-                                <FormFeedback invalid={1}>At least 4 Characters</FormFeedback>
-                            </InputGroup><br/>
-                            <InputGroup>
-                                <InputGroupAddon addonType="prepend">
-                                    <InputGroupText><FontAwesomeIcon icon={faUser}/></InputGroupText>
-                                </InputGroupAddon>
-                                <Input type="text" name="username" placeholder="Username"
-                                       className="col-md-4" invalid={err === 3 || err === 4} required/>
-                                <FormFeedback invalid={1}>{usernameErr}</FormFeedback>
-                            </InputGroup><br/>
-                            <InputGroup>
-                                <InputGroupAddon addonType="prepend">
-                                    <InputGroupText><FontAwesomeIcon icon={faLock}/></InputGroupText>
-                                </InputGroupAddon>
-                                <Input type="password" name="password" placeholder="Password"
-                                       className="col-md-4" invalid={err === 1} required/>
-                                <FormFeedback invalid={1}>Password too short</FormFeedback>
-                            </InputGroup><br/>
-                            <InputGroup>
-                                <InputGroupAddon addonType="prepend">
-                                    <InputGroupText><FontAwesomeIcon icon={faLock}/></InputGroupText>
-                                </InputGroupAddon>
-                                <Input type="password" name="repeat" placeholder="Repeat"
-                                       className="col-md-4" invalid={err === 2} required/>
-                                <FormFeedback invalid={1}>Passwords do not match</FormFeedback>
-                            </InputGroup><br/>
-                            {this.state.showSuccessMessage && <Alert color="success" className="col-md-4">
-                                Registration successfull! <br/>
-                                <a href="/login">Log in</a> to your new Account
-                            </Alert>}
-                            <Button color="primary" onClick={this.loginClicked}>Register</Button>
-                        </FormGroup>
-
-                    </Form>
-                </div>
+                <h2>My Dashboard</h2>
+                <b>Id: {user.id}</b><br/>
+                <b>User: {user.username}</b><br/>
+                <b>Name: {user.name}</b><br/><br/>
+                <b>Reservations</b><br/>
+                {reservationList}
             </Container>
         )
     }

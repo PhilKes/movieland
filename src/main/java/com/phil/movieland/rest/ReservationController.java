@@ -2,6 +2,7 @@ package com.phil.movieland.rest;
 
 import com.phil.movieland.auth.jwt.entity.UserPrincipal;
 import com.phil.movieland.auth.jwt.util.CurrentUser;
+import com.phil.movieland.data.UserSummary;
 import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.data.request.ReservationRequest;
 import com.phil.movieland.service.ReservationService;
@@ -58,5 +59,12 @@ public class ReservationController {
     public ResponseEntity<?> deleteReservations() {
         reservationService.deleteAll();
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/reservations/me")
+    @PreAuthorize("hasRole('USER')")
+    public List<Reservation> getCurrentUsersReservations(@CurrentUser UserPrincipal currentUser) {
+        //UserSummary userSummary=new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
+        return reservationService.getAllReservationsOfUser(currentUser.getId());
     }
 }
