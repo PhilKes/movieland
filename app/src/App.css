@@ -97,3 +97,47 @@ body{
     width: auto;
     max-width: 185px;
 }
+
+.seatimg {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    min-width: 24px;
+    min-height: 24px;
+    max-width: 28px;
+    border-top-left-radius: 40%;
+    border-top-right-radius: 40%;
+    background-color: darkgrey;
+}
+
+
+.seatimg:hover {
+    cursor: pointer;
+    box-shadow: 0 7px 7px rgba(0, 0, 0, 0.25);
+}
+
+.seatTable {
+    table-layout: fixed;
+    position: relative;
+    left: 50%;
+    min-width: 410px;
+}
+
+#screen {
+    background-color: black;
+    width: 200%;
+}
+
+#room {
+    width: 50%;
+    min-width: 364px;
+}
+
+.reserved {
+    background-color: red;
+}
+
+.selected {
+    background-color: green;
+}

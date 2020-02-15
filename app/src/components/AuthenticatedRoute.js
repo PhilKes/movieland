@@ -8,7 +8,6 @@ class AuthenticatedRoute extends Component {
         if (!AuthenticationService.isUserLoggedIn()) {
             history.push({pathname: "/login", state: {previous: this.props.path}});
         }
-
     }
 
     render() {

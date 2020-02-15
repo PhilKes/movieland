@@ -1,18 +1,22 @@
 package com.phil.movieland.rest;
 
+import com.phil.movieland.auth.jwt.entity.UserPrincipal;
+import com.phil.movieland.auth.jwt.util.CurrentUser;
 import com.phil.movieland.data.entity.Reservation;
+import com.phil.movieland.data.request.ReservationRequest;
 import com.phil.movieland.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
-@Controller
-@RequestMapping("/reservations")
+@RestController
+@RequestMapping("/api")
 public class ReservationController {
     private final ReservationService reservationService;
 
@@ -21,12 +25,38 @@ public class ReservationController {
         this.reservationService=reservationService;
     }
 
-    @GetMapping
-    public String getReservations(
-            @RequestParam(value="userName",required=true)String userName,
-            Model model){
-        List<Reservation> userReservations= reservationService.getReservationsOfUsername(userName);
-        model.addAttribute("userReservations",userReservations);
-        return "reservations";
+    @GetMapping("/reservations")
+    public List<?> getReservations() {
+        List<Reservation> userReservations=reservationService.getAllReservations();
+        return userReservations;
+    }
+
+    @GetMapping("/reservations/show/{showId}")
+    List<Reservation> getReservationsofShow(@PathVariable Long showId) {
+        return reservationService.getAllReservationsOfShow(showId);
+    }
+
+    @PostMapping("/reservation")
+    public ResponseEntity<?> createReservation(@RequestBody ReservationRequest reservationRequest,
+                                               @CurrentUser UserPrincipal currentUser) throws URISyntaxException {
+        Reservation reservation=new Reservation();
+        reservation.setShowId(reservationRequest.getShow_id());
+        reservation.setUserId(currentUser.getId());
+        //TODO CHECK IF RESERVATION OR SEATS ARE ALREADY IN DATABASE
+        Reservation result=reservationService.saveReservation(reservation, reservationRequest.getSeats());
+        if(result==null) {
+            return ResponseEntity.badRequest()
+                    .body("Seats already taken!");
+        }
+        return ResponseEntity.created(new URI("/api/reservation/" + result.getResId()))
+                .body(result);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/reservations")
+    public ResponseEntity<?> deleteReservations() {
+        reservationService.deleteAll();
+        return ResponseEntity.ok().build();
     }
 }

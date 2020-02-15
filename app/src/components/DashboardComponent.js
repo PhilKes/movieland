@@ -16,7 +16,8 @@ import {faUserAlt, faUser, faLock} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
 
-/** Register page*/
+/** User Dashboard page*/
+//TODO EVERYTHING
 class DashboardComponent extends Component {
     constructor(props) {
         super(props)

@@ -10,6 +10,7 @@ import history from './history';
 import RegisterComponent from "./components/RegisterComponent";
 import AppNavbar from "./AppNavbar";
 import MovieList from "./components/MovieList";
+import MovieShow from "./components/MovieShow";
 
 class App extends Component {
 
@@ -37,6 +38,9 @@ class App extends Component {
                     {/*<Route path='/movies' exact={true} component={MovieList}/>**/}
                     <AuthenticatedRoute path='/shows' exact={true} component={MovieShowList}/>
                     <AuthenticatedRoute path="/movies/edit" exact component={MovieListEdit}/>
+
+                    <AuthenticatedRoute path="/show/:showId" exact component={MovieShow}/>
+
                     <Route path='/movies' exact component={MovieList}/>
                     <Route path='/login'
                            render={(props) => <LoginComponent onLogin={this.setUserLogin}

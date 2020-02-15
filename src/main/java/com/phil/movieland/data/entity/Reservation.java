@@ -1,7 +1,6 @@
 package com.phil.movieland.data.entity;
 
 import javax.persistence.*;
-import java.util.Date;
 
 
 @Entity
@@ -11,7 +10,7 @@ public class Reservation {
     @Id
     @Column(name="RESERVATION_ID")
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private long reservationId;
+    private long resId;
 
     @Column(name="SHOW_ID")
     private long showId;
@@ -19,12 +18,12 @@ public class Reservation {
     @Column(name="USER_ID")
     private long userId;
 
-    public long getReservationId() {
-        return reservationId;
+    public long getResId() {
+        return resId;
     }
 
-    public void setReservationId(long reservationId) {
-        this.reservationId=reservationId;
+    public void setResId(long resId) {
+        this.resId=resId;
     }
 
     public long getShowId() {
