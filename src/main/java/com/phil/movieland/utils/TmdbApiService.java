@@ -5,6 +5,7 @@ import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.TmdbMovies;
 import info.movito.themoviedbapi.model.Artwork;
 import info.movito.themoviedbapi.model.MovieDb;
+import info.movito.themoviedbapi.model.Video;
 import info.movito.themoviedbapi.model.core.MovieResultsPage;
 import info.movito.themoviedbapi.tools.ApiUrl;
 import info.movito.themoviedbapi.tools.RequestMethod;
@@ -33,6 +34,8 @@ public class TmdbApiService {
      * Additional backdrops stored in memory
      */
     private static HashMap<Long, String> backdrops=new HashMap<>();
+
+    private static HashMap<Long, String> trailers=new HashMap<>();
 
     public TmdbApiService() {
     }
@@ -72,5 +75,21 @@ public class TmdbApiService {
         System.out.println("Loaded: " + path + " from tmdb");
         backdrops.put(movId, path);
         return path;
+    }
+
+    public String getTrailerURL(Long tmdbId) {
+        if(trailers.containsKey(tmdbId)) {
+            return trailers.get(tmdbId);
+        }
+        List<Video> videos=tmdbMovies.getMovie(tmdbId.intValue(), "en", TmdbMovies.MovieMethod.videos).getVideos();
+        if(!videos.isEmpty()) {
+            Video trailer=videos.get(0);
+            if(trailer.getSite().equals("YouTube")) {
+                //String url="https://youtube.com/watch?v="+trailer.getKey();
+                trailers.put(tmdbId, trailer.getKey());
+                return trailer.getKey();
+            }
+        }
+        return null;
     }
 }

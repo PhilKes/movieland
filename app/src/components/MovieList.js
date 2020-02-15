@@ -22,6 +22,7 @@ import * as queryString from "query-string";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser, faVideo} from "@fortawesome/free-solid-svg-icons";
 import {faInfoCircle} from "@fortawesome/free-solid-svg-icons/faInfoCircle";
+import TrailerModal from "./modal/TrailerModal";
 
 
 /** /movies page Component
@@ -77,7 +78,6 @@ class MovieList extends Component {
             .then(res => res.data)
             .then(shows => {
                 var movieShows = [];
-                console.log(shows)
                 shows.forEach(show => {
                     let movId = show.movId;
                     let day = Moment(show.date).format("dd");
@@ -158,9 +158,7 @@ class MovieList extends Component {
                 return <Col key={movie.movId}/>;
             }
             const showList = Object.keys(shows[movie.movId]).map(day => {
-                    console.log("Day: " + day)
                     const movieShowList = Object.keys(shows[movie.movId][day]).map(time => {
-                            console.log("Time: " + time)
                             return (
                                 <ListGroupItem key={time}><a href={"/show/" + shows[movie.movId][day][time]}>
                                     {time}</a></ListGroupItem>
@@ -189,9 +187,10 @@ class MovieList extends Component {
                                     <Button color="light" style={{flex: 1}}>
                                         <FontAwesomeIcon icon={faInfoCircle}/>
                                     </Button>
-                                    <Button color="light" style={{flex: 1}}>
+                                    {/* <Button color="light" style={{flex: 1}}>
                                         <FontAwesomeIcon icon={faVideo}/>
-                                    </Button>
+                                    </Button>*/}
+                                    <TrailerModal movId={movie.movId}/>
                                 </ButtonGroup>
                             </div>
                         </Card.Body>

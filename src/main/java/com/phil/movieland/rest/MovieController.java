@@ -78,6 +78,13 @@ public class MovieController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @GetMapping("/movie/trailer/{movId}")
+    ResponseEntity<String> getMovieTrailer(@PathVariable Long movId) {
+        Optional<String> trailer=movieService.getTrailer(movId);
+        return trailer.map(response -> ResponseEntity.ok().body(response))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/movie")
     ResponseEntity<?> createMovie(@RequestBody Movie movie) throws URISyntaxException {

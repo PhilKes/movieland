@@ -112,4 +112,12 @@ public class MovieService {
         ;
         return path;
     }
+
+    public Optional<String> getTrailer(Long movId) {
+        Optional<Movie> movie=movieRepository.findById(movId);
+        if(movie.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(tmdbApiService.getTrailerURL(movie.get().getTmdbId()));
+    }
 }
