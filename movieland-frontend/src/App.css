@@ -1,0 +1,148 @@
+.App {
+    text-align: center;
+}
+
+.App-logo {
+    height: 40vmin;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
+}
+
+.App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+
+.App-link {
+    color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.container, .container-fluid {
+    margin-top: 20px;
+}
+
+.navbar-nav > li > a, .navbar-brand {
+    padding-top: 5px !important;
+    padding-bottom: 0 !important;
+    height: 30px;
+}
+
+.navbar {
+    min-height: 60px !important;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand > img {
+    padding: 4px;
+    margin: auto
+}
+
+.logo-icon {
+    height: 60px;
+}
+
+.modal-movieList {
+    height: 35vh;
+    overflow-y: scroll;
+}
+
+body {
+    padding-top: 50px;
+}
+
+.carousel .carousel-inner img {
+    width: 100%;
+    height: 30em;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.footer {
+    text-align: center;
+    background-color: #1f1e1e;
+    color: white;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.carousel-caption {
+    color: #fff;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+.card-image {
+    height: auto;
+    width: auto;
+    max-width: 185px;
+}
+
+.seatimg {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    min-width: 24px;
+    min-height: 24px;
+    max-width: 28px;
+    border-top-left-radius: 40%;
+    border-top-right-radius: 40%;
+    background-color: darkgrey;
+}
+
+
+.seatimg:hover {
+    cursor: pointer;
+    box-shadow: 0 7px 7px rgba(0, 0, 0, 0.25);
+}
+
+.seatTable {
+    table-layout: fixed;
+    position: relative;
+    left: 50%;
+    min-width: 410px;
+}
+
+#screen {
+    background-color: black;
+    width: 200%;
+}
+
+#room {
+    width: 50%;
+    min-width: 364px;
+}
+
+.reserved {
+    background-color: red;
+}
+
+.selected {
+    background-color: green;
+}

@@ -1,0 +1,57 @@
+import React, {Component} from 'react'
+import {Route, Redirect} from 'react-router-dom'
+import AuthenticationService from "../../service/AuthenticationService";
+import history from "../../history";
+
+/** Redirects to login if not authenticated*/
+class AuthenticatedRoute extends Component {
+    constructor(props) {
+        super(props);
+        this.checkAdmin = props.admin;
+    }
+
+    /**Immediately redirect to login page if not logged in or Admin required*/
+    componentDidMount() {
+        if (!AuthenticationService.isUserLoggedIn()) {
+            console.log("path: " + this.props.computedMatch.params.showId);
+            let path = this.props.path;
+            if (Object.keys(this.props.computedMatch.params).length > 0) {
+                path = this.parseMatchParams(path, this.props.computedMatch.params)
+            }
+            history.push({
+                pathname: "/login", state: {
+                    previous: path,
+                    msg: "Must be logged in to access"
+                }
+            });
+        } else if (this.checkAdmin && !AuthenticationService.isAdmin()) {
+            history.push({
+                pathname: "/login", state: {
+                    previous: this.props.path,
+                    msg: "Must be logged in as Admin to access!"
+                }
+            });
+        }
+    }
+
+    /** Replace path match params with values (e.g showId)*/
+    parseMatchParams(path, params) {
+        let parsed = path;
+        Object.keys(params).forEach(key => {
+            console.log("Replace: :" + key + " with: " + params[key])
+            parsed = parsed.replace(":" + key, params[key]);
+        });
+        console.log("Parsed: " + parsed)
+        return parsed;
+    }
+
+    render() {
+        if (AuthenticationService.isUserLoggedIn()) {
+            return <Route {...this.props} />
+        } else {
+            return (<div>Empty</div>);
+        }
+    }
+}
+
+export default AuthenticatedRoute
