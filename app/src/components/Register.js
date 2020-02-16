@@ -17,7 +17,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
 
 /** Register page*/
-class RegisterComponent extends Component {
+class Register extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -118,4 +118,4 @@ class RegisterComponent extends Component {
     }
 }
 
-export default RegisterComponent
+export default Register

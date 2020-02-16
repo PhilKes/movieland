@@ -1,5 +1,5 @@
 import axios from "axios";
-import AuthenticatedRoute from "./AuthenticatedRoute";
+import AuthenticatedRoute from "../components/misc/AuthenticatedRoute";
 
 /** Service to generate Authorization request + storing JWT Token*/
 class AuthenticationService {

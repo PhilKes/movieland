@@ -12,8 +12,8 @@ import Moment from 'moment';
 import {faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import ErrorPage from "../ErrorPage";
-import LoadingPage from "../LoadingPage";
+import ErrorPage from "./misc/ErrorPage";
+import LoadingPage from "./misc/LoadingPage";
 
 /** /shows page
  * Shows MovieShows by Date + ADD/REMOVE Shows*/

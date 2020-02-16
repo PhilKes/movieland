@@ -11,7 +11,7 @@ import {
     UncontrolledDropdown
 } from 'reactstrap';
 import history from "./history";
-import AuthenticationService from "./components/AuthenticationService";
+import AuthenticationService from "./service/AuthenticationService";
 import {
     faUser,
     faSignInAlt,

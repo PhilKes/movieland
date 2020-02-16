@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
 import './App.css';
-import Home from './Home';
 import {Router, Redirect, Route, Switch, withRouter} from 'react-router-dom';
 import MovieListEdit from './components/MovieListEdit';
 import MovieShowList from './components/MovieShowList';
-import LoginComponent from "./components/LoginComponent";
-import AuthenticatedRoute from "./components/AuthenticatedRoute";
+import Login from "./components/Login";
+import AuthenticatedRoute from "./components/misc/AuthenticatedRoute";
 import history from './history';
-import RegisterComponent from "./components/RegisterComponent";
+import Register from "./components/Register";
 import AppNavbar from "./AppNavbar";
 import MovieList from "./components/MovieList";
 import MovieShow from "./components/MovieShow";
-import DashboardComponent from "./components/DashboardComponent";
-import AuthenticationService from "./components/AuthenticationService";
+import Dashboard from "./components/Dashboard";
+import AuthenticationService from "./service/AuthenticationService";
 
 class App extends Component {
 
@@ -24,6 +23,7 @@ class App extends Component {
         this.navBar = React.createRef();
     }
 
+    /** Notify navbar if loggedIn user changed*/
     setUserLogin(loggedIn, currUser) {
         this.navBar.current.setLoggedIn(loggedIn, currUser);
         this.setState({isLoggedIn: loggedIn, currUser: currUser});
@@ -43,15 +43,15 @@ class App extends Component {
 
                     <AuthenticatedRoute path="/show/:showId" exact component={MovieShow}/>
 
-                    <AuthenticatedRoute path="/user/me" exact component={DashboardComponent}/>
+                    <AuthenticatedRoute path="/user/me" exact component={Dashboard}/>
 
                     <Route path='/movies' exact component={MovieList}/>
                     <Route path='/login'
-                           render={(props) => <LoginComponent onLogin={this.setUserLogin}
-                                                              {...props} />}
+                           render={(props) => <Login onLogin={this.setUserLogin}
+                                                     {...props} />}
                     />
 
-                    <Route path='/register' exact={true} component={RegisterComponent}/>
+                    <Route path='/register' exact={true} component={Register}/>
                 </Switch>
                 <footer className="footer">
                     <div className="py-2">All Movie details and images taken from{" "}

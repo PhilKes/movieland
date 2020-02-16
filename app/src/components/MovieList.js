@@ -16,8 +16,8 @@ import { Link } from 'react-router-dom';
 import MovieModal from "./modal/MovieModal";
 import Moment from 'moment';
 import axios from "axios";
-import ErrorPage from "../ErrorPage";
-import LoadingPage from "../LoadingPage";
+import ErrorPage from "./misc/ErrorPage";
+import LoadingPage from "./misc/LoadingPage";
 import * as queryString from "query-string";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser, faVideo} from "@fortawesome/free-solid-svg-icons";
@@ -74,6 +74,7 @@ class MovieList extends Component {
         ;
     }
 
+    /** Fetch all shows of this week (starting from today)*/
     getShows() {
         axios.get('api/shows/week')
             .then(res => res.data)
@@ -81,17 +82,17 @@ class MovieList extends Component {
                 var movieShows = [];
                 shows.forEach(show => {
                     let movId = show.movId;
-                    let day = Moment(show.date).format("dd");
+                    let day = Moment(show.date).locale("en").format("dd");
                     let time = Moment(show.date).format("HH:mm");
                     if (movieShows[movId] == null) {
                         movieShows[movId] = [];
                         movieShows[movId]["Mo"] = [];
-                        movieShows[movId]["Di"] = [];
-                        movieShows[movId]["Mi"] = [];
-                        movieShows[movId]["Do"] = [];
+                        movieShows[movId]["Tu"] = [];
+                        movieShows[movId]["We"] = [];
+                        movieShows[movId]["Th"] = [];
                         movieShows[movId]["Fr"] = [];
                         movieShows[movId]["Sa"] = [];
-                        movieShows[movId]["So"] = [];
+                        movieShows[movId]["Su"] = [];
                         movieShows[movId][day] = [];
                         movieShows[movId][day][time] = show.showId;
                     } else if (movieShows[movId][day] == null) {

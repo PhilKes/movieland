@@ -1,13 +1,14 @@
 import React, {Component} from 'react'
-import AuthService from "./AuthenticationService";
+import AuthService from "../service/AuthenticationService";
 import history from '../history';
-import AuthenticationService from "./AuthenticationService";
+import AuthenticationService from "../service/AuthenticationService";
 import AppNavbar from "../AppNavbar";
 import {Alert, Button, Container, FormFeedback, FormGroup, Input, Label} from "reactstrap";
 import App from "../App";
 
-/** Login Page for JWT Authentication*/
-class LoginComponent extends Component {
+/** /login page Component
+ *  Login Page for JWT Authentication*/
+class Login extends Component {
     constructor(props) {
         super(props);
         let msg = null;
@@ -46,12 +47,16 @@ class LoginComponent extends Component {
                 AuthenticationService.registerJwtSuccessfulLogin(resp.data.accessToken);
                 this.props.onLogin(true, this.state.username);
                 this.setState({showSuccessMessage: true, hasLoginFailed: false});
-                //if (window.location.pathname !== this.props.location.state.previous) {
-                    //TODO
+                if (this.props.location.state == null || this.props.location.state.previous === "/login") {
+                    console.log("to: /")
+                    history.push("/");
+                } else {
+                    console.log("to: " + this.props.location.state.previous)
                     history.push(this.props.location.state.previous);
-                //}
+                }
 
-            }).catch(() => {
+            }).catch((err) => {
+            console.log(err)
             this.setState({showSuccessMessage: false})
             this.setState({hasLoginFailed: true})
         })
@@ -87,4 +92,4 @@ class LoginComponent extends Component {
     }
 }
 
-export default LoginComponent
+export default Login

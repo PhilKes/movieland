@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {Route, Redirect} from 'react-router-dom'
-import AuthenticationService from "./AuthenticationService";
-import history from "../history";
+import AuthenticationService from "../../service/AuthenticationService";
+import history from "../../history";
 
 /** Redirects to login if not authenticated*/
 class AuthenticatedRoute extends Component {

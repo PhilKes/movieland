@@ -15,11 +15,12 @@ import {
 import {faUserAlt, faUser, faLock} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import LoadingPage from "../LoadingPage";
+import LoadingPage from "./misc/LoadingPage";
 import moment from "moment";
 
-/** User Dashboard page showing user details, reservations*/
-class DashboardComponent extends Component {
+/** /user/me page Component
+ *  User Dashboard page showing user details, reservations*/
+class Dashboard extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -109,4 +110,4 @@ class DashboardComponent extends Component {
     }
 }
 
-export default DashboardComponent
+export default Dashboard

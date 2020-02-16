@@ -1,6 +1,6 @@
 import React, {Component, useState} from 'react';
 import {Collapse, Container, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink} from 'reactstrap';
-import AppNavbar from "./AppNavbar";
+import AppNavbar from "../../AppNavbar";
 
 /** Navigation Bar ,sticky on top*/
 export default class LoadingPage extends Component {

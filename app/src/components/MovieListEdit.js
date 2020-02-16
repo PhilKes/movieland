@@ -5,8 +5,8 @@ import {Link} from 'react-router-dom';
 import MovieModal from "./modal/MovieModal";
 import Moment from 'moment';
 import axios from "axios";
-import ErrorPage from "../ErrorPage";
-import LoadingPage from "../LoadingPage";
+import ErrorPage from "./misc/ErrorPage";
+import LoadingPage from "./misc/LoadingPage";
 
 const INSTRUCTOR = 'admin';
 const PASSWORD = 'admin';
