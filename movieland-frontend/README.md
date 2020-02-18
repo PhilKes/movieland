@@ -1,5 +1,10 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# IMPORTANT
+If you run the app with docker, change "proxy" in the package.json to "http://app-server:8080".
+If you run the app on your localhost change it back to "http://localhost:8080".
+
+
 ## Available Scripts
 
 In the project directory, you can run:
