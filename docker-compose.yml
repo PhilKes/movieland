@@ -12,7 +12,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
-    restart: always
+    restart: on-failure
     depends_on:
       - db # This service depends on mysql. Start that first.
     environment: # Pass environment variables to the service
@@ -41,7 +41,7 @@ services:
 
   # Database Service (Mysql)
   db:
-    image: mysql:5.7
+    image: mysql:5.7.29
     ports:
       - "3306:3306"
     restart: always
@@ -52,6 +52,9 @@ services:
       MYSQL_ROOT_PASSWORD: movielandadmin
     volumes:
       - db-data:/var/lib/mysql
+      - ./database:/database
+    command: mysqld --init-file="/database/schema-and-data.sql"
+            
     networks:
       - backend
 
