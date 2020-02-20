@@ -1,0 +1,169 @@
+
+@import "variables";
+
+.logo-icon {
+    height: 60px;
+}
+
+.modal-movieList {
+    height: 35vh;
+    overflow-y: scroll;
+}
+
+.carousel .carousel-inner img {
+    width: 100%;
+    height: 30em;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.carousel-caption {
+    color: #fff;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+.card-image {
+    width: 185px;
+    height: auto;
+    max-width: 185px;
+}
+.movie-card{
+    width: 185px;
+    text-align: center;
+    align-content: center;
+    background-color: transparent;
+    border: none;
+}
+.movie-card > *{
+    border: none;
+}
+
+.seatimg {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    min-width: 24px;
+    min-height: 24px;
+    max-width: 28px;
+    border-top-left-radius: 40%;
+    border-top-right-radius: 40%;
+    background-color: darkgrey;
+}
+
+
+.seatimg:hover {
+    cursor: pointer;
+    box-shadow: 0 7px 7px rgba(0, 0, 0, 0.25);
+}
+
+.seatTable {
+    table-layout: fixed;
+    position: relative;
+    left: 50%;
+    min-width: 410px;
+}
+
+#screen {
+    background-color: black;
+    width: 200%;
+}
+
+#room {
+    width: 50%;
+    min-width: 364px;
+}
+
+.reserved {
+    background-color: red;
+}
+
+.selected {
+    background-color: green;
+}
+
+.shows-table  * {
+    text-align: center;
+    background-color: transparent;
+}
+.shows-table{
+    border-radius: 5%;
+    border-color: black;
+    border-width: 4px;
+    width: 50vw;
+    min-width: 20px;
+}
+.showtime-item{
+    font-size: 12pt;
+}
+
+.nav-link{
+    color: white;
+    font-size: 12pt;
+}
+.nav-link:hover {
+    color: #ff807b;
+}
+.nav-link * {
+    color: white;
+}
+.nav-link:hover * {
+    color: #ff807b;
+}
+
+.ontop{
+    color: #89001d;
+}
+.fontaw-icon{
+    margin-right: 10px;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+.navbar-brand>img {
+    padding: 14px ;
+}
+.sidebar-logo{
+    display: flex;
+    align-items: center;
+    width: 200px;
+}
+.top-navbar * {
+    background-color: rgb(152, 42, 38);
+    color: #f0f0f0;
+}
+.top-navbar img {
+    background-color: transparent;
+}
+
+
+.navbar-toggler-button:hover{
+    opacity: 0.75;
+}
+
+
+
+.footer{
+    text-align: center;
+    background-color: #1f1e1e;
+    color: white;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.main-panel{
+    min-height: 100vh;
+}
+
+.modal-trailer{
+    background-color: transparent;
+}
+.modal-trailer * {
+     background-color: transparent;
+    border: none;
+    box-shadow: none;
+ }

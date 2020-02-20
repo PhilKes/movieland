@@ -15,25 +15,30 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
-import ReactDOM from "react-dom";
+import React, { Component } from "react";
+import { FormGroup, ControlLabel, FormControl, Row } from "react-bootstrap";
 
-import { Route, Switch, Redirect } from "react-router-dom";
+function FieldGroup({ label, ...props }) {
+  return (
+    <FormGroup>
+      <ControlLabel>{label}</ControlLabel>
+      <FormControl {...props} />
+    </FormGroup>
+  );
+}
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./assets/css/animate.min.css";
-import "./assets/sass/light-bootstrap-dashboard-react.scss";
-import "./assets/css/demo.css";
-import "./assets/sass/lbd/_App.scss";
-import "./assets/css/pe-icon-7-stroke.css";
+export class FormInputs extends Component {
+  render() {
+    var row = [];
+    for (var i = 0; i < this.props.ncols.length; i++) {
+      row.push(
+        <div key={i} className={this.props.ncols[i]}>
+          <FieldGroup {...this.props.properties[i]} />
+        </div>
+      );
+    }
+    return <Row>{row}</Row>;
+  }
+}
 
-import App from "./App";
-import {Router} from "react-router";
-import history from "./history";
-
-ReactDOM.render(
-  <Router history={history} >
-    <App/>
-  </Router>,
-  document.getElementById("root")
-);
+export default FormInputs;

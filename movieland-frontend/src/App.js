@@ -1,17 +1,8 @@
 import React, {Component} from 'react';
-import './App.css';
+import './assets/sass/lbd/_App.scss';
 import {Router, Redirect, Route, Switch, withRouter} from 'react-router-dom';
-import MovieListEdit from './components/MovieListEdit';
-import MovieShowList from './components/MovieShowList';
-import Login from "./components/Login";
-import AuthenticatedRoute from "./components/misc/AuthenticatedRoute";
-import history from './history';
-import Register from "./components/Register";
-import AppNavbar from "./AppNavbar";
-import MovieList from "./components/MovieList";
-import MovieShow from "./components/MovieShow";
-import Dashboard from "./components/Dashboard";
 import AuthenticationService from "./service/AuthenticationService";
+import Layout from "./layouts/Layout";
 
 class App extends Component {
 
@@ -26,18 +17,31 @@ class App extends Component {
     /** Notify navbar if loggedIn user changed*/
     setUserLogin(loggedIn, currUser) {
         this.navBar.current.setLoggedIn(loggedIn, currUser);
-        this.setState({isLoggedIn: loggedIn, currUser: currUser});
+        //this.setState({isLoggedIn: loggedIn, currUser: currUser});
     }
 
     render() {
         return (
-            <div>
+            <Switch>
+                <Route path='/' exact={true}>
+                    <Redirect to='/movies'/>
+                </Route>
+                <Route path="/*" render={props => <Layout {...props} ref={this.navBar} />} />
+
+            </Switch>
+        )
+    }
+}
+
+export default withRouter(App);
+
+/*<div>
                 <AppNavbar ref={this.navBar} user={this.state.currUser} loggedIn={this.state.isLoggedIn}/>
                 <Switch>
                     <Route path='/' exact={true}>
                         <Redirect to='/movies'/>
                     </Route>
-                    {/*<Route path='/movies' exact={true} component={MovieList}/>**/}
+                    <Route path='/movies' exact={true} component={MovieList}/>*
                     <AuthenticatedRoute admin={true} path='/shows' exact={true} component={MovieShowList}/>
                     <AuthenticatedRoute admin={true} path="/movies/edit" exact component={MovieListEdit}/>
 
@@ -59,9 +63,4 @@ class App extends Component {
                         <a href="https://www.themoviedb.org/" target="_blank">TMDB</a>
                     </div>
                 </footer>
-            </div>
-        )
-    }
-}
-
-export default withRouter(App);
+            </div>*/

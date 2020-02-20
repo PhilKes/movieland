@@ -1,5 +1,5 @@
 import axios from "axios";
-import AuthenticatedRoute from "../components/misc/AuthenticatedRoute";
+import AuthenticatedRoute from "../webviews/misc/AuthenticatedRoute";
 
 /** Service to generate Authorization request + storing JWT Token*/
 class AuthenticationService {
@@ -19,7 +19,7 @@ class AuthenticationService {
     }
 
     registerSuccessfulLogin(username, password) {
-        localStorage.setItem("AUTH_USER", username)
+        sessionStorage.setItem("AUTH_USER", username)
         this.setupaxiosInterceptors(this.createBasicAuthToken(username, password))
     }
 
@@ -32,18 +32,17 @@ class AuthenticationService {
         return 'Bearer ' + token;
     }
 
-    /** Store JWT Token in localStorage + add auth header to all future axios requests*/
+    /** Store JWT Token in sessionStorage + add auth header to all future axios requests*/
     registerJwtSuccessfulLogin(token) {
         //let basicAuthHeader = 'Basic ' +  window.btoa(username + ":" + password)
         //console.log('registerSuccessfulLogin')
-        localStorage.setItem("JWT_TOKEN", token);
+        sessionStorage.setItem("JWT_TOKEN", token);
         this.setupaxiosInterceptors(this.createJwtAuthHeader(token))
 
     }
 
     isAdmin() {
-
-        let token = localStorage.getItem("JWT_TOKEN");
+        let token = sessionStorage.getItem("JWT_TOKEN");
         let payload = this.parseJwt(token);
         return payload.authorities.find(auth => auth.authority === "ROLE_ADMIN") != null;
     }
@@ -58,7 +57,7 @@ class AuthenticationService {
     };
 
     logoutUser() {
-        localStorage.removeItem("JWT_TOKEN");
+        sessionStorage.removeItem("JWT_TOKEN");
         axios.interceptors.request.use(config => config);
     }
 
@@ -74,7 +73,7 @@ class AuthenticationService {
     }
 
     isUserLoggedIn() {
-        let token = localStorage.getItem("JWT_TOKEN");
+        let token = sessionStorage.getItem("JWT_TOKEN");
         if (token === null) {
             return false
         }
@@ -83,11 +82,11 @@ class AuthenticationService {
     }
 
     setUserName(username) {
-        localStorage.setItem("USER", username)
+        sessionStorage.setItem("USER", username)
     }
 
     getUserName() {
-        return localStorage.getItem("USER");
+        return sessionStorage.getItem("USER");
     }
 
     //TODO is user ADMIN? -> do not allow e.g /shows to edit shows
