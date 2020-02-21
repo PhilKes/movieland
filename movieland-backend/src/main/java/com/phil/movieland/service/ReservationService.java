@@ -1,6 +1,5 @@
 package com.phil.movieland.service;
 
-import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.data.entity.Seat;
 import com.phil.movieland.data.repository.ReservationRepository;
@@ -67,21 +66,32 @@ public class ReservationService {
     }
 
     public void saveReservationsWithSeats(List<StatisticsService.ReservationWithSeats> reservations) {
-        reservations.stream().forEach(res-> saveReservation(res.getReservation(),res.getSeats()));
+        reservations.stream().forEach(res -> saveReservation(res.getReservation(), res.getSeats()));
     }
 
-    /** Return if seatList is available for show*/
+    /**
+     * Return if seatList is available for show
+     */
     //TODO REPLACE WITH SQL STATEMENT
     public boolean areSeatsAvailable(long showId, List<Seat> seatList) {
-        List<Reservation> reservations= reservationRepository.findAllByShowId(showId);
+       /* List<Reservation> reservations= reservationRepository.findAllByShowId(showId);
         for(Reservation res: reservations){
             List<Seat> takenSeats=seatRepository.findAllByResId(res.getResId());
             for(Seat takenSeat: takenSeats){
-                /** Return false if takenSeat matches any in the list*/
+                *//** Return false if takenSeat matches any in the list*//*
                 if(seatList.stream().anyMatch(s-> s.getNumber()==takenSeat.getNumber()))
                     return false;
             }
         }
+        return true;*/
+        for(Seat seat : seatList) {
+            if(!seatRepository.findSeatDuplicates(seat.getNumber(), showId).isEmpty()) {
+                System.out.println("Seat taken("+seat.getNumber()+",show: "+showId+")");
+                return false;
+            }
+        }
         return true;
     }
+
+
 }

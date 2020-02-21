@@ -34,8 +34,40 @@ import {
   responsiveBar,
   legendBar
 } from "../variables/Variables.jsx";
+import axios from "axios";
+import * as queryString from "query-string";
+import LoadingPage from "../webviews/misc/LoadingPage";
+import moment from "moment";
 
 class Dashboard extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+        isLoading:true,
+        income: -1
+    }
+  }
+
+  componentDidMount() {
+    document.title = "Admin Dashboard";
+    let today= moment();
+    axios.get('/api/statistics/income', {
+      params: {
+        until: today.format("YYYY-MM-DD"),
+        from: today.subtract(7,"days").format("YYYY-MM-DD")
+      },
+      paramsSerializer: params => {
+        return queryString.stringify(params)
+      }
+    })
+        .then(res => res.data)
+        .then(data => {
+          console.log("income: "+data);
+          this.setState({isLoading:false, income:data})
+        })
+  }
+
+
   createLegend(json) {
     var legend = [];
     for (var i = 0; i < json["names"].length; i++) {
@@ -47,6 +79,9 @@ class Dashboard extends Component {
     return legend;
   }
   render() {
+    if(this.state.isLoading){
+      return <LoadingPage/>
+    }
     return (
       <div className="content">
         <Grid fluid>
@@ -64,9 +99,9 @@ class Dashboard extends Component {
               <StatsCard
                 bigIcon={<i className="pe-7s-wallet text-success" />}
                 statsText="Revenue"
-                statsValue="$1,345"
+                statsValue={this.state.income+"$"}
                 statsIcon={<i className="fa fa-calendar-o" />}
-                statsIconText="Last day"
+                statsIconText="Last 7 Days"
               />
             </Col>
             <Col lg={3} sm={6}>

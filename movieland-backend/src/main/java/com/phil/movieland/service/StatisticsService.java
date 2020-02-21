@@ -66,6 +66,7 @@ public class StatisticsService {
                 }
                 movieShowService.saveShows(movieShows);
             }
+            System.out.println("Generated shows for: " + countDate.getTime());
             countDate.add(Calendar.DATE, 1);
         }
     }
@@ -103,11 +104,10 @@ public class StatisticsService {
                     ReservationWithSeats reservationWithSeats=new ReservationWithSeats();
                     reservationWithSeats.setReservation(reservation);
                     /** Determine Seats of reservation*/
-                    List<Seat> seatList= new ArrayList<>();
-                    do{
+                    List<Seat> seatList=new ArrayList<>();
+                    do {
                         seatList.clear();
-                        //TODO int amtSeats=1 + rand.nextInt(4);
-                        int amtSeats=1;
+                        int amtSeats=2 + rand.nextInt(4);
                         int startSeat=rand.nextInt(160) - amtSeats;
                         if(startSeat<0) {
                             startSeat=0;
@@ -116,9 +116,9 @@ public class StatisticsService {
                         for(int j=0; j<amtSeats; j++) {
                             Seat seat=new Seat();
                             seat.setResId(reservation.getResId());
-                            seat.setNumber(startSeat+j);
+                            seat.setNumber(startSeat + j);
                             int type=rand.nextInt(4);
-                            switch(type){
+                            switch(type) {
                                 case 0:
                                     seat.setType(Seat.Seat_Type.CHILD);
                                     break;
@@ -137,14 +137,26 @@ public class StatisticsService {
                             }
                             seatList.add(seat);
                         }
-                    }while(!reservationService.areSeatsAvailable(show.getShowId(),seatList));
+                    } while(!reservationService.areSeatsAvailable(show.getShowId(), seatList));
                     reservationWithSeats.setSeats(seatList);
                     reservations.add(reservationWithSeats);
                 }
                 reservationService.saveReservationsWithSeats(reservations);
             }
+            System.out.println("Generated reservations for: " + countDate.getTime());
             countDate.add(Calendar.DATE, 1);
         }
+    }
+
+    /** Calculates income based on reservation from Date to Date until*/
+    public double calculateIncomeBetween(Date from, Date until) {
+        List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
+        double sum=0.0;
+        for(MovieShow show : shows){
+            List<Seat> seats=seatRepository.findSeatsOfShow(show.getShowId());
+            sum+=seats.stream().mapToDouble(seat->Seat.getPrice(seat.getType())).sum();
+        }
+        return sum;
     }
 
     public class ReservationWithSeats {

@@ -2,6 +2,9 @@ package com.phil.movieland.data.entity;
 
 
 import javax.persistence.*;
+import java.util.HashMap;
+
+import static com.phil.movieland.data.entity.Seat.Seat_Type.*;
 
 @Entity
 @Table(name="SEAT")
@@ -9,6 +12,16 @@ public class Seat {
 
     public enum Seat_Type{
         CHILD,STUDENT,ADULT,DISABLED
+    }
+    private static final HashMap<Seat_Type,Double>PRICE_MAP=new HashMap();
+    static {
+        PRICE_MAP.put(CHILD,5.5);
+        PRICE_MAP.put(STUDENT,6.0);
+        PRICE_MAP.put(ADULT,7.0);
+        PRICE_MAP.put(DISABLED,5.5);
+    }
+    public static double getPrice(Seat_Type type){
+        return PRICE_MAP.get(type);
     }
 
     @Id
