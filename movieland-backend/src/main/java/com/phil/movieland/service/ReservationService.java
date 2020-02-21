@@ -1,5 +1,6 @@
 package com.phil.movieland.service;
 
+import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.data.entity.Seat;
 import com.phil.movieland.data.repository.ReservationRepository;
@@ -22,25 +23,23 @@ public class ReservationService {
     }
 
 
-    public Reservation saveReservation(Reservation reservation, List<Integer> seats) {
+    public Reservation saveReservation(Reservation reservation, List<Seat> seats) {
         /** Check if seats are already taken*/
         List<Reservation> reservations=reservationRepository.findAllByShowId(reservation.getShowId());
         for(Reservation res : reservations) {
             List<Seat> seatList=seatRepository.findAllByResId(res.getResId());
             for(Seat reserved : seatList) {
-                if(seats.stream().anyMatch(selected -> reserved.getNumber()==selected)) {
+                if(seats.stream().anyMatch(selected -> reserved.getNumber()==selected.getNumber())) {
                     return null;
                 }
             }
         }
 
         Reservation result=reservationRepository.save(reservation);
-        seats.stream().map(number -> {
-            Seat seat=new Seat();
-            seat.setNumber(number);
+        seats.stream().forEach(seat -> {
             seat.setResId(result.getResId());
-            return seat;
-        }).forEach(seat -> seatRepository.save(seat));
+            seatRepository.save(seat);
+        });
         return result;
     }
 
@@ -65,5 +64,24 @@ public class ReservationService {
 
     public List<Reservation> getAllReservationsOfUser(Long userId) {
         return reservationRepository.findAllByUserId(userId);
+    }
+
+    public void saveReservationsWithSeats(List<StatisticsService.ReservationWithSeats> reservations) {
+        reservations.stream().forEach(res-> saveReservation(res.getReservation(),res.getSeats()));
+    }
+
+    /** Return if seatList is available for show*/
+    //TODO REPLACE WITH SQL STATEMENT
+    public boolean areSeatsAvailable(long showId, List<Seat> seatList) {
+        List<Reservation> reservations= reservationRepository.findAllByShowId(showId);
+        for(Reservation res: reservations){
+            List<Seat> takenSeats=seatRepository.findAllByResId(res.getResId());
+            for(Seat takenSeat: takenSeats){
+                /** Return false if takenSeat matches any in the list*/
+                if(seatList.stream().anyMatch(s-> s.getNumber()==takenSeat.getNumber()))
+                    return false;
+            }
+        }
+        return true;
     }
 }

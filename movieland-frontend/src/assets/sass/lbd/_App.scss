@@ -98,14 +98,11 @@
 }
 
 .nav-link{
-    color: white;
+    color: #ff807b;
     font-size: 12pt;
 }
 .nav-link:hover {
     color: #ff807b;
-}
-.nav-link * {
-    color: white;
 }
 .nav-link:hover * {
     color: #ff807b;
@@ -113,7 +110,17 @@
 
 .ontop{
     color: #89001d;
+    background-color: transparent;
 }
+.ontop * {
+    color: #89001d;
+    background-color: transparent;
+}
+
+.navitem:hover{
+    background-color: white;
+}
+
 .fontaw-icon{
     margin-right: 10px;
 }
@@ -167,3 +174,32 @@
     border: none;
     box-shadow: none;
  }
+
+.img-fluid{
+    width: 14vh;
+    align-content: center;
+    align-self: center;
+}
+
+.responsive-text  {
+    font-size: 20vw;
+}
+.wrap-words{
+    td {
+        word-wrap: break-word;
+    }
+}
+.transparent{
+    color: transparent;
+}
+
+.transparent * {
+    color: transparent;
+}
+
+.text-center{
+    text-align: center;
+}
+.content{
+    margin-bottom: 50px;
+}

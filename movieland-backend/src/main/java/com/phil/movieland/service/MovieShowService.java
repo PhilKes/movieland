@@ -9,10 +9,7 @@ import com.phil.movieland.utils.TmdbApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /** Service to interface movieShowRepository */
 @Service
@@ -110,5 +107,13 @@ public class MovieShowService {
         in7Days.add(Calendar.DATE, 7);
         System.out.println("Looking for shows between: " + date + " and " + in7Days.getTime());
         return movieShowRepository.findAllByDateBetween(date, in7Days.getTime());
+    }
+
+    public void saveShows(List<MovieShow> movieShows) {
+        movieShows.stream().sorted(Comparator.comparing(MovieShow::getDate)).forEach(this::saveShow);
+    }
+
+    public List<MovieShow> getShowsForBetween(Date from, Date until) {
+        return movieShowRepository.findAllByDateBetween(from,until);
     }
 }

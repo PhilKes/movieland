@@ -30,13 +30,14 @@ import AuthenticationService from "./service/AuthenticationService";
 import Login from "./webviews/Login";
 import Logout from "./webviews/Logout";
 import Register from "./webviews/Register";
+import Dashboard from "./webviews/Dashboard";
 
 const loggedInActions = [
   {
     path: "/profile/me",
     name: "Account",
     icon: faUser,
-    component: MovieShow,
+    component: Dashboard,
     onAction: false
   },
   {

@@ -7,6 +7,10 @@ import javax.persistence.*;
 @Table(name="SEAT")
 public class Seat {
 
+    public enum Seat_Type{
+        CHILD,STUDENT,ADULT,DISABLED
+    }
+
     @Id
     @Column(name="SEAT_ID")
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -17,6 +21,17 @@ public class Seat {
 
     @Column(name="SEAT_NR")
     private int number;
+
+    @Column(name="TYPE")
+    private Seat_Type type;
+
+    public Seat_Type getType() {
+        return type;
+    }
+
+    public void setType(Seat_Type type) {
+        this.type=type;
+    }
 
     public long getSeatID() {
         return seatID;

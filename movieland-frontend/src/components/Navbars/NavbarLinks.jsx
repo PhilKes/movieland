@@ -58,7 +58,8 @@ class NavbarLinks extends Component {
           {this.props.routes.map((prop, key) => {
               if (!prop.redirect && prop.show)
                   return (
-                      <NavItem key={key}>
+
+                      <NavItem key={key} >
                           <NavLink
                               className={this.props.onTop? "nav-link ontop" : "nav-link"} to={prop.path}>
                               <div>
@@ -66,6 +67,7 @@ class NavbarLinks extends Component {
                               </div>
                           </NavLink>
                       </NavItem>
+
                   );
               return null;
           })}

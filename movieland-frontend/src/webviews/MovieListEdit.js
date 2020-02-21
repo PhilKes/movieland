@@ -6,6 +6,8 @@ import Moment from 'moment';
 import axios from "axios";
 import ErrorPage from "./misc/ErrorPage";
 import LoadingPage from "./misc/LoadingPage";
+import {Col, Grid, Row} from "react-bootstrap";
+import ReactCard from "../components/Card/Card";
 
 const INSTRUCTOR = 'admin';
 const PASSWORD = 'admin';
@@ -89,7 +91,7 @@ class MovieListEdit extends Component {
             return <tr key={movie.movId}>
                 <td><img src={movie.posterUrl} className={'img-fluid'} alt="Responsive image"/></td>
                 <td>{movie.name}</td>
-                <td>{descript}</td>
+               {/* <td>{descript}</td>*/}
                 <td>
                     <div key={movie.movId}>{Moment(movie.date).format('DD.MM.YYYY')}</div>
                 </td>
@@ -105,31 +107,55 @@ class MovieListEdit extends Component {
 
         return (
             <div className="content">
-                <Container fluid>
-                    <div className="float-right">
-                        <MovieModal onSubmit={this.addMovie.bind(this)}/>
-                    </div>
-                    <h2>Movies</h2><br/>
-                    <Input type="text" placeholder="Search Movies" innerRef={ref => this.searchQuery = ref}
-                           onKeyPress={this.handleKeyPress.bind(this)}/><br/>
-                    <Alert color="danger" isOpen={error.length > 0} toggle={() => this.setState({error: ""})}>
-                        {error}
-                    </Alert>
-                    <Table className="mt-5">
-                        <thead>
-                        <tr>
-                            <th width="15%">Poster</th>
-                            <th width="6%">Name</th>
-                            <th width="25%">Description</th>
-                            <th width="15%">Release Date</th>
-                            <th width="15%">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {movieList}
-                        </tbody>
-                    </Table>
-                </Container>
+                <Grid fluid>
+                    <Row>
+                        <Col md={12}>
+                            <div className="float-right">
+                                <MovieModal onSubmit={this.addMovie.bind(this)}/>
+                            </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={12}>
+                            <h2>Movies</h2><br/>
+                            <Input type="text" placeholder="Search Movies" innerRef={ref => this.searchQuery = ref}
+                                   onKeyPress={this.handleKeyPress.bind(this)}/><br/>
+                            <Alert color="danger" isOpen={error.length > 0} toggle={() => this.setState({error: ""})}>
+                                {error}
+                            </Alert>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={12}>
+                            <ReactCard
+                                plain
+                                ctTableFullWidth
+                                ctTableResponsive
+                                content={
+
+                                <Table className="wrap-words">
+                                    <thead>
+                                        <tr>
+                                           {/* <th width="15%">Poster</th>
+                                            <th width="6%">Name</th>
+                                            <th width="25%">Description</th>
+                                            <th width="15%">Release Date</th>
+                                            <th width="15%">Actions</th> */}
+                                            <th >Poster</th>
+                                            <th width="20vw" >Name</th>
+                                           {/* <th >Description</th>*/}
+                                            <th >Release Date</th>
+                                            <th >Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {movieList}
+                                    </tbody>
+                                </Table>}
+                            />
+                        </Col>
+                    </Row>
+                </Grid>
             </div>
         );
     }

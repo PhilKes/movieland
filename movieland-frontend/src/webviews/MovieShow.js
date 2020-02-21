@@ -127,7 +127,7 @@ class MovieShow extends Component {
         axios.post('/api/reservation',
             {
                 show_id: this.state.showId,
-                seats: Object.keys(this.state.selectedSeats)
+                seats: Object.keys(this.state.selectedSeats).map(number=>{ return {number:number,type: "CHILD"};})
             })
             .then(res => window.location.reload());
     }

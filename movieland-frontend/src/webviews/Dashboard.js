@@ -97,7 +97,9 @@ class Dashboard extends Component {
             );
         });
 
+        //TODO past reservations/ACTIVE
         return (
+            <div className="content">
             <Container fluid>
                 <h2>My Dashboard</h2>
                 <b>Id: {user.id}</b><br/>
@@ -106,6 +108,7 @@ class Dashboard extends Component {
                 <b>Reservations</b><br/>
                 {reservationList}
             </Container>
+            </div>
         )
     }
 }

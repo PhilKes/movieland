@@ -43,7 +43,7 @@ public class ReservationController {
         Reservation reservation=new Reservation();
         reservation.setShowId(reservationRequest.getShow_id());
         reservation.setUserId(currentUser.getId());
-        //TODO CHECK IF RESERVATION OR SEATS ARE ALREADY IN DATABASE
+
         Reservation result=reservationService.saveReservation(reservation, reservationRequest.getSeats());
         if(result==null) {
             return ResponseEntity.badRequest()

@@ -4,14 +4,18 @@ import {
     ListGroup,
     ListGroupItem,
     ButtonGroup,
-    InputGroup, InputGroupText, InputGroupAddon, Input
 } from 'reactstrap';
 import Moment from "moment";
 import {Link} from "react-router-dom";
 import {faSearch, faClock} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import {Modal} from "react-bootstrap";
+import {Col, Grid,Row, Modal} from "react-bootstrap";
+import {InputGroup} from "react-bootstrap";
+import InputGroupAddon from "react-bootstrap/lib/InputGroupAddon";
+import InputGroupText from "reactstrap/lib/InputGroupText";
+import InputGroupButton from "react-bootstrap/lib/InputGroupButton";
+import Input from "reactstrap/lib/Input";
 
 /** Modal for adding a new MovieShow with movieId + time*/
 export default class MovieShowModal extends React.Component {
@@ -73,42 +77,49 @@ export default class MovieShowModal extends React.Component {
         });
 
         return (
-            <div >
+            <div className="content" >
                 <Button color="success" onClick={this.toggle}>Add MovieShow</Button>
                 <Modal show={this.state.modal}>
                     <form onSubmit={this.handleSubmit}>
                         <Modal.Header>Add a Show for a new Movie</Modal.Header>
                         <Modal.Body>
-                            <div className="row">
-                                <div className="form-group col-md-12">
-                                    <InputGroup>
-                                        <InputGroupAddon addonType="prepend">
-                                            <InputGroupText>
-                                                <FontAwesomeIcon icon={faClock}/>
-                                            </InputGroupText>
-                                        </InputGroupAddon>
-                                        <Input type="time"
-                                               defaultValue={Moment().format("HH:mm")}
-                                               style={{width: 'auto'}}
-                                               name="time"/>
-                                    </InputGroup><br/>
-                                    <InputGroup>
-                                        <InputGroupAddon addonType="prepend">
-                                            <InputGroupText>
-                                                <FontAwesomeIcon icon={faSearch}/>
-                                            </InputGroupText>
-                                        </InputGroupAddon>
-                                        <Input placeholder="Search" type="text"
-                                               placeholder="Search Movies"
-                                               value={this.state.name}
-                                               onChange={this.handleChangeName}
-                                               className="form-control"/>
-                                    </InputGroup>
-                                </div>
-                            </div>
-                            <ListGroup className={'modal-movieList'}>
-                                {movieList}
-                            </ListGroup>
+                            <Grid fluid>
+                                <Row>
+                                    <Col md={8}>
+                                            <div className="form-group">
+                                                <InputGroup>
+                                                    <InputGroupAddon addonType="prepend">
+                                                        <InputGroupText>
+                                                            <FontAwesomeIcon icon={faClock}/>
+                                                        </InputGroupText>
+                                                    </InputGroupAddon>
+                                                    <Input type="time"
+                                                           defaultValue={Moment().format("HH:mm")}
+                                                           style={{width: 'auto'}}
+                                                           name="time"/>
+                                                </InputGroup><br/>
+                                                <InputGroup>
+                                                    <InputGroupAddon addonType="prepend">
+                                                        <InputGroupText>
+                                                            <FontAwesomeIcon icon={faSearch}/>
+                                                        </InputGroupText>
+                                                    </InputGroupAddon>
+                                                    <Input placeholder="Search" type="text"
+                                                           placeholder="Search Movies"
+                                                           value={this.state.name}
+                                                           onChange={this.handleChangeName}
+                                                           className="form-control"/>
+
+                                                </InputGroup>
+                                            </div>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <ListGroup className={'modal-movieList'}>
+                                        {movieList}
+                                    </ListGroup>
+                                </Row>
+                            </Grid>
                         </Modal.Body>
                         <Modal.Footer>
                             <input type="submit" value="Add" color="success" className="btn btn-primary"/>

@@ -13,6 +13,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import ErrorPage from "./misc/ErrorPage";
 import LoadingPage from "./misc/LoadingPage";
+import {Col, Grid, Row} from "react-bootstrap";
+import ReactCard from "../components/Card/Card";
+import CustomButton from "../components/CustomButton/CustomButton";
 
 /** /shows page
  * Shows MovieShows by Date + ADD/REMOVE Shows*/
@@ -140,43 +143,48 @@ class MovieShowList extends Component {
         }
 
         /** Generate table rows for each movie containing its shows on dateParam*/
-        const movieList = Object.keys(movies).map(id => {
+        let movieKeys=Object.keys(movies);
+        const movieList = movieKeys.map(id => {
             console.log("Render movie: " + movies[id].name)
             return <tr key={movies[id].movId}>
-                <td><img src={movies[id].posterUrl} className={'img-fluid'} alt="Responsive image"/></td>
                 <td>
-                    <div className="row">
-                        <h5>{movies[id].name}</h5>
+                    <h5 className="text-center">{movies[id].name}</h5>
+                    <div className="text-center">
+                    <img src={movies[id].posterUrl} className="img-fluid" alt="Responsive image"/>
                     </div>
-                    <div className="row">{movies[id].description}</div>
                 </td>
                 <td>
-                    <Table borderless size="sm">
-                        <tbody>
-                        {shows.map(show => {
-                            if (show.movId == movies[id].movId) {
-                                return (
-                                    <tr key={show.showId}>
-                                        <td width="10%">
-                                            <div style={{
-                                                fontSize: 14 + 'pt',
-                                                marginRight: 30 + 'pt'
-                                            }}>{Moment(show.date).format('HH:mm')}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <Form onSubmit={this.remove.bind(this)}>
-                                                <Button type="submit" size="sm" color="danger">
-                                                    <FontAwesomeIcon icon={faMinusCircle}/>
-                                                </Button>
-                                                <Input type="hidden" name="showId" value={show.showId}/>
-                                            </Form>
-                                        </td>
-                                    </tr>);
-                            }
-                        })}
-                        </tbody>
-                    </Table>
+                    <Grid fluid>
+                    <Row>
+                        <Col md={8}>
+                            <Table bordered >
+                                <thead><tr><th colSpan={2} className="text-center">Shows</th></tr></thead>
+                                <tbody>
+                                {shows.map(show => {
+                                    if (show.movId == movies[id].movId) {
+                                        return (
+                                            <tr key={show.showId} className="text-center">
+                                                <td style={{
+                                                    fontSize: 14 + 'pt'
+                                                }}>
+                                                    {Moment(show.date).format('HH:mm')}
+                                                </td>
+                                                <td>
+                                                    <Form onSubmit={this.remove.bind(this)}>
+                                                        <Button type="submit" size="sm" color="danger">
+                                                            <FontAwesomeIcon icon={faMinusCircle}/>
+                                                        </Button>
+                                                        <Input type="hidden" name="showId" value={show.showId}/>
+                                                    </Form>
+                                                </td>
+                                            </tr>);
+                                    }
+                                })}
+                                </tbody>
+                            </Table>
+                        </Col>
+                    </Row>
+                    </Grid>
                 </td>
 
                 <td>
@@ -189,7 +197,7 @@ class MovieShowList extends Component {
                             />
                             <Input type="hidden" name="movId" value={movies[id].movId}/>
                             <InputGroupAddon addonType="append">
-                                <Button size="sm" color="success" type="submit">Add</Button>
+                                <CustomButton block size="sm" bsStyle="success" type="submit">Add</CustomButton>
                             </InputGroupAddon>
                         </InputGroup>
                     </Form>
@@ -200,32 +208,53 @@ class MovieShowList extends Component {
 
         return (
             <div className="content">
-                <Container fluid>
-                    <h3>Movie Shows</h3>
-                    <div >
-                        <MovieShowModal onSubmit={this.addShowModal.bind(this)}/>
-                    </div><br/>
-                    <FormGroup>
-                        <Label for="exampleDate">Date</Label>
-                        <Input type="date" defaultValue={this.dateParam} placeholder="date placeholder"
-                               onChange={this.changeDate.bind(this)}
-                               style={{width: 'auto'}}
-                        />
-                    </FormGroup>
-                    <Table>
-                        <thead>
-                        <tr>
-                            <th width="200px">Poster</th>
-                            <th>Movie Name</th>
-                            <th width="10%">Times</th>
-                            <th width="25%">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {movieList}
-                        </tbody>
-                    </Table>
-                </Container>
+                <Grid fluid>
+                    <Row>
+                        <Col md={12}>
+                            <h3>Movie Shows</h3>
+                            <div >
+                                <MovieShowModal onSubmit={this.addShowModal.bind(this)}/>
+                            </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={12}>
+                            <FormGroup>
+                                <Label for="exampleDate">Date</Label>
+                                <Input type="date" defaultValue={this.dateParam} placeholder="date placeholder"
+                                       onChange={this.changeDate.bind(this)}
+                                       style={{width: 'auto'}}
+                                />
+                            </FormGroup>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={12}>
+                            {
+                                movieKeys.length>0?
+                                    (<ReactCard
+                                    plain
+                                    ctTableFullWidth
+                                    ctTableResponsive
+                                    content={
+                                    <Table className="wrap-words">
+                                        <thead>
+                                        <tr className="text-center">
+                                            <th className="text-center">Movie</th>
+                                            <th className="text-center">Times</th>
+                                            <th className="text-center">Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            {movieList}
+                                        </tbody>
+                                    </Table>}
+                                />)
+                                : <h4>No Shows found for this date...</h4>
+                            }
+                        </Col>
+                    </Row>
+                </Grid>
             </div>
         );
     }

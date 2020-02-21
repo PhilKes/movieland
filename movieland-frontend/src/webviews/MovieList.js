@@ -14,8 +14,6 @@ import {
     CarouselItem,
     ListGroupItem,
     ListGroup,
-    Row,
-    Col,
     CardBody,
     CardImg
 } from 'reactstrap';
@@ -30,7 +28,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 import TrailerModal from "./modal/TrailerModal";
 import CardHeader from "reactstrap/lib/CardHeader";
-import {Grid} from "react-bootstrap";
+import {Grid,Row,Col} from "react-bootstrap";
 import ReactCard from "../components/Card/Card";
 
 
@@ -168,9 +166,10 @@ class MovieList extends Component {
             if (shows[movie.movId] == null) {
                 return <Row key={movie.movId}/>;
             }
-            //TODO days in order starting from today
+
             let days = Object.keys(shows[movie.movId]);
             let today = Moment().locale("en").format("dd");
+            //TODO days in order starting from today
             days = days.sort((a, b) => {
                 if (a === today) {
                     return -1;
@@ -200,41 +199,57 @@ class MovieList extends Component {
 
             return (
                 <Row key={movie.movId}>
-                    <Col>
-                        <ReactCard content={
-                            <Row>
-                                <Col sm={4}>
-                                <Card className="movie-card">
-                                          <CardBody>
-                                              <CardImg variant="top" src={movie.posterUrl} className="card-image text-center"/>
-                                              <div style={{width: 185 + "px"}}>
-                                                  <ButtonGroup style={{display: "flex"}}>
-                                                      <Button color="light" style={{flex: 1}}>
-                                                          <FontAwesomeIcon icon={faInfoCircle}/>
-                                                      </Button>
-                                                      <TrailerModal movId={movie.movId}/>
-                                                  </ButtonGroup>
-                                              </div>
-                                          </CardBody>
-                                </Card>
-                                </Col>
-                                <Col>
-                                    <h3>{movie.name}</h3>
-                                    <Table borderless className="shows-table">
-                                        <thead>
-                                        <tr>
-                                            {days.map(day=>{
-                                                return(
-                                                    <th key={day} width="14.286%" className="showday-header"><h4>{day}</h4></th>
-                                                );
-                                            })
-                                            }
-                                        </tr>
-                                        {showList}
-                                        </thead>
-                                    </Table>
-                                </Col>
-                            </Row>}
+                    <Col md={12}>
+                        {/*TODO TABLE FULL WIDTH*/}
+                        <ReactCard
+                            plain
+                            content={
+                                <Grid>
+                                    <Row>
+                                        <Col xs={6}>
+                                            <ReactCard
+                                                plain
+                                                content={
+                                                    <div>
+                                                        <img src={movie.posterUrl} className="img-fluid text-center"/>
+                                                        <div>
+                                                            <ButtonGroup style={{display: "flex"}}>
+                                                                <Button color="light" >
+                                                                    <FontAwesomeIcon icon={faInfoCircle}/>
+                                                                </Button>
+                                                                <TrailerModal movId={movie.movId}/>
+                                                            </ButtonGroup>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            />
+                                        </Col>
+                                        <Col xs={3} >
+                                            <h3>{movie.name}</h3>
+                                        </Col>
+                                    </Row>
+                                        <Row>
+                                            <Col md={8}>
+                                                <ReactCard
+                                                    plain
+                                                    content={
+                                                <Table borderless size="sm">
+                                                    <thead>
+                                                    <tr>
+                                                        {days.map(day=>{
+                                                            return(
+                                                                <th key={day} width="14.286%" className="showday-header"><h4>{day}</h4></th>
+                                                            );
+                                                        })
+                                                        }
+                                                    </tr>
+                                                    {showList}
+                                                    </thead>
+                                                </Table>}/>
+                                            </Col>
+                                        </Row>
+                                </Grid>
+                                }
                         />
                     </Col>
 

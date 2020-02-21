@@ -159,9 +159,9 @@ class Layout extends Component {
             {this.getRoutes(this.routes)}
             {this.getRoutes(loggedInActions)}
             {this.getRoutes(loggedOutActions)}
-            <Route path="*">
+            {/*<Route path="*">
               <Redirect to="/"/>
-            </Route>
+            </Route>*/}
           </Switch>
 
         </div>
