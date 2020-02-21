@@ -168,7 +168,7 @@ class Layout extends Component {
        {/*TODO <Sidebar {...this.props} routes={this.routes} actions={this.actions}
                  color={this.state.color}
         />*/}
-          <footer className="footer">
+          <footer className="footer footer-me">
             &copy; {new Date().getFullYear()}{" "}
             <a href="https://github.com/PhilKes">
               Phil Kes

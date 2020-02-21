@@ -29,6 +29,9 @@ public class Movie {
     @Column(name="POSTER_URL", nullable=true)
     private String posterUrl;
 
+    @Column(name="LENGTH", nullable=true)
+    private Long length;
+
     @Column(name="TMDB_ID")
     private Long tmdbId;
 
@@ -36,6 +39,18 @@ public class Movie {
     @Transient //Ignore for Persistence in Database
     @JsonIgnore
     private MovieDb tmdbMovie;
+
+    public Long getLength() {
+        return length;
+    }
+
+    public void setLength(Long length) {
+        this.length=length;
+    }
+
+    public void setTmdbId(Long tmdbId) {
+        this.tmdbId=tmdbId;
+    }
 
     public long getMovId() {
         return movId;
@@ -93,6 +108,7 @@ public class Movie {
         this.tmdbMovie=tmdbMovie;
         this.tmdbId=(long) tmdbMovie.getId();
         this.posterUrl=TmdbApiService.POSTER_BASE_URL+tmdbMovie.getPosterPath();
+        this.length=(long)tmdbMovie.getRuntime();
         //TODO pipe description
 
         this.description=tmdbMovie.getOverview();

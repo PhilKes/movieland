@@ -42,46 +42,28 @@ public class StatisticsController {
 
     @PostMapping("/shows")
     public ResponseEntity<?> generateShows(@RequestBody BetweenDatesRequest datesRequest) throws URISyntaxException {
-        Calendar from=Calendar.getInstance();
-        from.setTime(datesRequest.getFrom());
-        from.set(Calendar.HOUR, 0);
-        from.set(Calendar.MINUTE, 0);
-        from.set(Calendar.SECOND, 0);
-        from.set(Calendar.MILLISECOND, 0);
-        Calendar until=Calendar.getInstance();
-        until.setTime(datesRequest.getUntil());
-        until.set(Calendar.HOUR, 23);
-        until.set(Calendar.MINUTE, 59);
-        until.set(Calendar.SECOND, 59);
-        if(from.after(until)) {
+        Date start=getDateFormDayStartOrEnd(datesRequest.getFrom(),true);
+        Date end= getDateFormDayStartOrEnd(datesRequest.getUntil(),false);
+        if(start.after(end)) {
             return ResponseEntity.badRequest().body("From Date must be earlier than until Date!");
         }
-        statisticsService.generateShowsBetween(from.getTime(), until.getTime());
+        statisticsService.generateShowsBetween(start, end);
         return ResponseEntity.created(new URI("/api/shows"))
-                .body("Created shows from " + from.getTime() + " until " + until.getTime());
+                .body("Created shows from " + start + " until " + end);
     }
 
 
     //TODO SPEED UP WITH SQL QUERIES
     @PostMapping("/reservations")
     public ResponseEntity<?> generateReservations(@RequestBody BetweenDatesRequest datesRequest) throws URISyntaxException {
-        Calendar from=Calendar.getInstance();
-        from.setTime(datesRequest.getFrom());
-        from.set(Calendar.HOUR, 0);
-        from.set(Calendar.MINUTE, 0);
-        from.set(Calendar.SECOND, 0);
-        from.set(Calendar.MILLISECOND, 0);
-        Calendar until=Calendar.getInstance();
-        until.setTime(datesRequest.getUntil());
-        until.set(Calendar.HOUR, 23);
-        until.set(Calendar.MINUTE, 59);
-        until.set(Calendar.SECOND, 59);
-        if(from.after(until)) {
+        Date start=getDateFormDayStartOrEnd(datesRequest.getFrom(),true);
+        Date end= getDateFormDayStartOrEnd(datesRequest.getUntil(),false);
+        if(start.after(end)) {
             return ResponseEntity.badRequest().body("From Date must be earlier than until Date!");
         }
-        statisticsService.generateReservationsBetween(from.getTime(), until.getTime());
+        statisticsService.generateReservationsBetween(start, end);
         return ResponseEntity.created(new URI("/api/reservations"))
-                .body("Created reservations from " + from.getTime() + " until " + until.getTime());
+                .body("Created reservations from " + start+ " until " + end);
     }
 
     @GetMapping("/income")
@@ -90,21 +72,42 @@ public class StatisticsController {
             @RequestParam(value="from") Date from
             ,@DateTimeFormat(pattern = "yyyy-MM-dd")
             @RequestParam(value="until") Date until) throws URISyntaxException {
-        Calendar fromCal=Calendar.getInstance();
-        fromCal.setTime(from);
-        fromCal.set(Calendar.HOUR, 0);
-        fromCal.set(Calendar.MINUTE, 0);
-        fromCal.set(Calendar.SECOND, 0);
-        fromCal.set(Calendar.MILLISECOND, 0);
-        Calendar untilCal=Calendar.getInstance();
-        untilCal.setTime(until);
-        untilCal.set(Calendar.HOUR, 23);
-        untilCal.set(Calendar.MINUTE, 59);
-        untilCal.set(Calendar.SECOND, 59);
-        if(fromCal.after(untilCal)) {
+        Date start=getDateFormDayStartOrEnd(from,true);
+        Date end= getDateFormDayStartOrEnd(until,false);
+        if(start.after(end)) {
             return 0.0;
         }
-        return statisticsService.calculateIncomeBetween(fromCal.getTime(), untilCal.getTime());
+        return statisticsService.calculateIncomeBetween(start, end);
+    }
+
+    @GetMapping("/summary")
+    public StatisticsService.Statistics getSummaryBetween(
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(value="from") Date from
+            ,@DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(value="until") Date until) throws URISyntaxException {
+        Date start=getDateFormDayStartOrEnd(from,true);
+        Date end= getDateFormDayStartOrEnd(until,false);
+        if(start.after(end)) {
+            return new StatisticsService.Statistics();
+        }
+        return statisticsService.calculateStatistics(start,end);
+    }
+
+    public Date getDateFormDayStartOrEnd(Date date, boolean startEnd){
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        if(startEnd) {
+            calendar.set(Calendar.HOUR, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+        }else {
+            calendar.set(Calendar.HOUR, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
+        }
+        return calendar.getTime();
     }
 
 

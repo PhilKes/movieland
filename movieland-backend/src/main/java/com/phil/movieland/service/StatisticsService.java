@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class StatisticsService {
@@ -148,15 +149,127 @@ public class StatisticsService {
         }
     }
 
-    /** Calculates income based on reservation from Date to Date until*/
+    /**
+     * Calculates income based on reservation from Date to Date until
+     */
     public double calculateIncomeBetween(Date from, Date until) {
         List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
         double sum=0.0;
-        for(MovieShow show : shows){
+        for(MovieShow show : shows) {
             List<Seat> seats=seatRepository.findSeatsOfShow(show.getShowId());
-            sum+=seats.stream().mapToDouble(seat->Seat.getPrice(seat.getType())).sum();
+            sum+=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
         }
         return sum;
+    }
+
+    //TODO MOST WATCHED MOVIE/HIGHEST GROSSING
+    //TODO CURVE (see Users Behavior inf react app dashbaord)
+
+    /**
+     * Calculates income based on reservation from Date to Date until
+     */
+    public Statistics calculateStatistics(Date from, Date until) {
+        long amtShows=0, amtMovies=0, amtSeats=0, amtWatchedMins=0, income=0;
+        List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
+        HashMap<Date, Integer> dailyStats=new HashMap<>();
+        HashMap<Long, Movie> movies=getMoviesFromShows(shows);
+        amtShows=shows.size();
+        amtMovies=movies.size();
+        for(MovieShow show : shows) {
+            List<Seat> seats=seatRepository.findSeatsOfShow(show.getShowId());
+            Calendar showDay=Calendar.getInstance();
+            showDay.setTime(show.getDate());
+            showDay.set(Calendar.HOUR_OF_DAY,0);
+            showDay.set(Calendar.MINUTE,0);
+            showDay.set(Calendar.SECOND,0);
+            showDay.set(Calendar.MILLISECOND,0);
+            Date date=showDay.getTime();
+            int daySeats=seats.size();
+            amtSeats+=daySeats;
+            if(!dailyStats.containsKey(date)) {
+                dailyStats.put(date, daySeats);
+            }else{
+                dailyStats.put(date, dailyStats.get(date)+daySeats);
+            }
+            income+=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
+            amtWatchedMins+=movies.get(show.getMovId()).getLength();
+        }
+        Statistics statistics=new Statistics();
+        statistics.setAmtMovies(amtMovies);
+        statistics.setAmtSeats(amtSeats);
+        statistics.setAmtShows(amtShows);
+        statistics.setIncome(income);
+        statistics.setAmtWatchedMins(amtWatchedMins);
+        statistics.setDailyStats(dailyStats);
+        return statistics;
+    }
+
+    private HashMap<Long, Movie> getMoviesFromShows(List<MovieShow> shows) {
+        HashMap<Long, Movie> movies=new HashMap<>();
+        shows.stream().mapToLong(show -> show.getMovId()).distinct().forEach(
+                mov -> movieService.queryMovie(mov).ifPresent(movie -> movies.put(movie.getMovId(), movie))
+        );
+        return movies;
+    }
+
+    public static class Statistics {
+        private long amtShows, amtMovies, amtSeats;
+        private long amtWatchedMins;
+        private long income;
+        private HashMap<Date,Integer> dailyStats= new HashMap<>();
+
+        public List<Integer> getSortedDailyStats(){
+            return dailyStats.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+                    .map(e->e.getValue()).collect(Collectors.toList());
+        }
+
+        public HashMap<Date, Integer> getDailyStats() {
+            return dailyStats;
+        }
+
+        public void setDailyStats(HashMap<Date, Integer> dailyStats) {
+            this.dailyStats=dailyStats;
+        }
+
+        public long getAmtShows() {
+            return amtShows;
+        }
+
+        public void setAmtShows(long amtShows) {
+            this.amtShows=amtShows;
+        }
+
+        public long getAmtMovies() {
+            return amtMovies;
+        }
+
+        public void setAmtMovies(long amtMovies) {
+            this.amtMovies=amtMovies;
+        }
+
+        public long getAmtSeats() {
+            return amtSeats;
+        }
+
+        public void setAmtSeats(long amtSeats) {
+            this.amtSeats=amtSeats;
+        }
+
+        public long getAmtWatchedMins() {
+            return amtWatchedMins;
+        }
+
+        public void setAmtWatchedMins(long amtWatchedMins) {
+            this.amtWatchedMins=amtWatchedMins;
+        }
+
+        public long getIncome() {
+            return income;
+        }
+
+        public void setIncome(long income) {
+            this.income=income;
+        }
     }
 
     public class ReservationWithSeats {

@@ -38,20 +38,23 @@ import axios from "axios";
 import * as queryString from "query-string";
 import LoadingPage from "../webviews/misc/LoadingPage";
 import moment from "moment";
+import {faDollarSign, faEye, faFilm, faInfoCircle, faTicketAlt} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 class Dashboard extends Component {
   constructor(props) {
     super(props)
     this.state = {
         isLoading:true,
-        income: -1
+        dailyStats: null
     }
   }
 
+  //TODO HOURS WATCHED, MOVIES IN DB, BEST GROSSING MOVIES, GENERATING TAB
   componentDidMount() {
     document.title = "Admin Dashboard";
     let today= moment();
-    axios.get('/api/statistics/income', {
+    axios.get('/api/statistics/summary', {
       params: {
         until: today.format("YYYY-MM-DD"),
         from: today.subtract(7,"days").format("YYYY-MM-DD")
@@ -61,9 +64,27 @@ class Dashboard extends Component {
       }
     })
         .then(res => res.data)
-        .then(data => {
-          console.log("income: "+data);
-          this.setState({isLoading:false, income:data})
+        .then(summary => {
+          console.log("daily stats: "+summary.dailyStats);
+          let labels=[];
+          let seatsSeries=[];
+          let series=[];
+          Object.keys(summary.dailyStats)
+              .sort((k1,k2)=>moment(k1).isAfter(moment(k2))? 1: -1)
+              .forEach(date=>{
+            console.log("day: ")
+            console.log(date)
+            console.log("Stats:")
+            console.log(summary.dailyStats[date]);
+            labels.push(moment(date).format("dd,DD.MM"));
+            seatsSeries.push(summary.dailyStats[date]);
+          });
+          series.push(seatsSeries);
+
+          this.setState({isLoading:false, income:summary.income,amtShows: summary.amtShows,
+          amtMovies: summary.amtMovies, amtSeats: summary.amtSeats, amtWatchedMins:summary.amtWatchedMins,
+          dailyStats: {labels: labels, series:series}
+          })
         })
   }
 
@@ -88,36 +109,36 @@ class Dashboard extends Component {
           <Row>
             <Col lg={3} sm={6}>
               <StatsCard
-                bigIcon={<i className="pe-7s-server text-warning" />}
-                statsText="Capacity"
-                statsValue="105GB"
+                bigIcon={<FontAwesomeIcon icon={faFilm} size="lg" className="text-dark"/>}
+                statsText="Movies shown"
+                statsValue={this.state.amtMovies}
                 statsIcon={<i className="fa fa-refresh" />}
-                statsIconText="Updated now"
+                statsIconText="Last 7 Days"
               />
             </Col>
             <Col lg={3} sm={6}>
               <StatsCard
-                bigIcon={<i className="pe-7s-wallet text-success" />}
+                bigIcon={<FontAwesomeIcon icon={faDollarSign} size="lg" className="text-success"/>}
                 statsText="Revenue"
-                statsValue={this.state.income+"$"}
+                statsValue={this.state.income+" $" }
                 statsIcon={<i className="fa fa-calendar-o" />}
                 statsIconText="Last 7 Days"
               />
             </Col>
             <Col lg={3} sm={6}>
               <StatsCard
-                bigIcon={<i className="pe-7s-graph1 text-danger" />}
-                statsText="Errors"
-                statsValue="23"
+                bigIcon={<FontAwesomeIcon icon={faTicketAlt} size="lg" className="text-danger"/>}
+                statsText="Tickets sold"
+                statsValue={this.state.amtSeats}
                 statsIcon={<i className="fa fa-clock-o" />}
-                statsIconText="In the last hour"
+                statsIconText="Last 7 Days"
               />
             </Col>
             <Col lg={3} sm={6}>
               <StatsCard
-                bigIcon={<i className="fa fa-twitter text-info" />}
-                statsText="Followers"
-                statsValue="+45"
+                bigIcon={<FontAwesomeIcon icon={faEye} size="lg" className="text-warning"/>}
+                statsText="Watched Minutes"
+                statsValue={this.state.amtWatchedMins}
                 statsIcon={<i className="fa fa-refresh" />}
                 statsIconText="Updated now"
               />
@@ -128,13 +149,13 @@ class Dashboard extends Component {
               <Card
                 statsIcon="fa fa-history"
                 id="chartHours"
-                title="Users Behavior"
-                category="24 Hours performance"
+                title="Visitors"
+                category="Last 7 Days"
                 stats="Updated 3 minutes ago"
                 content={
                   <div className="ct-chart">
                     <ChartistGraph
-                      data={dataSales}
+                      data={this.state.dailyStats}
                       type="Line"
                       options={optionsSales}
                       responsiveOptions={responsiveSales}

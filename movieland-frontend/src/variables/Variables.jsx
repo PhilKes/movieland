@@ -520,12 +520,15 @@ var dataSales = {
   ]
 };
 var optionsSales = {
-  low: 0,
-  high: 800,
+  low: 400,
+  high: 600,
   showArea: false,
   height: "245px",
   axisX: {
     showGrid: false
+  },
+  axisY: {
+    showGrid: true
   },
   lineSmooth: true,
   showLine: true,
@@ -548,8 +551,8 @@ var responsiveSales = [
   ]
 ];
 var legendSales = {
-  names: ["Open", "Click", "Click Second Time"],
-  types: ["info", "danger", "warning"]
+  names: ["Open",],
+  types: ["info"]
 };
 
 // Data for Bar Chart

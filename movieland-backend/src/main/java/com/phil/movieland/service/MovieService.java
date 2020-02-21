@@ -45,7 +45,6 @@ public class MovieService {
     }
 
     public List<Movie> queryTmdbMovies(String name){
-
         return tmdbApiService.getMoviesFromTmdb(name).stream().map(tmdbMovie->{
            Movie mov= new Movie();
            mov.setTmdbMovie(tmdbMovie);
@@ -102,9 +101,7 @@ public class MovieService {
                 updateMovie(movie);
             }
         }
-        else {
-            // System.out.println("Already loaded: " + movie.getName());
-        }
+
     }
 
     public String getBackdrop(Long movId) {
