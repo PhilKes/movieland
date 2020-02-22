@@ -26,7 +26,6 @@ import {
   dataPie,
   legendPie,
   dataSales,
-  optionsSales,
   responsiveSales,
   legendSales,
   dataBar,
@@ -83,7 +82,8 @@ class Dashboard extends Component {
 
           this.setState({isLoading:false, income:summary.income,amtShows: summary.amtShows,
           amtMovies: summary.amtMovies, amtSeats: summary.amtSeats, amtWatchedMins:summary.amtWatchedMins,
-          dailyStats: {labels: labels, series:series}
+          dailyStats: {labels: labels, series:series},highestMovie: summary.highestGrossingMovie,
+            lowestMovie: summary.lowestGrossingMovie
           })
         })
   }
@@ -103,6 +103,24 @@ class Dashboard extends Component {
     if(this.state.isLoading){
       return <LoadingPage/>
     }
+
+    var optionsVisitorChart = {
+      showArea: false,
+      height: "245px",
+      axisX: {
+        showGrid: false
+      },
+      axisY: {
+        showGrid: true
+      },
+      lineSmooth: true,
+      showLine: true,
+      showPoint: true,
+      fullWidth: true,
+      chartPadding: {
+        right: 50
+      }
+    };
     return (
       <div className="content">
         <Grid fluid>
@@ -140,7 +158,25 @@ class Dashboard extends Component {
                 statsText="Watched Minutes"
                 statsValue={this.state.amtWatchedMins}
                 statsIcon={<i className="fa fa-refresh" />}
-                statsIconText="Updated now"
+                statsIconText="Last 7 Days"
+              />
+            </Col>
+            <Col lg={6} sm={6}>
+              <StatsCard
+                bigIcon={<img src={this.state.highestMovie.posterPath} className="img-fluid"/>}
+                statsText="Highest Grossing Movie"
+                statsValue={this.state.highestMovie.grossing+" $\n ("+this.state.highestMovie.visitors+" Tickets)"}
+                statsIcon={<i className="fa fa-refresh" />}
+                statsIconText="Last 7 Days"
+              />
+            </Col>
+            <Col lg={6} sm={6}>
+              <StatsCard
+                bigIcon={<img src={this.state.lowestMovie.posterPath} className="img-fluid"/>}
+                statsText="Lowest Grossing Movie"
+                statsValue={this.state.lowestMovie.grossing+"  $\n ("+this.state.lowestMovie.visitors+" Tickets)"}
+                statsIcon={<i className="fa fa-refresh" />}
+                statsIconText="Last 7 Days"
               />
             </Col>
           </Row>
@@ -157,7 +193,7 @@ class Dashboard extends Component {
                     <ChartistGraph
                       data={this.state.dailyStats}
                       type="Line"
-                      options={optionsSales}
+                      options={optionsVisitorChart}
                       responsiveOptions={responsiveSales}
                     />
                   </div>

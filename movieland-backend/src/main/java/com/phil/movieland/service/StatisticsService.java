@@ -1,5 +1,6 @@
 package com.phil.movieland.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.phil.movieland.auth.AuthenticationController;
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
@@ -7,10 +8,12 @@ import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.data.entity.Seat;
 import com.phil.movieland.data.repository.SeatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 @Service
 public class StatisticsService {
@@ -169,9 +172,11 @@ public class StatisticsService {
      * Calculates income based on reservation from Date to Date until
      */
     public Statistics calculateStatistics(Date from, Date until) {
+        System.out.println("Calculating statistics for: "+from+" until: "+until);
         long amtShows=0, amtMovies=0, amtSeats=0, amtWatchedMins=0, income=0;
         List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
         HashMap<Date, Integer> dailyStats=new HashMap<>();
+        LinkedHashMap<Long, MovieStats> movieGrossing=new LinkedHashMap<>();
         HashMap<Long, Movie> movies=getMoviesFromShows(shows);
         amtShows=shows.size();
         amtMovies=movies.size();
@@ -179,20 +184,30 @@ public class StatisticsService {
             List<Seat> seats=seatRepository.findSeatsOfShow(show.getShowId());
             Calendar showDay=Calendar.getInstance();
             showDay.setTime(show.getDate());
-            showDay.set(Calendar.HOUR_OF_DAY,0);
-            showDay.set(Calendar.MINUTE,0);
-            showDay.set(Calendar.SECOND,0);
-            showDay.set(Calendar.MILLISECOND,0);
+            showDay.set(Calendar.HOUR_OF_DAY,1);
+            /*showDay.set(Calendar.MINUTE,0);
+            showDay.set(Calendar.SECOND,0);*/
+            //showDay.set(Calendar.MILLISECOND,0);
             Date date=showDay.getTime();
             int daySeats=seats.size();
             amtSeats+=daySeats;
+            /** Update daily stats*/
             if(!dailyStats.containsKey(date)) {
                 dailyStats.put(date, daySeats);
             }else{
                 dailyStats.put(date, dailyStats.get(date)+daySeats);
             }
-            income+=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
-            amtWatchedMins+=movies.get(show.getMovId()).getLength();
+            double seatsIncome=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
+            income+=seatsIncome;
+            long movId=show.getMovId();
+            /** Update Movie income stats*/
+            if(!movieGrossing.containsKey(movId)) {
+                movieGrossing.put(movId, new MovieStats(movId,movies.get(movId).getPosterUrl(),seatsIncome,seats.size()));
+            }else{
+                movieGrossing.get(movId).addGrossing(seatsIncome);
+                movieGrossing.get(movId).addVisitors(seats.size());
+            }
+            amtWatchedMins+=movies.get(movId).getLength();
         }
         Statistics statistics=new Statistics();
         statistics.setAmtMovies(amtMovies);
@@ -201,6 +216,7 @@ public class StatisticsService {
         statistics.setIncome(income);
         statistics.setAmtWatchedMins(amtWatchedMins);
         statistics.setDailyStats(dailyStats);
+        statistics.setMovieStats(movieGrossing);
         return statistics;
     }
 
@@ -212,16 +228,102 @@ public class StatisticsService {
         return movies;
     }
 
+    public static class MovieStats {
+        private long movId;
+        private String posterPath;
+        private Double grossing;
+        private Integer visitors;
+
+        public MovieStats() {
+        }
+
+        public MovieStats(long movId, String posterPath, double grossing,int visitors) {
+            this.movId=movId;
+            this.posterPath=posterPath;
+            this.grossing=grossing;
+            this.visitors=visitors;
+        }
+
+        public Integer getVisitors() {
+            return visitors;
+        }
+
+        public void setVisitors(Integer visitors) {
+            this.visitors=visitors;
+        } 
+        public void addVisitors(Integer visitors) {
+            this.visitors+=visitors;
+        }
+
+        public long getMovId() {
+            return movId;
+        }
+
+        public void setMovId(long movId) {
+            this.movId=movId;
+        }
+
+        public String getPosterPath() {
+            return posterPath;
+        }
+
+        public void setPosterPath(String posterPath) {
+            this.posterPath=posterPath;
+        }
+
+        public Double getGrossing() {
+            return grossing;
+        }
+
+        public void setGrossing(Double grossing) {
+            this.grossing=grossing;
+        }
+        public void addGrossing(double grossing) {
+            this.grossing+=grossing;
+        }
+
+
+    }
     public static class Statistics {
         private long amtShows, amtMovies, amtSeats;
         private long amtWatchedMins;
         private long income;
-        private HashMap<Date,Integer> dailyStats= new HashMap<>();
+        private HashMap<Date,Integer> dailyStats;
+        private LinkedHashMap<Long, MovieStats> movieStats;
 
-        public List<Integer> getSortedDailyStats(){
+        //TODO SHOW in REACT
+        //TODO USE Highest & LowestGrossing to determine bounds for Chart
+        public MovieStats getHighestGrossingMovie(){
+            return movieStats.values().stream().max(Comparator.comparing(MovieStats::getGrossing)).get();
+        }
+
+        public MovieStats getLowestGrossingMovie(){
+            return movieStats.values().stream().min(Comparator.comparing(MovieStats::getGrossing)).get();
+        }
+
+        @Transient
+        @JsonIgnore
+        public Map<Long, MovieStats> getMovieStats() {
+            return movieStats;
+        }
+
+        /** Sorts and sets moveStats Map*/
+        public void setMovieStats(LinkedHashMap<Long, MovieStats> movieStats) {
+            LinkedHashMap<Long, MovieStats> sorted =  movieStats.entrySet().stream()
+                    .sorted((e1,e2)->Double.compare(e1.getValue().getGrossing(),e2.getValue().getGrossing())*-1)
+                    .collect(toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (a, b) -> { throw new AssertionError();},
+                            LinkedHashMap::new
+                    ));
+            this.movieStats=sorted;
+        }
+
+       /* public List<Integer> getSortedDailyStats(){
             return dailyStats.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
                     .map(e->e.getValue()).collect(Collectors.toList());
-        }
+        }*/
 
         public HashMap<Date, Integer> getDailyStats() {
             return dailyStats;

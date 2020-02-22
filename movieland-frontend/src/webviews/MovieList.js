@@ -25,11 +25,13 @@ import ErrorPage from "./misc/ErrorPage";
 import LoadingPage from "./misc/LoadingPage";
 import * as queryString from "query-string";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faInfoCircle} from "@fortawesome/free-solid-svg-icons";
+import {faEye, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 import TrailerModal from "./modal/TrailerModal";
 import CardHeader from "reactstrap/lib/CardHeader";
 import {Grid,Row,Col} from "react-bootstrap";
 import ReactCard from "../components/Card/Card";
+import {StatsCard} from "../components/StatsCard/StatsCard";
+import CustomButton from "../components/CustomButton/CustomButton";
 
 
 /** /movies page Component
@@ -199,55 +201,60 @@ class MovieList extends Component {
 
             return (
                 <Row key={movie.movId}>
-                    <Col md={12}>
+                    <Col>
                         {/*TODO TABLE FULL WIDTH*/}
                         <ReactCard
                             plain
+                            ctTableFullWidth
+                            ctTableResponsive
                             content={
                                 <Grid>
                                     <Row>
-                                        <Col xs={6}>
-                                            <ReactCard
-                                                plain
-                                                content={
-                                                    <div>
-                                                        <img src={movie.posterUrl} className="img-fluid text-center"/>
-                                                        <div>
-                                                            <ButtonGroup style={{display: "flex"}}>
-                                                                <Button color="light" >
-                                                                    <FontAwesomeIcon icon={faInfoCircle}/>
-                                                                </Button>
-                                                                <TrailerModal movId={movie.movId}/>
-                                                            </ButtonGroup>
-                                                        </div>
-                                                    </div>
-                                                }
-                                            />
+                                        <Col xs={7} sm={5} lg={3} md={3} large={10} xl={10}>
+
+                                            <div>
+                                                <img src={movie.posterUrl} className="img-fluid text-center"/>
+                                                <div>
+                                                    <ButtonGroup style={{display: "flex"}} className="img-fluid">
+                                                        <CustomButton bsStyle="light" style={{flex: 1}} >
+                                                            <FontAwesomeIcon icon={faInfoCircle}/>
+                                                        </CustomButton>
+                                                        <TrailerModal movId={movie.movId}/>
+                                                    </ButtonGroup>
+                                                </div>
+                                            </div>
+                                           {/* <StatsCard
+                                                bigIcon={<img src={movie.posterUrl} className="img-fluid text-center"/>}
+                                                statsText={movie.name}
+                                                statsValue={this.state.amtWatchedMins}
+                                            />*/}
                                         </Col>
-                                        <Col xs={3} >
-                                            <h3>{movie.name}</h3>
+                                        <Col xs={4} sm={7} lg={3} md={8} >
+                                            <h3 className="text-center">{movie.name}</h3>
                                         </Col>
                                     </Row>
-                                        <Row>
-                                            <Col md={8}>
-                                                <ReactCard
-                                                    plain
-                                                    content={
-                                                <Table borderless size="sm">
-                                                    <thead>
-                                                    <tr>
-                                                        {days.map(day=>{
-                                                            return(
-                                                                <th key={day} width="14.286%" className="showday-header"><h4>{day}</h4></th>
-                                                            );
-                                                        })
-                                                        }
-                                                    </tr>
-                                                    {showList}
-                                                    </thead>
-                                                </Table>}/>
-                                            </Col>
-                                        </Row>
+                                    <Row>
+                                        <Col md={8}>
+                                            <ReactCard
+                                                ctTableFullWidth
+                                                ctTableResponsive
+                                                plain
+                                                content={
+                                            <Table bordered className="shows-table">
+                                                <thead>
+                                                <tr>
+                                                    {days.map(day=>{
+                                                        return(
+                                                            <th key={day} width="14.286%" className="shows-table"><h5><b>{day}</b></h5></th>
+                                                        );
+                                                    })
+                                                    }
+                                                </tr>
+                                                {showList}
+                                                </thead>
+                                            </Table>}/>
+                                        </Col>
+                                    </Row>
                                 </Grid>
                                 }
                         />

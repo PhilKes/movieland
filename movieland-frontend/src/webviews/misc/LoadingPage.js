@@ -13,7 +13,7 @@ export default class LoadingPage extends Component {
 
     render() {
         return (
-            <Container fluid>
+            <Container fluid className="whole-height">
                 <h4>Loading...</h4>
             </Container>
         );

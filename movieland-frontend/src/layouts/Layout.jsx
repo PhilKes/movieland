@@ -164,7 +164,7 @@ class Layout extends Component {
             </Route>*/}
           </Switch>
 
-        </div>
+
        {/*TODO <Sidebar {...this.props} routes={this.routes} actions={this.actions}
                  color={this.state.color}
         />*/}
@@ -182,7 +182,9 @@ class Layout extends Component {
               </a>
             </div>
           </footer>
+        </div>
       </div>
+
     );
   }
 }

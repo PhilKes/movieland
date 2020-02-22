@@ -85,13 +85,16 @@
 .shows-table  * {
     text-align: center;
     background-color: transparent;
+
 }
 .shows-table{
-    border-radius: 5%;
-    border-color: black;
-    border-width: 4px;
-    width: 50vw;
-    min-width: 20px;
+    //border-radius: 5%;
+    //border-color: black;
+    //border-width: 4px;
+    //width: 50vw;
+    //min-width: 20px;
+    font-size: 20pt;
+    padding: 10px;
 }
 .showtime-item{
     font-size: 12pt;
@@ -150,13 +153,10 @@
     opacity: 0.75;
 }
 
-
-
 .footer-me{
     text-align: center;
     background-color: #1f1e1e;
     color: white;
-    position: fixed;
     z-index: 10;
     left: 0;
     bottom: 0;
@@ -167,6 +167,10 @@
     min-height: 100vh;
 }
 
+.whole-height{
+    min-height: 100vh;
+
+}
 .modal-trailer{
     background-color: transparent;
 }
@@ -177,7 +181,7 @@
  }
 
 .img-fluid{
-    width: 14vh;
+    width: 20vh;
     align-content: center;
     align-self: center;
 }
@@ -200,4 +204,7 @@
 
 .text-center{
     text-align: center;
+}
+.showday-header{
+    height: 20px;
 }
