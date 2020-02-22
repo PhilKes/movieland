@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap Dashboard React - v1.3.0
+* Light Bootstrap UserDashboard React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -19,9 +19,9 @@ import React, { Component } from "react";
 import ChartistGraph from "react-chartist";
 import { Grid, Row, Col } from "react-bootstrap";
 
-import { Card } from "../components/Card/Card.jsx";
-import { StatsCard } from "../components/StatsCard/StatsCard.jsx";
-import { Tasks } from "../components/Tasks/Tasks.jsx";
+import {Card} from "../../components/Card/Card.jsx";
+import {StatsCard} from "../../components/StatsCard/StatsCard.jsx";
+import {Tasks} from "../../components/Tasks/Tasks.jsx";
 import {
   dataPie,
   legendPie,
@@ -32,15 +32,15 @@ import {
   optionsBar,
   responsiveBar,
   legendBar
-} from "../variables/Variables.jsx";
+} from "../../variables/Variables.jsx";
 import axios from "axios";
 import * as queryString from "query-string";
-import LoadingPage from "../webviews/misc/LoadingPage";
+import LoadingPage from "../misc/LoadingPage";
 import moment from "moment";
 import {faDollarSign, faEye, faFilm, faInfoCircle, faTicketAlt} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-class Dashboard extends Component {
+class AdminDashboard extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -51,7 +51,7 @@ class Dashboard extends Component {
 
   //TODO HOURS WATCHED, MOVIES IN DB, BEST GROSSING MOVIES, GENERATING TAB
   componentDidMount() {
-    document.title = "Admin Dashboard";
+      document.title = "Admin UserDashboard";
     let today= moment();
     axios.get('/api/statistics/summary', {
       params: {
@@ -163,20 +163,20 @@ class Dashboard extends Component {
             </Col>
             <Col lg={6} sm={6}>
               <StatsCard
-                bigIcon={<img src={this.state.highestMovie.posterPath} className="img-fluid"/>}
-                statsText="Highest Grossing Movie"
-                statsValue={this.state.highestMovie.grossing+" $\n ("+this.state.highestMovie.visitors+" Tickets)"}
-                statsIcon={<i className="fa fa-refresh" />}
-                statsIconText="Last 7 Days"
+                  bigIcon={<img src={this.state.highestMovie.posterPath} className="img-fluid small-fluid"/>}
+                  statsText="Highest Grossing Movie"
+                  statsValue={this.state.highestMovie.grossing+" $\n ("+this.state.highestMovie.visitors+" Tickets)"}
+                  statsIcon={<i className="fa fa-refresh" />}
+                  statsIconText="Last 7 Days"
               />
             </Col>
             <Col lg={6} sm={6}>
               <StatsCard
-                bigIcon={<img src={this.state.lowestMovie.posterPath} className="img-fluid"/>}
-                statsText="Lowest Grossing Movie"
-                statsValue={this.state.lowestMovie.grossing+"  $\n ("+this.state.lowestMovie.visitors+" Tickets)"}
-                statsIcon={<i className="fa fa-refresh" />}
-                statsIconText="Last 7 Days"
+                  bigIcon={<img src={this.state.lowestMovie.posterPath} className="img-fluid small-fluid"/>}
+                  statsText="Lowest Grossing Movie"
+                  statsValue={this.state.lowestMovie.grossing+"  $\n ("+this.state.lowestMovie.visitors+" Tickets)"}
+                  statsIcon={<i className="fa fa-refresh" />}
+                  statsIconText="Last 7 Days"
               />
             </Col>
           </Row>
@@ -270,4 +270,4 @@ class Dashboard extends Component {
   }
 }
 
-export default Dashboard;
+export default AdminDashboard;

@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import {Button, ButtonGroup, Container, Table, Input, Alert} from 'reactstrap';
 import {Link} from 'react-router-dom';
-import MovieModal from "./modal/MovieModal";
+import MovieModal from "../modal/MovieModal";
 import Moment from 'moment';
 import axios from "axios";
-import ErrorPage from "./misc/ErrorPage";
-import LoadingPage from "./misc/LoadingPage";
+import ErrorPage from "../misc/ErrorPage";
+import LoadingPage from "../misc/LoadingPage";
 import {Col, Grid, Row} from "react-bootstrap";
-import ReactCard from "../components/Card/Card";
+import ReactCard from "../../components/Card/Card";
 
 const INSTRUCTOR = 'admin';
 const PASSWORD = 'admin';

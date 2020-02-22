@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap Dashboard React - v1.3.0
+* Light Bootstrap UserDashboard React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -15,13 +15,13 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import Dashboard from "./views/Dashboard.jsx";
+import AdminDashboard from "./webviews/admin/AdminDashboard.jsx";
 import UserProfile from "./views/UserProfile.jsx";
 import MovieShow from "./webviews/MovieShow";
 import MovieList from "./webviews/MovieList";
 import {faAddressCard, faFilm, faUser, faVideo} from "@fortawesome/free-solid-svg-icons";
-import MovieListEdit from "./webviews/MovieListEdit";
-import MovieShowList from "./webviews/MovieShowList";
+import MovieListEdit from "./webviews/admin/MovieListEdit";
+import MovieShowList from "./webviews/admin/MovieShowList";
 
 const adminRoutes = [
   {
@@ -47,9 +47,9 @@ const adminRoutes = [
   },
   {
     path: "/dashboard",
-    name: "Dashboard",
+      name: "AdminDashboard",
     icon: faAddressCard,
-    component: Dashboard,
+      component: AdminDashboard,
     show: true,
   },
   {
@@ -87,14 +87,6 @@ const userRoutes = [
     icon: faFilm,
     component: MovieList,
     show: true,
-  },
-  {
-    path: "/user",
-    name: "User Profile",
-    icon: faUser,
-    component: UserProfile,
-    show: true,
-
   },
   {
     path: "/show/:showId",

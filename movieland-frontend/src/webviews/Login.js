@@ -68,7 +68,7 @@ class Login extends Component {
 
     render() {
         return (
-            <div className="content">
+            <div className="content whole-height">
                 <Grid fluid>
                     <Row>
                         <Col md={8}>

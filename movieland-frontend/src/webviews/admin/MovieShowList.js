@@ -6,16 +6,16 @@ import {
     Input,
     FormGroup, Label, InputGroup, InputGroupAddon, Form
 } from 'reactstrap';
-import MovieShowModal from "./modal/MovieShowModal";
+import MovieShowModal from "../modal/MovieShowModal";
 import Moment from 'moment';
 import {faMinusCircle} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import ErrorPage from "./misc/ErrorPage";
-import LoadingPage from "./misc/LoadingPage";
+import ErrorPage from "../misc/ErrorPage";
+import LoadingPage from "../misc/LoadingPage";
 import {Col, Grid, Row} from "react-bootstrap";
-import ReactCard from "../components/Card/Card";
-import CustomButton from "../components/CustomButton/CustomButton";
+import ReactCard from "../../components/Card/Card";
+import CustomButton from "../../components/CustomButton/CustomButton";
 
 /** /shows page
  * Shows MovieShows by Date + ADD/REMOVE Shows*/

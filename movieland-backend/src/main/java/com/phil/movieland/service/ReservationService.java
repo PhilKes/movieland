@@ -62,8 +62,9 @@ public class ReservationService {
     }
 
     public List<Reservation> getAllReservationsOfUser(Long userId) {
-        return reservationRepository.findAllByUserId(userId);
+        return reservationRepository.findAllByUserId(userId).subList(0, 6);
     }
+
 
     public void saveReservationsWithSeats(List<StatisticsService.ReservationWithSeats> reservations) {
         reservations.stream().forEach(res -> saveReservation(res.getReservation(), res.getSeats()));

@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap Dashboard React - v1.3.0
+* Light Bootstrap UserDashboard React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -102,7 +102,7 @@ class Layout extends Component {
       title: <span data-notify="icon" className="pe-7s-gift" />,
       message: (
         <div>
-          Welcome to <b>Light Bootstrap Dashboard</b> - a beautiful freebie for
+          Welcome to <b>Light Bootstrap UserDashboard</b> - a beautiful freebie for
           every web developer.
         </div>
       ),
@@ -165,9 +165,9 @@ class Layout extends Component {
           </Switch>
 
 
-       {/*TODO <Sidebar {...this.props} routes={this.routes} actions={this.actions}
-                 color={this.state.color}
-        />*/}
+            <Sidebar {...this.props} routes={this.routes} actions={this.actions}
+                     color={this.state.color}
+            />
           <footer className="footer footer-me">
             &copy; {new Date().getFullYear()}{" "}
             <a href="https://github.com/PhilKes">

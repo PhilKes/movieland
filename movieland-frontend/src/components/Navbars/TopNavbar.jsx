@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap Dashboard React - v1.3.0
+* Light Bootstrap UserDashboard React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -49,7 +49,7 @@ class TopNavbar extends Component {
       this.parentElement.removeChild(this);
       document.documentElement.classList.toggle("nav-open");
     };
-    document.body.appendChild(node);
+      //document.body.appendChild(node);
   }
   render() {
     return (
@@ -67,18 +67,19 @@ class TopNavbar extends Component {
           </Navbar.Brand>
           {/*<Navbar.Toggle onClick={this.mobileSidebarToggle} />TODO*/}
 
-         {/* <button id="menu-toggle" type="button" className="navbar-toggle navbar-toggler-button" onClick={this.mobileSidebarToggle}>
+            <button id="menu-toggle" type="button" className="navbar-toggle navbar-toggler-button"
+                    onClick={this.mobileSidebarToggle}>
             <img src={menuIcon} width={40} height={40} style={{marginTop: -8}}/>
-          </button>*/}
+            </button>
         </Navbar.Header>
-      {/*  <Navbar.Collapse>
+          <Navbar.Collapse>
           <NavbarLinks {...this.props} onTop={true}
                        actions={this.props.actions}
           />
-       </Navbar.Collapse>*/}
-        <NavbarLinks {...this.props} onTop={true}
+          </Navbar.Collapse>
+          {/* <NavbarLinks {...this.props} onTop={true}
                      actions={this.props.actions}
-        />
+        />*/}
       </Navbar>
     );
   }

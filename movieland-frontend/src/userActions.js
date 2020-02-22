@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap Dashboard React - v1.3.0
+* Light Bootstrap UserDashboard React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -30,14 +30,14 @@ import AuthenticationService from "./service/AuthenticationService";
 import Login from "./webviews/Login";
 import Logout from "./webviews/Logout";
 import Register from "./webviews/Register";
-import Dashboard from "./webviews/Dashboard";
+import UserDashboard from "./webviews/UserDashboard";
 
 const loggedInActions = [
   {
     path: "/profile/me",
     name: "Account",
     icon: faUser,
-    component: Dashboard,
+      component: UserDashboard,
     onAction: false
   },
   {

@@ -19,8 +19,8 @@ import LoadingPage from "./misc/LoadingPage";
 import moment from "moment";
 
 /** /user/me page Component
- *  User Dashboard page showing user details, reservations*/
-class Dashboard extends Component {
+ *  User UserDashboard page showing user details, reservations*/
+class UserDashboard extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -34,7 +34,7 @@ class Dashboard extends Component {
     }
 
     componentDidMount() {
-        document.title = "My Dashboard";
+        document.title = "My UserDashboard";
         axios.get('/api/user/me')
             .then(res => res.data)
             .then(user => this.setState({user: user}))
@@ -98,6 +98,7 @@ class Dashboard extends Component {
         });
 
         //TODO past reservations/ACTIVE
+        //TODO only generate reservations for users not admins
         return (
             <div className="content">
             <Container fluid>
@@ -113,4 +114,4 @@ class Dashboard extends Component {
     }
 }
 
-export default Dashboard
+export default UserDashboard

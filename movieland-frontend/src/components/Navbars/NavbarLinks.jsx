@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap Dashboard React - v1.3.0
+* Light Bootstrap UserDashboard React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -59,10 +59,10 @@ class NavbarLinks extends Component {
               if (!prop.redirect && prop.show)
                   return (
 
-                      <NavItem key={key} >
+                      <NavItem key={key} className="nav-link">
                           <NavLink
-                              className={this.props.onTop? "nav-link ontop" : "nav-link"} to={prop.path}>
-                              <div>
+                              className={"nav-link ontop"} to={prop.path}>
+                              <div className="navlink-div">
                                 <FontAwesomeIcon className="fontaw-icon" icon={prop.icon} size="lg"/>{prop.name}
                               </div>
                           </NavLink>
@@ -76,8 +76,8 @@ class NavbarLinks extends Component {
               {this.props.actions.map((prop,key)=>{
                   return(
                       <NavItem key={key}  className="nav-link">
-                          <div>
-                              <NavLink className={this.props.onTop ? "nav-link ontop" : "nav-link"} to={prop.path}>
+                          <div className="navlink-div">
+                              <NavLink className={"nav-link ontop"} to={prop.path}>
                                   <FontAwesomeIcon className="fontaw-icon" icon={prop.icon} size="lg"/>
                                   {prop.name==="Account"? AuthenticationService.getUserName() : prop.name}
                               </NavLink>

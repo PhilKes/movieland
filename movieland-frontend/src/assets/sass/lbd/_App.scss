@@ -102,7 +102,7 @@
 
 .nav-link{
     color: #ff807b;
-    font-size: 12pt;
+    font-size: 13pt;
 }
 .nav-link:hover {
     color: #ff807b;
@@ -112,11 +112,11 @@
 }
 
 .ontop{
-    color: #89001d;
+    color: white;
     background-color: transparent;
 }
 .ontop * {
-    color: #89001d;
+    color: white;
     background-color: transparent;
 }
 
@@ -184,6 +184,10 @@
     width: 20vh;
     align-content: center;
     align-self: center;
+}
+
+.small-fluid {
+    width: 14vh;
 }
 
 .responsive-text  {

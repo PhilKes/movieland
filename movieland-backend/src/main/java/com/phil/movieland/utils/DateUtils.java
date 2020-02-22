@@ -24,4 +24,14 @@ public class DateUtils {
         }
         return date;
     }
+
+    public static String getDateStringFromDate(Date date) {
+        return DATE_FORMAT.format(date);
+    }
+
+    public static String getDateRangeStringFromDate(Date from, Date until) {
+        return getDateStringFromDate(from) + "-to-" + getDateStringFromDate(until);
+    }
+
+
 }

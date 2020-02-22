@@ -7,6 +7,7 @@ import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.data.entity.Seat;
 import com.phil.movieland.data.repository.SeatRepository;
+import com.phil.movieland.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ public class StatisticsService {
     private final SeatRepository seatRepository;
     private final ReservationService reservationService;
 
+    private final static HashMap<String, Statistics> precalculatedSummaries=new HashMap<>();
+
     @Autowired
     public StatisticsService(SeatRepository seatRepository, ReservationService reservationService,
                              MovieShowService movieShowService, MovieService movieService,
@@ -34,7 +37,6 @@ public class StatisticsService {
         this.movieService=movieService;
         this.authenticationController=authenticationController;
     }
-
 
     public void generateShowsBetween(Date from, Date until) {
         Calendar countDate=Calendar.getInstance();
@@ -172,6 +174,11 @@ public class StatisticsService {
      * Calculates income based on reservation from Date to Date until
      */
     public Statistics calculateStatistics(Date from, Date until) {
+        String summaryKey=DateUtils.getDateRangeStringFromDate(from, until);
+        if(precalculatedSummaries.containsKey(summaryKey)) {
+            System.out.println("Already calculated statistics for: " + from + " until: " + until);
+            return precalculatedSummaries.get(summaryKey);
+        }
         System.out.println("Calculating statistics for: "+from+" until: "+until);
         long amtShows=0, amtMovies=0, amtSeats=0, amtWatchedMins=0, income=0;
         List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
@@ -217,6 +224,7 @@ public class StatisticsService {
         statistics.setAmtWatchedMins(amtWatchedMins);
         statistics.setDailyStats(dailyStats);
         statistics.setMovieStats(movieGrossing);
+        precalculatedSummaries.put(summaryKey, statistics);
         return statistics;
     }
 
