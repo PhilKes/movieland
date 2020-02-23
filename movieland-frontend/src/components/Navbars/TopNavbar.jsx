@@ -34,24 +34,28 @@ class TopNavbar extends Component {
       sidebarExists: false
     };
   }
-  mobileSidebarToggle(e) {
-    console.log("Toggle sidebar")
-    if (this.state.sidebarExists === false) {
-      this.setState({
-        sidebarExists: true
-      });
+
+    /** Toggle sidebar if NavbarToggle is clicked -> CSS*/
+    mobileSidebarToggle(e) {
+        console.log("Toggle sidebar")
+        if (this.state.sidebarExists === false) {
+            this.setState({
+                sidebarExists: true
+            });
+        }
+        e.preventDefault();
+        document.documentElement.classList.toggle("nav-open");
+        /** Append node with clicklistener to close Sidebar again*/
+        var node = document.createElement("div");
+        node.id = "bodyClick";
+        node.onclick = function () {
+            this.parentElement.removeChild(this);
+            document.documentElement.classList.toggle("nav-open");
+        };
+        //document.body.appendChild(node);
     }
-    e.preventDefault();
-    document.documentElement.classList.toggle("nav-open");
-    var node = document.createElement("div");
-    node.id = "bodyClick";
-    node.onclick = function() {
-      this.parentElement.removeChild(this);
-      document.documentElement.classList.toggle("nav-open");
-    };
-      //document.body.appendChild(node);
-  }
-  render() {
+
+    render() {
     return (
       <Navbar fluid className="top-navbar" >
         <Navbar.Header>
@@ -65,8 +69,6 @@ class TopNavbar extends Component {
               />{' '}
             </a>
           </Navbar.Brand>
-          {/*<Navbar.Toggle onClick={this.mobileSidebarToggle} />TODO*/}
-
             <button id="menu-toggle" type="button" className="navbar-toggle navbar-toggler-button"
                     onClick={this.mobileSidebarToggle}>
             <img src={menuIcon} width={40} height={40} style={{marginTop: -8}}/>
@@ -77,9 +79,6 @@ class TopNavbar extends Component {
                        actions={this.props.actions}
           />
           </Navbar.Collapse>
-          {/* <NavbarLinks {...this.props} onTop={true}
-                     actions={this.props.actions}
-        />*/}
       </Navbar>
     );
   }

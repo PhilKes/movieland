@@ -1,21 +1,11 @@
 import React, {Component} from 'react';
-import {
-    Button,
-    ButtonGroup,
-    Container,
-    Table,
-    Input,
-    Alert,
-    Carousel,
-    CarouselIndicators,
-    CarouselControl, CarouselCaption, CarouselItem, DropdownToggle, ListGroupItem, ListGroup, Row, Col
-} from 'reactstrap';
+import {Button, Container, Table} from 'reactstrap';
 import Moment from 'moment';
 import axios from "axios";
 
 
-/** /show/showId page Component
- * Shows MovieShow details + Reservations (if logged in)*/
+/** /show/:showId page Component
+ * Shows MovieShow details + make Reservation (if logged in)*/
 class MovieShow extends Component {
 
     constructor(props) {
@@ -47,7 +37,6 @@ class MovieShow extends Component {
                             this.setState({movie: mov, show: show, isLoading: true})
                         }
                     );
-
                 /** Get all reserved seats from all reservations*/
                 axios.get('/api/reservations/show/' + show.showId)
                     .then(res => res.data)
@@ -99,7 +88,6 @@ class MovieShow extends Component {
             let cells = [];
             for (let i = 0; i < cols; i++) {
                 let cell = [];
-                //TODO ADD onClick to select reservations
                 if (reservedSeats[y * cols + i] == null) {
                     cell = (<td key={i}>
                         <div
@@ -115,7 +103,6 @@ class MovieShow extends Component {
                         </div>
                     </td>);
                 }
-                //TODO CHECK this.state.reservedSeats contains y*rows+i as number
                 cells.push(cell)
             }
             tableRows.push(<tr key={y}>{cells}</tr>);
@@ -123,6 +110,7 @@ class MovieShow extends Component {
         return tableRows;
     }
 
+    /** Send Request for Reservation with Seats*/
     submitReservation() {
         axios.post('/api/reservation',
             {
@@ -133,6 +121,7 @@ class MovieShow extends Component {
     }
 
 
+    /** Render All Seats,highlight reserved Seats*/
     render() {
         const {movie, isLoading, error, timedout, show, selectedSeats} = this.state;
 

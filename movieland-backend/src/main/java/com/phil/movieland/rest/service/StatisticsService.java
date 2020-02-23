@@ -1,7 +1,8 @@
-package com.phil.movieland.service;
+package com.phil.movieland.rest.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.phil.movieland.auth.AuthenticationController;
+import com.phil.movieland.auth.jwt.entity.Role;
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.data.entity.Reservation;
@@ -13,6 +14,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -75,6 +77,7 @@ public class StatisticsService {
             System.out.println("Generated shows for: " + countDate.getTime());
             countDate.add(Calendar.DATE, 1);
         }
+        precalculatedSummaries.clear();
     }
 
     public void generateReservationsBetween(Date from, Date until) {
@@ -82,7 +85,7 @@ public class StatisticsService {
         countDate.setTime(from);
         /** Generate reservations for each show until Date until is reached*/
         Random rand=new Random();
-        List<Long> userIds=authenticationController.getAllUserIds();
+        List<Long> userIds=authenticationController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
         while(countDate.getTime().before(until)) {
             List<MovieShow> shows=movieShowService.getShowsForDate(countDate.getTime());
             /** For each show generate reservations */
@@ -152,6 +155,19 @@ public class StatisticsService {
             System.out.println("Generated reservations for: " + countDate.getTime());
             countDate.add(Calendar.DATE, 1);
         }
+        precalculatedSummaries.clear();
+
+    }
+
+    public void deleteStatisticsBetween(Date from, Date until) {
+        System.out.println("Deleting Statistics from: " + from + " until " + until);
+        List<Long> showIds=movieShowService.getShowsForBetween(from, until).stream().map(MovieShow::getShowId).collect(Collectors.toList());
+        long deletedRes=reservationService.deleteReservationsOfShows(showIds);
+        System.out.println("Deleted " + deletedRes + " Reservations");
+        long deletedShows=movieShowService.deleteShowsByIds(showIds);
+        System.out.println("Deleted " + deletedShows + " Shows");
+        precalculatedSummaries.clear();
+
     }
 
     /**
@@ -167,8 +183,6 @@ public class StatisticsService {
         return sum;
     }
 
-    //TODO MOST WATCHED MOVIE/HIGHEST GROSSING
-    //TODO CURVE (see Users Behavior inf react app dashbaord)
 
     /**
      * Calculates income based on reservation from Date to Date until
@@ -180,6 +194,7 @@ public class StatisticsService {
             return precalculatedSummaries.get(summaryKey);
         }
         System.out.println("Calculating statistics for: "+from+" until: "+until);
+        Statistics statistics=new Statistics();
         long amtShows=0, amtMovies=0, amtSeats=0, amtWatchedMins=0, income=0;
         List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
         HashMap<Date, Integer> dailyStats=new HashMap<>();
@@ -189,6 +204,14 @@ public class StatisticsService {
         amtMovies=movies.size();
         for(MovieShow show : shows) {
             List<Seat> seats=seatRepository.findSeatsOfShow(show.getShowId());
+            /** Split seats into Seat Types*/
+            Map<Seat.Seat_Type, List<Seat>> seatsMap=seats.stream()
+                    .collect(Collectors.groupingBy(s -> s.getType()));
+            /** Add amount of seats to types Statistics*/
+            seatsMap.entrySet().forEach(seatType ->
+                    statistics.addSeatsDistribution(Map.entry(seatType.getKey(), seatType.getValue().size()))
+            );
+
             Calendar showDay=Calendar.getInstance();
             showDay.setTime(show.getDate());
             showDay.set(Calendar.HOUR_OF_DAY,1);
@@ -216,7 +239,7 @@ public class StatisticsService {
             }
             amtWatchedMins+=movies.get(movId).getLength();
         }
-        Statistics statistics=new Statistics();
+
         statistics.setAmtMovies(amtMovies);
         statistics.setAmtSeats(amtSeats);
         statistics.setAmtShows(amtShows);
@@ -225,6 +248,7 @@ public class StatisticsService {
         statistics.setDailyStats(dailyStats);
         statistics.setMovieStats(movieGrossing);
         precalculatedSummaries.put(summaryKey, statistics);
+        System.out.println("Finished calculating statistics for: " + from + " until: " + until);
         return statistics;
     }
 
@@ -236,77 +260,48 @@ public class StatisticsService {
         return movies;
     }
 
-    public static class MovieStats {
-        private long movId;
-        private String posterPath;
-        private Double grossing;
-        private Integer visitors;
-
-        public MovieStats() {
-        }
-
-        public MovieStats(long movId, String posterPath, double grossing,int visitors) {
-            this.movId=movId;
-            this.posterPath=posterPath;
-            this.grossing=grossing;
-            this.visitors=visitors;
-        }
-
-        public Integer getVisitors() {
-            return visitors;
-        }
-
-        public void setVisitors(Integer visitors) {
-            this.visitors=visitors;
-        } 
-        public void addVisitors(Integer visitors) {
-            this.visitors+=visitors;
-        }
-
-        public long getMovId() {
-            return movId;
-        }
-
-        public void setMovId(long movId) {
-            this.movId=movId;
-        }
-
-        public String getPosterPath() {
-            return posterPath;
-        }
-
-        public void setPosterPath(String posterPath) {
-            this.posterPath=posterPath;
-        }
-
-        public Double getGrossing() {
-            return grossing;
-        }
-
-        public void setGrossing(Double grossing) {
-            this.grossing=grossing;
-        }
-        public void addGrossing(double grossing) {
-            this.grossing+=grossing;
-        }
-
-
-    }
     public static class Statistics {
         private long amtShows, amtMovies, amtSeats;
         private long amtWatchedMins;
         private long income;
         private HashMap<Date,Integer> dailyStats;
+        private Map<Seat.Seat_Type, Integer> seatsDistribution;
         private LinkedHashMap<Long, MovieStats> movieStats;
+
+
+        public Statistics() {
+            seatsDistribution=new HashMap<>();
+            for(Seat.Seat_Type type : Seat.Seat_Type.values()) {
+                seatsDistribution.put(type, 0);
+            }
+        }
 
         //TODO SHOW in REACT
         //TODO USE Highest & LowestGrossing to determine bounds for Chart
         public MovieStats getHighestGrossingMovie(){
-            return movieStats.values().stream().max(Comparator.comparing(MovieStats::getGrossing)).get();
+            return movieStats.values().stream().max(Comparator.comparing(MovieStats::getGrossing)).orElse(new MovieStats());
         }
 
         public MovieStats getLowestGrossingMovie(){
-            return movieStats.values().stream().min(Comparator.comparing(MovieStats::getGrossing)).get();
+            return movieStats.values().stream().min(Comparator.comparing(MovieStats::getGrossing)).orElse(new MovieStats());
+        }
+
+        public Map<Seat.Seat_Type, Integer> getSeatsDistribution() {
+            return seatsDistribution;
+        }
+
+        public void setSeatsDistribution(Map<Seat.Seat_Type, Integer> seatsDistribution) {
+            this.seatsDistribution=seatsDistribution;
+        }
+
+        public void addSeatsDistributions(Map<Seat.Seat_Type, Integer> seatsDistribution) {
+            seatsDistribution.entrySet().forEach(entry -> {
+                this.seatsDistribution.put(entry.getKey(), this.seatsDistribution.get(entry.getKey()) + entry.getValue());
+            });
+        }
+
+        public void addSeatsDistribution(Map.Entry<Seat.Seat_Type, Integer> entry) {
+            this.seatsDistribution.put(entry.getKey(), this.seatsDistribution.get(entry.getKey()) + entry.getValue());
         }
 
         @Transient
@@ -382,7 +377,66 @@ public class StatisticsService {
         }
     }
 
-    public class ReservationWithSeats {
+    public static class MovieStats {
+        private long movId=-1;
+        private String posterPath;
+        private Double grossing;
+        private Integer visitors;
+
+        public MovieStats() {
+        }
+
+        public MovieStats(long movId, String posterPath, double grossing, int visitors) {
+            this.movId=movId;
+            this.posterPath=posterPath;
+            this.grossing=grossing;
+            this.visitors=visitors;
+        }
+
+        public Integer getVisitors() {
+            return visitors;
+        }
+
+        public void setVisitors(Integer visitors) {
+            this.visitors=visitors;
+        }
+
+        public void addVisitors(Integer visitors) {
+            this.visitors+=visitors;
+        }
+
+        public long getMovId() {
+            return movId;
+        }
+
+        public void setMovId(long movId) {
+            this.movId=movId;
+        }
+
+        public String getPosterPath() {
+            return posterPath;
+        }
+
+        public void setPosterPath(String posterPath) {
+            this.posterPath=posterPath;
+        }
+
+        public Double getGrossing() {
+            return grossing;
+        }
+
+        public void setGrossing(Double grossing) {
+            this.grossing=grossing;
+        }
+
+        public void addGrossing(double grossing) {
+            this.grossing+=grossing;
+        }
+
+
+    }
+
+    public static class ReservationWithSeats {
         private Reservation reservation;
         private List<Seat> seats;
 

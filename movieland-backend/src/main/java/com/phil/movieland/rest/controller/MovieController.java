@@ -1,8 +1,8 @@
-package com.phil.movieland.rest;
+package com.phil.movieland.rest.controller;
 
 import com.phil.movieland.data.entity.Movie;
-import com.phil.movieland.service.MovieService;
-import com.phil.movieland.service.MovieShowService;
+import com.phil.movieland.rest.service.MovieService;
+import com.phil.movieland.rest.service.MovieShowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +13,8 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /** REST Controller for Movies*/
 @RestController
@@ -40,6 +42,18 @@ public class MovieController {
         }
         return movies;
     }
+
+    @GetMapping("/movies/ids")
+    public Map<Long, Movie> getMoviesList(
+            @RequestParam(value="ids") List<Long> movIds) {
+        List<Movie> movies=movieService.queryMoviesByIds(movIds);
+        Map<Long, Movie> moviesMap=movies.stream()
+                .collect(Collectors.toMap(Movie::getMovId, Function.identity()));
+        System.out.println("Movies by ids:");
+        System.out.println(moviesMap);
+        return moviesMap;
+    }
+
 
     @GetMapping("/movies/tmdb")
     public Collection<Movie> getTmdbMovies(

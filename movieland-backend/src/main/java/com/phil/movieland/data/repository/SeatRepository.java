@@ -21,7 +21,8 @@ public interface SeatRepository extends CrudRepository<Seat, Long> {
     List<Seat> findSeatDuplicates(@Param("number")int number, @Param("showId") long showId);
 
     @Query("SELECT s FROM Seat s,Reservation r,MovieShow sh WHERE  s.resId= r.resId " +
-            "AND r.showId = :showId AND sh.showId=:showId")
+            "AND r.showId = :showId AND sh.showId=:showId ORDER BY s.type")
     List<Seat> findSeatsOfShow(@Param("showId") long showId);
+
 
 }

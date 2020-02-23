@@ -1,4 +1,4 @@
-@media (min-width: 901px){
+@media (min-width: 1021px) {
     .navbar-form {
         margin-top: 21px;
         margin-bottom: 21px;
@@ -83,7 +83,7 @@
 
 /*          Changes for small display      */
 
-@media (max-width: 900px){
+@media (max-width: 1020px) {
     .main-panel{
         width: 100%;
     }
@@ -246,7 +246,7 @@
     .navbar-header .navbar-toggle {
         margin: 10px 15px 10px ;
         width: 40px;
-        height: 40px;
+      height: 43px;
     }
     .bar1,
     .bar2,
@@ -451,7 +451,7 @@
 
 //overwrite table responsive for 768px screens
 
-@media (min-width: 992px){
+@media (min-width: 1021px) {
     .table-full-width{
         margin-left: -15px;
         margin-right: -15px;
@@ -462,7 +462,7 @@
 
 }
 
-@media (max-width: 991px){
+@media (max-width: 1020px) {
     .table-responsive {
         width: 100%;
         margin-bottom: 15px;

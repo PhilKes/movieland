@@ -14,16 +14,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -92,7 +88,28 @@ public class AuthenticationController {
         return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
     }
 
+    @GetMapping("/users")
+    public List<User> getUsersOfRolUsers() {
+        return getAllUserOfRole(Role.RoleName.ROLE_USER);
+
+    }
+
     public List<Long> getAllUserIds() {
         return userRepository.findAll().stream().map(User::getId).collect(Collectors.toList());
     }
+
+    public List<User> getAllUserOfRole(Role.RoleName roleName) {
+        Role role=roleRepository.findByName(roleName).get();
+        return userRepository.findAllByRolesContaining(role).stream()
+                .filter(
+                        user ->
+                                user.getRoles().size()==1)
+                .collect(Collectors.toList());
+    }
+
+    public List<Long> getAllUserIdsOfRole(Role.RoleName roleName) {
+        return getAllUserOfRole(roleName).stream().map(User::getId).collect(Collectors.toList());
+    }
+
+
 }

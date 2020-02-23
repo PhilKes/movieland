@@ -1,7 +1,7 @@
-package com.phil.movieland.rest;
+package com.phil.movieland.rest.controller;
 
 import com.phil.movieland.data.entity.MovieShow;
-import com.phil.movieland.service.MovieShowService;
+import com.phil.movieland.rest.service.MovieShowService;
 import com.phil.movieland.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

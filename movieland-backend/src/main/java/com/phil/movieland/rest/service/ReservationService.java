@@ -1,4 +1,4 @@
-package com.phil.movieland.service;
+package com.phil.movieland.rest.service;
 
 import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.data.entity.Seat;
@@ -95,4 +95,10 @@ public class ReservationService {
     }
 
 
+    /**
+     * Returns amount of deleted reservations
+     */
+    public long deleteReservationsOfShows(List<Long> showIds) {
+        return reservationRepository.deleteAllByShowIdIn(showIds);
+    }
 }

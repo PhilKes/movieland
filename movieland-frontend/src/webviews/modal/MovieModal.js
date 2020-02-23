@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-    Button,
-    ListGroupItem,
-    ListGroup,
-    Input,
-    Container, Form
-} from 'reactstrap';
+import {Button, ListGroupItem, ListGroup, Input} from 'reactstrap';
 import axios from "axios";
 import {Modal} from "react-bootstrap";
 
@@ -24,6 +18,7 @@ export default class MovieModal extends React.Component {
 
     }
 
+    /** Open/Close Modal*/
     toggle() {
         if (this.state.name == '') {
             axios.get('/api/movies/tmdb/top')
@@ -66,6 +61,7 @@ export default class MovieModal extends React.Component {
         this.setState({selMovie: movie});
     }
 
+    /** Render Search movie + List from TMDB Api search*/
     render() {
         const {movies, selMovie} = this.state;
 
@@ -84,9 +80,9 @@ export default class MovieModal extends React.Component {
 
         return (
             <div>
-                <Button color="success" onClick={this.toggle}>Add Movie</Button>
+                <Button color="success" onClick={this.toggle}>Open New Movie Dialog</Button>
                 <Modal show={this.state.modal}>
-                    <Modal.Header>Add new Movie title</Modal.Header>
+                    <Modal.Header><h3>Add new Movie</h3></Modal.Header>
                     <Modal.Body>
                         <div className="row">
                             <div className="form-group col-md-12">

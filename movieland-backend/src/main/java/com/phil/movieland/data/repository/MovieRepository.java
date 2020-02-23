@@ -9,7 +9,10 @@ import java.util.Optional;
 
 @Repository
 public interface MovieRepository extends CrudRepository<Movie,Long> {
-    List<Movie> findAll();
-    List<Movie> findAllByNameContains(String queryName);
+    List<Movie> findAllByOrderByName();
+
+    List<Movie> findAllByNameContainsOrderByName(String queryName);
+
+    List<Movie> findAllByMovIdIn(List<Long> movIds);
     Optional<Movie> findFirstByTmdbId(Long tmdbId);
 }

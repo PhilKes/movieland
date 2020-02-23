@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-    Button,
-    ListGroupItem,
-    ListGroup,
-    Input,
-    Container, Form, ButtonGroup
-} from 'reactstrap';
+import {Button} from 'reactstrap';
 import axios from "axios";
 import YouTube from "react-youtube";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -33,6 +27,7 @@ export default class TrailerModal extends React.Component {
         this.wrapperRef = node;
     }
 
+    /** Fetch Trailer URL (YouTube)*/
     componentDidMount() {
         axios.get('/api/movie/trailer/' + this.state.movId)
             .then(res => res.data)
@@ -44,6 +39,7 @@ export default class TrailerModal extends React.Component {
             });
     }
 
+    /** Add click listener to close Modal if click outside of Modal*/
     toggle() {
         if(!this.state.modal){
             document.addEventListener('mousedown',this.handleClick,false);
@@ -55,7 +51,7 @@ export default class TrailerModal extends React.Component {
         });
     }
 
-
+    /** Render YouTube Video embedded*/
     render() {
         const opts = {
             height: '390',

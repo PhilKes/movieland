@@ -32,21 +32,22 @@ import Logout from "./webviews/Logout";
 import Register from "./webviews/Register";
 import UserDashboard from "./webviews/UserDashboard";
 
+/** Defines Actions for logged in User / not logged in Visitor*/
 const loggedInActions = [
-  {
-    path: "/profile/me",
-    name: "Account",
-    icon: faUser,
-      component: UserDashboard,
-    onAction: false
-  },
-  {
-    path: "/logout",
-    name: "Logout",
-    icon: faSignOutAlt,
-    component: Logout,
-    onAction: true
-  }
+    {
+        path: "/user/me",
+        name: "Account",
+        icon: faUser,
+        component: UserDashboard,
+        onAction: false
+    },
+    {
+        path: "/logout",
+        name: "Logout",
+        icon: faSignOutAlt,
+        component: Logout,
+        onAction: true
+    }
 
 ];const loggedOutActions = [
   {

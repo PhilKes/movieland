@@ -157,7 +157,7 @@
     text-align: center;
     background-color: #1f1e1e;
     color: white;
-    z-index: 10;
+  z-index: 99999;
     left: 0;
     bottom: 0;
     right: 0;
@@ -211,4 +211,42 @@
 }
 .showday-header{
     height: 20px;
+}
+
+.sidebar-spacer {
+  margin-left: 60px;
+}
+
+.scroll {
+  opacity: 0.3;
+  background-color: #000000;
+  width: 40px;
+  height: 40px;
+  top: 90%;
+  left: 0.1%;
+  position: sticky;
+  border-radius: 5px;
+  border: none;
+  z-index: 999999;
+
+  &:hover {
+    opacity: 0.75;
+    background-color: #000000;
+
+  }
+}
+
+.arrow-up {
+  color: white;
+  position: absolute;
+  top: 34%;
+  left: 30%;
+  margin-top: -9px;
+  margin-left: -5px;
+}
+
+.align-center-vertical {
+  top: 50%;
+  align-content: center;
+  vertical-align: center;
 }

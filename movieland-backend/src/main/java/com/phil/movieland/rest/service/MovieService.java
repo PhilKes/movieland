@@ -1,8 +1,7 @@
-package com.phil.movieland.service;
+package com.phil.movieland.rest.service;
 
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.repository.MovieRepository;
-import com.phil.movieland.utils.DateUtils;
 import com.phil.movieland.utils.TmdbApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,12 +26,12 @@ public class MovieService {
     }
 
     public List<Movie> getAllMovies() {
-        List<Movie> movies=movieRepository.findAll();
+        List<Movie> movies=movieRepository.findAllByOrderByName();
         return loadTmdbMovies(movies);
     }
 
     public List<Movie> queryAllMovies(String queryName) {
-        List<Movie> movies=movieRepository.findAllByNameContains(queryName);
+        List<Movie> movies=movieRepository.findAllByNameContainsOrderByName(queryName);
         return loadTmdbMovies(movies);
     }
 
@@ -116,5 +115,9 @@ public class MovieService {
             return Optional.empty();
         }
         return Optional.of(tmdbApiService.getTrailerURL(movie.get().getTmdbId()));
+    }
+
+    public List<Movie> queryMoviesByIds(List<Long> movIds) {
+        return movieRepository.findAllByMovIdIn(movIds);
     }
 }

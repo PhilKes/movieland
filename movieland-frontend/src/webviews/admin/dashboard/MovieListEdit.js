@@ -1,16 +1,13 @@
 import React, {Component} from 'react';
-import {Button, ButtonGroup, Container, Table, Input, Alert} from 'reactstrap';
-import {Link} from 'react-router-dom';
-import MovieModal from "../modal/MovieModal";
+import {Button, ButtonGroup, Table, Input, Alert} from 'reactstrap';
+import MovieModal from "../../modal/MovieModal";
 import Moment from 'moment';
 import axios from "axios";
-import ErrorPage from "../misc/ErrorPage";
-import LoadingPage from "../misc/LoadingPage";
+import ErrorPage from "../../misc/ErrorPage";
+import LoadingPage from "../../misc/LoadingPage";
 import {Col, Grid, Row} from "react-bootstrap";
-import ReactCard from "../../components/Card/Card";
+import ReactCard from "../../../components/Card/Card";
 
-const INSTRUCTOR = 'admin';
-const PASSWORD = 'admin';
 
 /** /movies/edit page Component
  * Shows Movies + ADD/REMOVE Movies (only for Admins)*/
@@ -27,6 +24,7 @@ class MovieListEdit extends Component {
     componentDidMount() {
         document.title = "Manage Movies";
         this.setState({isLoading: true});
+
         axios.get('/api/movies')
             .then(res => res.data)
             .then(data => this.setState({movies: data, isLoading: false}))
@@ -78,6 +76,7 @@ class MovieListEdit extends Component {
         }
     }
 
+    /** Render Movie List with Actions*/
     render() {
         const {movies, isLoading, error, timedout} = this.state;
         if (timedout) {
@@ -91,7 +90,7 @@ class MovieListEdit extends Component {
             return <tr key={movie.movId}>
                 <td><img src={movie.posterUrl} className={'img-fluid'} alt="Responsive image"/></td>
                 <td>{movie.name}</td>
-               {/* <td>{descript}</td>*/}
+                {/* <td>{descript}</td>*/}
                 <td>
                     <div key={movie.movId}>{Moment(movie.date).format('DD.MM.YYYY')}</div>
                 </td>
@@ -106,57 +105,52 @@ class MovieListEdit extends Component {
 
 
         return (
-            <div className="content">
-                <Grid fluid>
-                    <Row>
-                        <Col md={12}>
-                            <div className="float-right">
-                                <MovieModal onSubmit={this.addMovie.bind(this)}/>
-                            </div>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md={12}>
-                            <h2>Movies</h2><br/>
-                            <Input type="text" placeholder="Search Movies" innerRef={ref => this.searchQuery = ref}
-                                   onKeyPress={this.handleKeyPress.bind(this)}/><br/>
-                            <Alert color="danger" isOpen={error.length > 0} toggle={() => this.setState({error: ""})}>
-                                {error}
-                            </Alert>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md={12}>
-                            <ReactCard
-                                plain
-                                ctTableFullWidth
-                                ctTableResponsive
-                                content={
+            <Grid fluid>
+                <Row>
+                    <Col md={12}>
+                        <h2>Movies</h2><br/>
+                        <div className="float-right">
+                            <MovieModal onSubmit={this.addMovie.bind(this)}/>
+                        </div>
+                        <br/>
+                        <Input type="text" placeholder="Search Movies" innerRef={ref => this.searchQuery = ref}
+                               onKeyPress={this.handleKeyPress.bind(this)}/><br/>
+                        <Alert color="danger" isOpen={error.length > 0} toggle={() => this.setState({error: ""})}>
+                            {error}
+                        </Alert>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col md={12}>
+                        <ReactCard
+                            plain
+                            ctTableFullWidth
+                            ctTableResponsive
+                            content={
 
                                 <Table className="wrap-words">
                                     <thead>
-                                        <tr>
-                                           {/* <th width="15%">Poster</th>
+                                    <tr>
+                                        {/* <th width="15%">Poster</th>
                                             <th width="6%">Name</th>
                                             <th width="25%">Description</th>
                                             <th width="15%">Release Date</th>
                                             <th width="15%">Actions</th> */}
-                                            <th >Poster</th>
-                                            <th width="20vw" >Name</th>
-                                           {/* <th >Description</th>*/}
-                                            <th >Release Date</th>
-                                            <th >Actions</th>
-                                        </tr>
+                                        <th>Poster</th>
+                                        <th width="20vw">Name</th>
+                                        {/* <th >Description</th>*/}
+                                        <th>Release Date</th>
+                                        <th>Actions</th>
+                                    </tr>
                                     </thead>
                                     <tbody>
-                                        {movieList}
+                                    {movieList}
                                     </tbody>
                                 </Table>}
-                            />
-                        </Col>
-                    </Row>
-                </Grid>
-            </div>
+                        />
+                    </Col>
+                </Row>
+            </Grid>
         );
     }
 }

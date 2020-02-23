@@ -1,11 +1,9 @@
-package com.phil.movieland.service;
+package com.phil.movieland.rest.service;
 
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
-import com.phil.movieland.data.repository.MovieRepository;
 import com.phil.movieland.data.repository.MovieShowRepository;
 import com.phil.movieland.utils.DateUtils;
-import com.phil.movieland.utils.TmdbApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +31,7 @@ public class MovieShowService {
     public List<MovieShow> getShowsForMovieDate(Movie movie,String dateString){
         Date date=DateUtils.createDateFromDateString(dateString);
         Date[] betweenDates=getBetweenDates(date);
-        List<MovieShow> shows= movieShowRepository.findAllByMovIdAndDateBetween(movie.getMovId(),betweenDates[0],betweenDates[1]);
+        List<MovieShow> shows=movieShowRepository.findAllByMovIdAndDateBetweenOrderByDate(movie.getMovId(), betweenDates[0], betweenDates[1]);
         for(MovieShow show : shows) {
             System.out.println("Show at: "+show.getDate());
         }
@@ -115,5 +113,9 @@ public class MovieShowService {
 
     public List<MovieShow> getShowsForBetween(Date from, Date until) {
         return movieShowRepository.findAllByDateBetween(from,until);
+    }
+
+    public long deleteShowsByIds(List<Long> showIds) {
+        return movieShowRepository.deleteAllByShowIdIn(showIds);
     }
 }

@@ -1,12 +1,12 @@
-package com.phil.movieland.rest;
+package com.phil.movieland.rest.controller;
 
 import com.phil.movieland.auth.jwt.entity.User;
 import com.phil.movieland.auth.jwt.entity.UserPrincipal;
 import com.phil.movieland.auth.jwt.entity.UserRepository;
 import com.phil.movieland.auth.jwt.util.CurrentUser;
 import com.phil.movieland.auth.jwt.util.ResourceNotFoundException;
-import com.phil.movieland.data.UserProfile;
-import com.phil.movieland.data.UserSummary;
+import com.phil.movieland.auth.jwt.entity.UserProfile;
+import com.phil.movieland.auth.jwt.entity.UserSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

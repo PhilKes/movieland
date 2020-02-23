@@ -13,6 +13,8 @@ class Logout extends Component {
         this.state = {}
         document.title = "MovieLand Logout";
     }
+
+    /** Immediately trigger Logout -> onAction prop in Layout*/
     componentDidMount() {
         this.props.onAction("Logout");
     }

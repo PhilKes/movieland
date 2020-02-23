@@ -1,6 +1,7 @@
 package com.phil.movieland.rest;
 
-import com.phil.movieland.service.ReservationService;
+import com.phil.movieland.rest.controller.ReservationController;
+import com.phil.movieland.rest.service.ReservationService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,26 +1,13 @@
 import React, {Component} from 'react'
-import {
-    Alert,
-     Col,
-    Container,
-    Form,
-    FormFeedback,
-    FormGroup,
-    Input,
-    InputGroup,
-    InputGroupAddon,
-    InputGroupText,
-    Label, NavItem, NavLink, Row
-} from "reactstrap";
-import {faUserAlt, faUser, faLock} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Col, Row} from "reactstrap";
 import axios from "axios";
 import {Grid} from "react-bootstrap";
 import FormInputs from "../components/FormInputs/FormInputs";
 import CustomButton from "../components/CustomButton/CustomButton";
 import Card from "../components/Card/Card";
 
-/** Register page*/
+/** /register
+ * Register page*/
 class Register extends Component {
     constructor(props) {
         super(props)
@@ -31,6 +18,7 @@ class Register extends Component {
         document.title = "MovieLand Register";
     }
 
+    /** Get Data from Form and validate to send register request*/
     registerClicked(ev) {
         ev.preventDefault();
         const data = new FormData(ev.target);

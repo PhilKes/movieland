@@ -1,11 +1,10 @@
-package com.phil.movieland.rest;
+package com.phil.movieland.rest.controller;
 
 import com.phil.movieland.auth.jwt.entity.UserPrincipal;
 import com.phil.movieland.auth.jwt.util.CurrentUser;
-import com.phil.movieland.data.UserSummary;
 import com.phil.movieland.data.entity.Reservation;
-import com.phil.movieland.data.request.ReservationRequest;
-import com.phil.movieland.service.ReservationService;
+import com.phil.movieland.rest.request.ReservationRequest;
+import com.phil.movieland.rest.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

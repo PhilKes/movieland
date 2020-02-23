@@ -19,46 +19,69 @@ import AdminDashboard from "./webviews/admin/AdminDashboard.jsx";
 import UserProfile from "./views/UserProfile.jsx";
 import MovieShow from "./webviews/MovieShow";
 import MovieList from "./webviews/MovieList";
-import {faAddressCard, faFilm, faUser, faVideo} from "@fortawesome/free-solid-svg-icons";
-import MovieListEdit from "./webviews/admin/MovieListEdit";
-import MovieShowList from "./webviews/admin/MovieShowList";
+import {
+    faAddressCard,
+    faChartLine,
+    faClipboardList,
+    faFilm, faListUl,
+    faThList,
+    faUser, faUsers,
+    faVideo
+} from "@fortawesome/free-solid-svg-icons";
+import MovieListEdit from "./webviews/admin/dashboard/MovieListEdit";
+import MovieShowList from "./webviews/admin/dashboard/MovieShowList";
+import Summary from "./webviews/admin/dashboard/Summary";
+import UserListEdit from "./webviews/admin/dashboard/UserListEdit";
 
+/** Defines Routes for Users/Admins*/
 const adminRoutes = [
-  {
-    path: "/movies",
-    name: "Movies",
-    icon: faFilm,
-    component: MovieList,
-    show: true,
-  },
-  {
-    path: "/movies/edit",
-    name: "Manage Movies",
-    icon: faFilm,
-    component: MovieListEdit,
-    show: true,
-  },
-  {
-    path: "/shows",
-    name: "Shows",
-    icon: faVideo,
-    component: MovieShowList,
-    show: true,
-  },
-  {
-    path: "/dashboard",
-      name: "AdminDashboard",
-    icon: faAddressCard,
-      component: AdminDashboard,
-    show: true,
-  },
-  {
-    path: "/show/:showId",
-    name: "Show",
-    icon: faVideo,
-    component: MovieShow,
-    show: false,
-  },
+    {
+        path: "/movies",
+        name: "Movies",
+        icon: faFilm,
+        component: MovieList,
+        show: true,
+    },
+    {
+        path: "/dashboard",
+        name: "Dashboard",
+        subroutes: [
+            {
+                path: "/summary",
+                name: "Summary",
+                icon: faChartLine,
+                component: Summary
+            },
+            {
+                path: "/movies",
+                name: "Movies",
+                icon: faFilm,
+                component: MovieListEdit
+            },
+            {
+                path: "/shows",
+                name: "Shows",
+                icon: faVideo,
+                component: MovieShowList
+            },
+            {
+                path: "/users",
+                name: "User",
+                icon: faUsers,
+                component: UserListEdit
+            },
+        ],
+        icon: faClipboardList,
+        component: AdminDashboard,
+        show: true,
+    },
+    {
+        path: "/show/:showId",
+        name: "Show",
+        icon: faVideo,
+        component: MovieShow,
+        show: false,
+    },
     /*
   {
     path: "/table",

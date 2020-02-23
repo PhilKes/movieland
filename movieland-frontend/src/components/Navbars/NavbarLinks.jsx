@@ -23,8 +23,8 @@ import {faFilm, faSignOutAlt, faUser} from "@fortawesome/free-solid-svg-icons";
 import {loggedInActions, loggedOutActions} from "../../userActions";
 import AuthenticationService from "../../service/AuthenticationService";
 
-/** NavLinks either shown on top or in Sidebar*/
-//TODO Show admin routes only if logged in as admin
+/** NavLinks either shown on top or in Sidebar
+ *  Routes/actions for user/admin*/
 class NavbarLinks extends Component {
     constructor(props) {
         super(props);
@@ -32,63 +32,70 @@ class NavbarLinks extends Component {
             width: window.innerWidth
         };
     }
+
     activeRoute(routeName) {
         return this.props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
     }
+
     updateDimensions() {
         this.setState({ width: window.innerWidth });
     }
+
     componentDidMount() {
         this.updateDimensions();
         window.addEventListener("resize", this.updateDimensions.bind(this));
     }
-  render() {
-    const notification = (
-      <div>
-        <i className="fa fa-globe" />
-        <b className="caret" />
-        <span className="notification">5</span>
-        <p className="hidden-lg hidden-md">Notification</p>
-      </div>
-    );
 
-    return (
-      <div>
-          <Nav pullLeft>
-          {this.props.routes.map((prop, key) => {
-              if (!prop.redirect && prop.show)
-                  return (
+    /** Render Routes (left) and Actions (right)*/
+    render() {
+        const notification = (
+            <div>
+                <i className="fa fa-globe"/>
+                <b className="caret"/>
+                <span className="notification">5</span>
+                <p className="hidden-lg hidden-md">Notification</p>
+            </div>
+        );
 
-                      <NavItem key={key} className="nav-link">
-                          <NavLink
-                              className={"nav-link ontop"} to={prop.path}>
-                              <div className="navlink-div">
-                                <FontAwesomeIcon className="fontaw-icon" icon={prop.icon} size="lg"/>{prop.name}
-                              </div>
-                          </NavLink>
-                      </NavItem>
+        return (
+            <div>
+                <Nav pullLeft>
+                    {this.props.routes.map((prop, key) => {
+                        if (!prop.redirect && prop.show)
+                            return (
 
-                  );
-              return null;
-          })}
-          </Nav>
-              <Nav pullRight>
-              {this.props.actions.map((prop,key)=>{
-                  return(
-                      <NavItem key={key}  className="nav-link">
-                          <div className="navlink-div">
-                              <NavLink className={"nav-link ontop"} to={prop.path}>
-                                  <FontAwesomeIcon className="fontaw-icon" icon={prop.icon} size="lg"/>
-                                  {prop.name==="Account"? AuthenticationService.getUserName() : prop.name}
-                              </NavLink>
-                          </div>
-                      </NavItem>
-                  )})
-              }
-              </Nav>
-      </div>
-    );
-  }
+                                <NavItem key={key} className="nav-link">
+                                    <NavLink
+                                        className={"nav-link ontop"} to={prop.path}>
+                                        <div className="navlink-div">
+                                            <FontAwesomeIcon className="fontaw-icon" icon={prop.icon}
+                                                             size="lg"/>{prop.name}
+                                        </div>
+                                    </NavLink>
+                                </NavItem>
+
+                            );
+                        return null;
+                    })}
+                </Nav>
+                <Nav pullRight>
+                    {this.props.actions.map((prop, key) => {
+                        return (
+                            <NavItem key={key} className="nav-link">
+                                <div className="navlink-div">
+                                    <NavLink className={"nav-link ontop"} to={prop.path}>
+                                        <FontAwesomeIcon className="fontaw-icon" icon={prop.icon} size="lg"/>
+                                        {prop.name === "Account" ? AuthenticationService.getUserName() : prop.name}
+                                    </NavLink>
+                                </div>
+                            </NavItem>
+                        )
+                    })
+                    }
+                </Nav>
+            </div>
+        );
+    }
 }
 
 export default NavbarLinks;

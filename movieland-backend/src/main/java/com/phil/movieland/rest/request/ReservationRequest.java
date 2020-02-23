@@ -1,4 +1,4 @@
-package com.phil.movieland.data.request;
+package com.phil.movieland.rest.request;
 
 import com.phil.movieland.data.entity.Seat;
 

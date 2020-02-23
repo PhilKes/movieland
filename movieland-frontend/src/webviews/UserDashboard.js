@@ -1,25 +1,11 @@
 import React, {Component} from 'react'
-import {
-    Alert,
-    Button,
-    Container,
-    Form,
-    FormFeedback,
-    FormGroup,
-    Input,
-    InputGroup,
-    InputGroupAddon,
-    InputGroupText,
-    Label, NavItem, NavLink
-} from "reactstrap";
-import {faUserAlt, faUser, faLock} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Container} from "reactstrap";
 import axios from "axios";
 import LoadingPage from "./misc/LoadingPage";
 import moment from "moment";
 
 /** /user/me page Component
- *  User UserDashboard page showing user details, reservations*/
+ *  UserDashboard page showing user details, reservations*/
 class UserDashboard extends Component {
     constructor(props) {
         super(props)
@@ -33,6 +19,7 @@ class UserDashboard extends Component {
         }
     }
 
+    /** Fetch User data and Reservations for Shows*/
     componentDidMount() {
         document.title = "My UserDashboard";
         axios.get('/api/user/me')
@@ -81,6 +68,7 @@ class UserDashboard extends Component {
     }
 
 
+    /** Render User Data and Reservations*/
     render() {
         let {err, user, reservations, shows, movies} = this.state;
         if (this.state.isLoading) {
@@ -101,14 +89,14 @@ class UserDashboard extends Component {
         //TODO only generate reservations for users not admins
         return (
             <div className="content">
-            <Container fluid>
-                <h2>My Dashboard</h2>
-                <b>Id: {user.id}</b><br/>
-                <b>User: {user.username}</b><br/>
-                <b>Name: {user.name}</b><br/><br/>
-                <b>Reservations</b><br/>
-                {reservationList}
-            </Container>
+                <Container fluid>
+                    <h2>My Dashboard</h2>
+                    <b>Id: {user.id}</b><br/>
+                    <b>User: {user.username}</b><br/>
+                    <b>Name: {user.name}</b><br/><br/>
+                    <b>Reservations</b><br/>
+                    {reservationList}
+                </Container>
             </div>
         )
     }

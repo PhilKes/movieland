@@ -32,7 +32,7 @@ export default class MovieShowModal extends React.Component {
     componentDidMount() {
         this.setState({isLoading: true});
 
-        axios.get('api/movies')
+        axios.get('/api/movies')
             .then(data => this.setState({movies: data.data, isLoading: false}));
     }
 
@@ -61,6 +61,7 @@ export default class MovieShowModal extends React.Component {
         this.setState({selMovId: movId});
     }
 
+    /** Render TimePicker + MovieList*/
     render() {
         const {movies, name, selMovId} = this.state;
         const movieList = movies.map(movie => {
@@ -86,32 +87,32 @@ export default class MovieShowModal extends React.Component {
                             <Grid fluid>
                                 <Row>
                                     <Col md={8}>
-                                            <div className="form-group">
-                                                <InputGroup>
-                                                    <InputGroupAddon addonType="prepend">
-                                                        <InputGroupText>
-                                                            <FontAwesomeIcon icon={faClock}/>
-                                                        </InputGroupText>
-                                                    </InputGroupAddon>
-                                                    <Input type="time"
-                                                           defaultValue={Moment().format("HH:mm")}
-                                                           style={{width: 'auto'}}
-                                                           name="time"/>
-                                                </InputGroup><br/>
-                                                <InputGroup>
-                                                    <InputGroupAddon addonType="prepend">
-                                                        <InputGroupText>
-                                                            <FontAwesomeIcon icon={faSearch}/>
-                                                        </InputGroupText>
-                                                    </InputGroupAddon>
-                                                    <Input placeholder="Search" type="text"
-                                                           placeholder="Search Movies"
-                                                           value={this.state.name}
-                                                           onChange={this.handleChangeName}
-                                                           className="form-control"/>
+                                        <div className="form-group">
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend">
+                                                    <InputGroupText>
+                                                        <FontAwesomeIcon icon={faClock}/>
+                                                    </InputGroupText>
+                                                </InputGroupAddon>
+                                                <Input type="time"
+                                                       defaultValue={Moment().format("HH:mm")}
+                                                       style={{width: 'auto'}}
+                                                       name="time"/>
+                                            </InputGroup><br/>
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend">
+                                                    <InputGroupText>
+                                                        <FontAwesomeIcon icon={faSearch}/>
+                                                    </InputGroupText>
+                                                </InputGroupAddon>
+                                                <Input placeholder="Search" type="text"
+                                                       placeholder="Search Movies"
+                                                       value={this.state.name}
+                                                       onChange={this.handleChangeName}
+                                                       className="form-control"/>
 
-                                                </InputGroup>
-                                            </div>
+                                            </InputGroup>
+                                        </div>
                                     </Col>
                                 </Row>
                                 <Row>

@@ -10,17 +10,23 @@ import static com.phil.movieland.data.entity.Seat.Seat_Type.*;
 @Table(name="SEAT")
 public class Seat {
 
-    public enum Seat_Type{
-        CHILD,STUDENT,ADULT,DISABLED
+    public enum Seat_Type {
+        CHILD, STUDENT, ADULT, DISABLED
     }
-    private static final HashMap<Seat_Type,Double>PRICE_MAP=new HashMap();
+
+    private static final HashMap<Seat_Type, Double> PRICE_MAP=new HashMap();
+
     static {
-        PRICE_MAP.put(CHILD,5.5);
-        PRICE_MAP.put(STUDENT,6.0);
-        PRICE_MAP.put(ADULT,7.0);
-        PRICE_MAP.put(DISABLED,5.5);
+        PRICE_MAP.put(CHILD, 5.5);
+        PRICE_MAP.put(STUDENT, 6.0);
+        PRICE_MAP.put(ADULT, 7.0);
+        PRICE_MAP.put(DISABLED, 5.5);
     }
-    public static double getPrice(Seat_Type type){
+
+    public static double getPrice(Seat_Type type) {
+        if(type==null) {
+            return 7.0;
+        }
         return PRICE_MAP.get(type);
     }
 

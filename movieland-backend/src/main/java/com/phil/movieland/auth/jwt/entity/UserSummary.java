@@ -1,4 +1,4 @@
-package com.phil.movieland.data;
+package com.phil.movieland.auth.jwt.entity;
 
 public class UserSummary {
     private Long id;

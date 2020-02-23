@@ -1,4 +1,4 @@
-package com.phil.movieland.data;
+package com.phil.movieland.rest.request;
 
 import java.util.Date;
 

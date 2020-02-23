@@ -6,16 +6,17 @@ import {
     Input,
     FormGroup, Label, InputGroup, InputGroupAddon, Form
 } from 'reactstrap';
-import MovieShowModal from "../modal/MovieShowModal";
+import MovieShowModal from "../../modal/MovieShowModal";
 import Moment from 'moment';
 import {faMinusCircle} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import ErrorPage from "../misc/ErrorPage";
-import LoadingPage from "../misc/LoadingPage";
+import ErrorPage from "../../misc/ErrorPage";
+import LoadingPage from "../../misc/LoadingPage";
 import {Col, Grid, Row} from "react-bootstrap";
-import ReactCard from "../../components/Card/Card";
-import CustomButton from "../../components/CustomButton/CustomButton";
+import ReactCard from "../../../components/Card/Card";
+import CustomButton from "../../../components/CustomButton/CustomButton";
+import * as queryString from "query-string";
 
 /** /shows page
  * Shows MovieShows by Date + ADD/REMOVE Shows*/
@@ -33,14 +34,18 @@ class MovieShowList extends Component {
 
     /** Initial load all shows*/
     componentDidMount() {
+        this.params = new URLSearchParams(this.props.location.search);
+
+        this.dateParam = this.params.get('date');
         document.title = "Manage Shows";
+        this.setState({isLoading: true});
         if (this.dateParam == null || this.dateParam.length < 9) {
             this.dateParam = Moment().format("YYYY-MM-DD");
             this.updateDateParam();
         }
-        this.setState({isLoading: true});
         this.updateShowList()
     }
+
 
     /** Update date or set to today*/
     changeDate(date) {
@@ -62,23 +67,25 @@ class MovieShowList extends Component {
 
     /** Fetch Shows for date and fetch referenced Movies*/
     updateShowList() {
-        axios.get('api/shows?date=' + this.dateParam)
+        console.log("UPDATEING SHOWS")
+        axios.get('/api/shows?date=' + this.dateParam)
             .then(res => {
-                let promises = [];
-                let movies = {};
                 let shows = res.data;
-                shows.forEach(
-                    (show) => {
-                        if (movies[show.movId] == null) {
-                            promises.push(
-                                axios.get('api/movie/' + show.movId)
-                                    .then(movie => movies[movie.data.movId] = movie.data));
-                        }
-                    });
-                axios.all(promises).then(res => {
-                    shows = shows.sort((a, b) => Moment(a.date).diff(b.date));
-                    this.setState({shows: shows, movies: movies, isLoading: false});
-                })
+                const distinct = (value, idx, self) => {
+                    return self.indexOf(value) === idx;
+                };
+                let ids = shows.map(show => show.movId).filter(distinct);
+                axios.get('/api/movies/ids', {
+                    params: {
+                        ids: ids
+                    },
+                    paramsSerializer: params => {
+                        return queryString.stringify(params)
+                    }
+                }).then(resp => {
+
+                    this.setState({shows: shows, movies: resp.data, isLoading: false});
+                });
             })
             .catch(err => this.setState({timedout: true}));
     }
@@ -145,7 +152,6 @@ class MovieShowList extends Component {
         /** Generate table rows for each movie containing its shows on dateParam*/
         let movieKeys=Object.keys(movies);
         const movieList = movieKeys.map(id => {
-            console.log("Render movie: " + movies[id].name)
             return <tr key={movies[id].movId}>
                 <td>
                     <h5 className="text-center">{movies[id].name}</h5>
@@ -207,7 +213,6 @@ class MovieShowList extends Component {
         });
 
         return (
-            <div className="content">
                 <Grid fluid>
                     <Row>
                         <Col md={12}>
@@ -255,7 +260,6 @@ class MovieShowList extends Component {
                         </Col>
                     </Row>
                 </Grid>
-            </div>
         );
     }
 

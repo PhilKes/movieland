@@ -23,51 +23,56 @@ import NavbarLinks from "../Navbars/NavbarLinks.jsx";
 import logo from "../../assets/img/movie_land_icon.png";
 import {loggedInActions, loggedOutActions} from "../../userActions";
 
+/** Sidebar for Navigation, shown on NavbarToggle */
 class Sidebar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      width: window.innerWidth
-    };
-  }
-  activeRoute(routeName) {
-    return this.props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
-  }
-  updateDimensions() {
-    this.setState({ width: window.innerWidth });
-  }
-  componentDidMount() {
-    this.updateDimensions();
-    window.addEventListener("resize", this.updateDimensions.bind(this));
-  }
-  render() {
+    constructor(props) {
+        super(props);
+        this.state = {
+            width: window.innerWidth
+        };
+    }
 
-    return (
-      <div
-        id="sidebar"
-        className="sidebar"
-        data-color={this.props.color}
-      >
-        <div className="logo">
-          <a
-            href="/"
-            className="simple-text logo-normal"
-          >
-            <div className="logo-img">
-              <img src={logo} alt="logo_image" />
+    activeRoute(routeName) {
+        return this.props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
+    }
+
+    updateDimensions() {
+        this.setState({width: window.innerWidth});
+    }
+
+    componentDidMount() {
+        this.updateDimensions();
+        window.addEventListener("resize", this.updateDimensions.bind(this));
+    }
+
+    /** Render Sidebar with NavbarLinks to routes/actions*/
+    render() {
+        return (
+            <div
+                id="sidebar"
+                className="sidebar"
+                data-color={this.props.color}
+            >
+                <div className="logo">
+                    <a
+                        href="/"
+                        className="simple-text logo-normal"
+                    >
+                        <div className="logo-img">
+                            <img src={logo} alt="logo_image"/>
+                        </div>
+                    </a>
+                </div>
+                <div className="sidebar-wrapper">
+                    <ul className="nav">
+                        <NavbarLinks {...this.props} routes={this.props.routes} onTop={false}
+                                     actions={this.props.actions}
+                        />
+                    </ul>
+                </div>
             </div>
-          </a>
-        </div>
-        <div className="sidebar-wrapper">
-          <ul className="nav">
-            <NavbarLinks {...this.props} routes={this.props.routes} onTop={false}
-                         actions={this.props.actions}
-            />
-          </ul>
-        </div>
-      </div>
-    );
-  }
+        );
+    }
 }
 
 export default Sidebar;

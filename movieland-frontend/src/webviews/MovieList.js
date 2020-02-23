@@ -1,24 +1,5 @@
 import React, {Component} from 'react';
-import {
-    Button,
-    ButtonGroup,
-    Container,
-    Table,
-    Input,
-    Alert,
-    Carousel,
-    Card,
-    CarouselIndicators,
-    CarouselControl,
-    CarouselCaption,
-    CarouselItem,
-    ListGroupItem,
-    ListGroup,
-    CardBody,
-    CardImg
-} from 'reactstrap';
-import {Link} from 'react-router-dom';
-import MovieModal from "./modal/MovieModal";
+import {ButtonGroup, Table, CarouselCaption, CarouselItem, ListGroupItem, ListGroup,} from 'reactstrap';
 import Moment from 'moment';
 import axios from "axios";
 import ErrorPage from "./misc/ErrorPage";
@@ -27,10 +8,8 @@ import * as queryString from "query-string";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEye, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 import TrailerModal from "./modal/TrailerModal";
-import CardHeader from "reactstrap/lib/CardHeader";
 import {Grid,Row,Col} from "react-bootstrap";
 import ReactCard from "../components/Card/Card";
-import {StatsCard} from "../components/StatsCard/StatsCard";
 import CustomButton from "../components/CustomButton/CustomButton";
 
 
@@ -49,10 +28,9 @@ class MovieList extends Component {
             animating: false,
             activeIndex: 0
         };
-
     }
 
-    /** Initial load all shows*/
+    /** Initial load all Shows with Movies*/
     componentDidMount() {
         this.setState({isLoading: true});
         document.title = "MovieLand Movies";
@@ -61,22 +39,24 @@ class MovieList extends Component {
             .then(res => res.data)
             .then(data => {
                 let ids = data.map(movie => movie.tmdbId);
-                axios.get('/api/movies/tmdb/images', {
-                    params: {
-                        ids: ids
-                    },
-                    paramsSerializer: params => {
-                        return queryString.stringify(params)
-                    }
-                }).then(resp => {
-                    data = data.map(m => {
-                        //console.log("Img:"+resp.data[m.tmdbId]);
-                        m.backdrop = resp.data[m.tmdbId];
-                        return m;
-                    });
-                    this.getShows();
-                    this.setState({movies: data, isLoading: true});
-                })
+                this.setState({movies: data, isLoading: true});
+                this.getShows();
+                /*  axios.get('/api/movies/tmdb/images', {
+                      params: {
+                          ids: ids
+                      },
+                      paramsSerializer: params => {
+                          return queryString.stringify(params)
+                      }
+                  }).then(resp => {
+                      data = data.map(m => {
+                          //console.log("Img:"+resp.data[m.tmdbId]);
+                          m.backdrop = resp.data[m.tmdbId];
+                          return m;
+                      });
+                      this.getShows();
+                      this.setState({movies: data, isLoading: true});
+                  })*/
                 //
             })
             .catch(err => this.setState({timedout: true}))
@@ -122,6 +102,7 @@ class MovieList extends Component {
     }
 
 
+    /** Render List of Movies with Shows this week*/
     render() {
         const {movies, isLoading, error, timedout, shows} = this.state;
         if (timedout) {
@@ -171,7 +152,7 @@ class MovieList extends Component {
 
             let days = Object.keys(shows[movie.movId]);
             let today = Moment().locale("en").format("dd");
-            //TODO days in order starting from today
+            //TODO SORT days in order starting from today
             days = days.sort((a, b) => {
                 if (a === today) {
                     return -1;
@@ -223,7 +204,7 @@ class MovieList extends Component {
                                                     </ButtonGroup>
                                                 </div>
                                             </div>
-                                           {/* <StatsCard
+                                            {/* <StatsCard
                                                 bigIcon={<img src={movie.posterUrl} className="img-fluid text-center"/>}
                                                 statsText={movie.name}
                                                 statsValue={this.state.amtWatchedMins}
@@ -240,23 +221,25 @@ class MovieList extends Component {
                                                 ctTableResponsive
                                                 plain
                                                 content={
-                                            <Table bordered className="shows-table">
-                                                <thead>
-                                                <tr>
-                                                    {days.map(day=>{
-                                                        return(
-                                                            <th key={day} width="14.286%" className="shows-table"><h5><b>{day}</b></h5></th>
-                                                        );
-                                                    })
-                                                    }
-                                                </tr>
-                                                {showList}
-                                                </thead>
-                                            </Table>}/>
+                                                    <Table bordered className="shows-table">
+                                                        <thead>
+                                                        <tr>
+                                                            {days.map(day => {
+                                                                return (
+                                                                    <th key={day} width="14.286%"
+                                                                        className="shows-table"><h5><b>{day}</b></h5>
+                                                                    </th>
+                                                                );
+                                                            })
+                                                            }
+                                                        </tr>
+                                                        {showList}
+                                                        </thead>
+                                                    </Table>}/>
                                         </Col>
                                     </Row>
                                 </Grid>
-                                }
+                            }
                         />
                     </Col>
 
@@ -268,8 +251,8 @@ class MovieList extends Component {
                 <Grid fluid>
                     <Row>
                         <Col md={8}>
-                        <h2>Newest Movies</h2><br/>
-                       {/* <Carousel
+                            <h2>Newest Movies</h2><br/>
+                            {/* <Carousel
                             activeIndex={activeIndex}
                             next={next}
                             previous={previous}
