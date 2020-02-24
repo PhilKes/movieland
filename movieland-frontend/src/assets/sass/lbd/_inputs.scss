@@ -3,10 +3,10 @@
 }
 .form-control:-moz-placeholder{
    @include placeholder($medium-gray,1);
-}  
+}
 .form-control::-webkit-input-placeholder{
-   @include placeholder($medium-gray,1); 
-} 
+  @include placeholder($medium-gray, 1);
+}
 .form-control:-ms-input-placeholder{
    @include placeholder($medium-gray,1);
 }
@@ -18,15 +18,15 @@
     color: #565656;
     @include input-size($padding-base-vertical, $padding-base-horizontal - 4, $height-base);
     @include box-shadow(none);
-    
+
     &:focus{
            background-color: $white-bg;
            border: 1px solid $medium-dark-gray;
            @include box-shadow(none);
-           outline: 0 !important;    
-           color: #333333;   
+      outline: 0 !important;
+      color: #333333;
     }
-    
+
     .has-success &,
     .has-error &,
     .has-success &:focus,
@@ -34,8 +34,8 @@
         border-color: $light-gray;
         @include box-shadow(none);
     }
-    
-    .has-success &{
+
+  .has-success &{
         color: $success-color;
     }
     .has-success &:focus{
@@ -47,8 +47,8 @@
     .has-error &:focus{
         border-color: $danger-color;
     }
-    
-    & + .form-control-feedback{
+
+  & + .form-control-feedback{
         border-radius: $border-radius-large;
         font-size: $font-size-base;
         margin-top: -7px;
@@ -57,8 +57,8 @@
         top: 50%;
         vertical-align: middle;
     }
-    
-    .open &{
+
+  .open &{
         border-radius: $border-radius-base $border-radius-base 0 0;
         border-bottom-color: transparent;
     }
@@ -85,8 +85,8 @@
     background-color: $white-color;
     border: 1px solid $light-gray;
     border-radius: $border-radius-base;
-    
-    .has-success &,
+
+  .has-success &,
     .has-error &{
         background-color: $white-color;
         border: 1px solid $light-gray;
@@ -106,15 +106,16 @@
     }
 }
 
-.input-group .form-control:first-child, 
-.input-group-addon:first-child,  
-.input-group-btn:first-child > .dropdown-toggle, 
+.input-group .form-control:first-child,
+.input-group-addon:first-child,
+.input-group-btn:first-child > .dropdown-toggle,
 .input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle) {
     border-right: 0 none;
 }
-.input-group .form-control:last-child, 
-.input-group-addon:last-child,  
-.input-group-btn:last-child > .dropdown-toggle, 
+
+.input-group .form-control:last-child,
+.input-group-addon:last-child,
+.input-group-btn:last-child > .dropdown-toggle,
 .input-group-btn:first-child > .btn:not(:first-child) {
     border-left: 0 none;
 }

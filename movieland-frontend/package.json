@@ -66,6 +66,7 @@
     "react-chartist": "0.13.3",
     "react-cookie": "^3.0.4",
     "react-data-grid": "^6.1.0",
+    "react-data-grid-addons": "^7.0.0-alpha.24",
     "react-dev-utils": "^10.1.0",
     "react-dom": "^16.12.0",
     "react-google-maps": "9.4.5",
@@ -91,7 +92,12 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "eject": "react-scripts eject",
+    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
+    "compile-sass": "node-sass src/assets/sass/light-bootstrap-dashboard-react.scss src/assets/css/light-bootstrap-dashboard-react.css",
+    "minify-sass": "node-sass src/assets/sass/light-bootstrap-dashboard-react.scss src/assets/css/light-bootstrap-dashboard-react.min.css --output-style compressed",
+    "map-sass": "node-sass src/assets/sass/light-bootstrap-dashboard-react.scss src/assets/css/light-bootstrap-dashboard-react.css --source-map true"
   },
   "proxy": "http://localhost:8080",
   "eslintConfig": {
@@ -163,5 +169,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.12.1"
   }
 }

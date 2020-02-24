@@ -211,7 +211,8 @@ class MovieList extends Component {
                                             />*/}
                                         </Col>
                                         <Col xs={4} sm={7} lg={3} md={8} >
-                                            <h3 className="text-center">{movie.name}</h3>
+                                            <h3 className="text-center">{movie.name}</h3><br/>
+                                            <p>{movie.description}</p>
                                         </Col>
                                     </Row>
                                     <Row>
@@ -251,7 +252,7 @@ class MovieList extends Component {
                 <Grid fluid>
                     <Row>
                         <Col md={8}>
-                            <h2>Newest Movies</h2><br/>
+                            <h2>This week's Movies</h2><br/>
                             {/* <Carousel
                             activeIndex={activeIndex}
                             next={next}

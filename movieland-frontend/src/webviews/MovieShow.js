@@ -2,6 +2,9 @@ import React, {Component} from 'react';
 import {Button, Container, Table} from 'reactstrap';
 import Moment from 'moment';
 import axios from "axios";
+import {Col, Grid, Row, Tooltip} from "react-bootstrap";
+import OverlayTrigger from "react-bootstrap/lib/OverlayTrigger";
+import LoadingPage from "./misc/LoadingPage";
 
 
 /** /show/:showId page Component
@@ -89,18 +92,25 @@ class MovieShow extends Component {
             for (let i = 0; i < cols; i++) {
                 let cell = [];
                 if (reservedSeats[y * cols + i] == null) {
+                    const tooltip = (<Tooltip id="seat_tooltip">Nr.{y * cols + i}</Tooltip>);
                     cell = (<td key={i}>
-                        <div
-                            className={selectedSeats[y * cols + i] == null ? "seatimg" : "seatimg selected"}
-                            onClick={() => this.selectSeat(y * cols + i)}>
-                            {y * cols + i}
-                        </div>
+                        <OverlayTrigger placement="top" overlay={tooltip}>
+                            <div
+                                className={selectedSeats[y * cols + i] == null ? "seatimg" : "seatimg selected"}
+                                onClick={() => this.selectSeat(y * cols + i)}>
+                                {/* {y * cols + i}*/}
+                            </div>
+                        </OverlayTrigger>
                     </td>);
                 } else {
+                    const tooltip = (<Tooltip id="seat_tooltip">Taken</Tooltip>);
+
                     cell = (<td key={i}>
-                        <div className="seatimg reserved">
-                            {y * cols + i}
-                        </div>
+                        <OverlayTrigger placement="top" overlay={tooltip}>
+                            <div className="seatimg reserved">
+                                {/* {y * cols + i}*/}
+                            </div>
+                        </OverlayTrigger>
                     </td>);
                 }
                 cells.push(cell)
@@ -124,28 +134,35 @@ class MovieShow extends Component {
     /** Render All Seats,highlight reserved Seats*/
     render() {
         const {movie, isLoading, error, timedout, show, selectedSeats} = this.state;
+        if (isLoading)
+            return <LoadingPage/>;
 
         //TODO add submit reservation -> Post
         return (
-            <Container fluid>
-                <h2>{movie.name}</h2><br/>
-                <h5>{movie.description}</h5>
-                <h5>{Moment(show.date).format('DD.MM.YYYY HH:mm')}</h5>
-                <div id="room">
-                    <div id="screen">Screen</div>
-                    <Table borderless size="sm" className="seatTable">
-                        <tbody>
-                        {this.createRows(10, 16)}
-                        </tbody>
-                    </Table>
-                </div>
-                <h4>Selection: {Object.keys(selectedSeats).length} Seats selected</h4>
+            <div className="content">
+                <Grid fluid>
+                    <Row>
+                        <Col md={12}>
+                            <h2>{movie.name}</h2>
+                            <h4>{Moment(show.date).format('DD.MM.YYYY HH:mm')}</h4>
+                            <h5>{movie.description}</h5>
+                            <div id="room">
+                                <div id="screen">Screen</div>
+                                <Table borderless size="sm" className="seatTable">
+                                    <tbody>
+                                    {this.createRows(10, 16)}
+                                    </tbody>
+                                </Table>
+                            </div>
+                            <h4>Selection: {Object.keys(selectedSeats).length} Seats selected</h4>
 
-                <Button color="success" onClick={this.submitReservation.bind(this)}
-                        disabled={Object.keys(selectedSeats).length === 0}
-                >Submit</Button>
-
-            </Container>
+                            <Button color="success" onClick={this.submitReservation.bind(this)}
+                                    disabled={Object.keys(selectedSeats).length === 0}
+                            >Submit</Button>
+                        </Col>
+                    </Row>
+                </Grid>
+            </div>
         );
     }
 }

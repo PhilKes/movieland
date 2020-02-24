@@ -45,7 +45,7 @@ public class User extends DateAudit {
     @JoinTable(name="USER_ROLES",
             joinColumns=@JoinColumn(name="user_id"),
             inverseJoinColumns=@JoinColumn(name="role_id"))
-    private Set<Role> roles=new HashSet<>();
+    private Set<Role> roles;
 
     public User() {
 
@@ -56,6 +56,7 @@ public class User extends DateAudit {
         this.username=username;
         this.email=email;
         this.password=password;
+        this.roles=new HashSet<>();
     }
 
     public Long getId() {

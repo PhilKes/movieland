@@ -1,3 +1,7 @@
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts" !default;
+@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "~@fortawesome/fontawesome-free/scss/regular.scss";
+
 /*      Checkbox and radio         */
 .checkbox,
 .radio {
@@ -15,8 +19,8 @@
 
 .checkbox label::before,
 .checkbox label::after{
-  font-family: 'FontAwesome';
-  content: "\f096";
+  font-family: "Font Awesome 5 Free";
+  content: "\f0c8";
   display: inline-block;
   position: absolute;
   width: 20px;
@@ -48,8 +52,8 @@
 }
 
 .checkbox input[type="checkbox"]:checked + label::after{
-    font-family: 'FontAwesome';
-    content: "\f046";
+  font-family: "Font Awesome 5 Free";
+  content: '\f14a';
 }
 
 .checkbox input[type="checkbox"]:checked + label::after{
@@ -130,7 +134,7 @@
 
 .radio label::before,
 .radio label::after {
-  font-family: 'FontAwesome';
+  font-family: "Font Awesome 5 Free";
   content: "\f10c";
   font-size: 20px;
   height: 20px;
@@ -148,7 +152,7 @@
 }
 
 .radio input[type="radio"]:checked + label::after {
-    font-family: 'FontAwesome';
+  font-family: "Font Awesome 5 Free";
     content: "\f192";
     color: $medium-gray;
 }

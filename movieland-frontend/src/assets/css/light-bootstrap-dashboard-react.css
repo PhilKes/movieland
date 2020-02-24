@@ -1015,8 +1015,8 @@ body > .navbar-collapse[data-color="purple"]:after {
 
 .checkbox label::before,
 .checkbox label::after {
-  font-family: 'FontAwesome';
-  content: "\f096";
+
+    content: "\f0c8";
   display: inline-block;
   position: absolute;
   width: 20px;
@@ -1045,8 +1045,9 @@ body > .navbar-collapse[data-color="purple"]:after {
   margin-left: 0; }
 
 .checkbox input[type="checkbox"]:checked + label::after {
-  font-family: 'FontAwesome';
-  content: "\f046"; }
+
+    content: "\f14a";
+}
 
 .checkbox input[type="checkbox"]:checked + label::after {
   color: #1DC7EA; }
@@ -1110,8 +1111,8 @@ body > .navbar-collapse[data-color="purple"]:after {
 
 .radio label::before,
 .radio label::after {
-  font-family: 'FontAwesome';
-  content: "\f10c";
+
+    content: "\f10c";
   font-size: 20px;
   height: 20px;
   width: 20px;
@@ -1127,8 +1128,8 @@ body > .navbar-collapse[data-color="purple"]:after {
   transition: color 0.2s linear; }
 
 .radio input[type="radio"]:checked + label::after {
-  font-family: 'FontAwesome';
-  content: "\f192";
+
+    content: "\f192";
   color: #DDDDDD; }
 
 .radio input[type="radio"]:checked + label::after {

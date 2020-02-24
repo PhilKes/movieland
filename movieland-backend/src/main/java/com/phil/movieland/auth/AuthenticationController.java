@@ -88,28 +88,7 @@ public class AuthenticationController {
         return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
     }
 
-    @GetMapping("/users")
-    public List<User> getUsersOfRolUsers() {
-        return getAllUserOfRole(Role.RoleName.ROLE_USER);
 
-    }
-
-    public List<Long> getAllUserIds() {
-        return userRepository.findAll().stream().map(User::getId).collect(Collectors.toList());
-    }
-
-    public List<User> getAllUserOfRole(Role.RoleName roleName) {
-        Role role=roleRepository.findByName(roleName).get();
-        return userRepository.findAllByRolesContaining(role).stream()
-                .filter(
-                        user ->
-                                user.getRoles().size()==1)
-                .collect(Collectors.toList());
-    }
-
-    public List<Long> getAllUserIdsOfRole(Role.RoleName roleName) {
-        return getAllUserOfRole(roleName).stream().map(User::getId).collect(Collectors.toList());
-    }
 
 
 }

@@ -147,7 +147,7 @@ class AdminDashboard extends Component {
                         {
                             this.props.subroutes.map((prop, key) => {
                                 return (
-                                    <NavItem eventKey={prop.path}>
+                                    <NavItem key={key} eventKey={prop.path}>
                                         <NavIcon>
                                             <i style={{fontSize: '1.75em'}}/>
                                             <FontAwesomeIcon icon={prop.icon} size="2x"/>

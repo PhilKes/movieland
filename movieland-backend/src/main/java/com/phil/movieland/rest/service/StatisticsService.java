@@ -3,11 +3,13 @@ package com.phil.movieland.rest.service;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.phil.movieland.auth.AuthenticationController;
 import com.phil.movieland.auth.jwt.entity.Role;
+import com.phil.movieland.auth.jwt.entity.User;
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.data.entity.Seat;
 import com.phil.movieland.data.repository.SeatRepository;
+import com.phil.movieland.rest.controller.UserController;
 import com.phil.movieland.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
@@ -22,7 +24,7 @@ import static java.util.stream.Collectors.toMap;
 public class StatisticsService {
 
     private final MovieShowService movieShowService;
-    private final AuthenticationController authenticationController;
+    private final UserController userController;
     private final MovieService movieService;
     private final SeatRepository seatRepository;
     private final ReservationService reservationService;
@@ -32,12 +34,12 @@ public class StatisticsService {
     @Autowired
     public StatisticsService(SeatRepository seatRepository, ReservationService reservationService,
                              MovieShowService movieShowService, MovieService movieService,
-                             AuthenticationController authenticationController) {
+                             UserController userController) {
         this.seatRepository=seatRepository;
         this.reservationService=reservationService;
         this.movieShowService=movieShowService;
         this.movieService=movieService;
-        this.authenticationController=authenticationController;
+        this.userController=userController;
     }
 
     public void generateShowsBetween(Date from, Date until) {
@@ -85,7 +87,7 @@ public class StatisticsService {
         countDate.setTime(from);
         /** Generate reservations for each show until Date until is reached*/
         Random rand=new Random();
-        List<Long> userIds=authenticationController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
+        List<Long> userIds=userController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
         while(countDate.getTime().before(until)) {
             List<MovieShow> shows=movieShowService.getShowsForDate(countDate.getTime());
             /** For each show generate reservations */
