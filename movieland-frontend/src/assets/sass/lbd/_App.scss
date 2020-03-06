@@ -8,7 +8,19 @@
     overflow-y: scroll;
 }
 
-.carousel .carousel-inner img {
+.show-carousel {
+  background-image: linear-gradient(to bottom, #982a22, #962926);
+  max-width: 1080px;
+  align-items: center;
+  align-content: center;
+  margin: auto;
+}
+
+.carousel-center {
+  align-items: center;
+}
+
+.carousel .carousel-inner a > img {
     width: 100%;
     height: 30em;
     object-fit: cover;
@@ -247,4 +259,18 @@
   top: 50%;
   align-content: center;
   vertical-align: center;
+}
+
+.click-icon {
+  color: gray;
+}
+
+.click-icon:hover {
+  color: rgb(152, 42, 38);
+  cursor: pointer;
+}
+
+.infinite-scroll-container {
+  height: 100%;
+  overflow-y: auto;
 }

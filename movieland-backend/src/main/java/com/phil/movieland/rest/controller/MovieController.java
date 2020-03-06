@@ -4,12 +4,15 @@ import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.rest.service.MovieService;
 import com.phil.movieland.rest.service.MovieShowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -34,6 +37,7 @@ public class MovieController {
             @RequestParam(value="name",required=false)String search){
         List<Movie> movies= null;
         if(null==search) {
+            //TODO PAGING
             System.out.println("No query entered");
             movies=movieService.getAllMovies();
         }else{
@@ -41,6 +45,30 @@ public class MovieController {
             movies=movieService.queryAllMovies(search);
         }
         return movies;
+    }
+
+    @GetMapping("/movies/page/{page}")
+    public ResponseEntity<Collection<Movie>> getMoviesPaged(
+            @RequestParam(value="name", required=false) String search,
+            @PathVariable(value="page") Integer page) {
+        HttpHeaders responseHeaders=new HttpHeaders();
+        Slice<Movie> slice;
+        if(null==search) {
+            System.out.println("No query entered");
+            slice=movieService.getAllMoviesPaged(page, 10);
+
+        }
+        else {
+            System.out.println("Searched for: " + search);
+            slice=movieService.queryAllMoviesPaged(search, page, 10);
+        }
+        if(slice.hasNext()) {
+            responseHeaders.set("hasMore", "true");
+        }
+        else {
+            responseHeaders.set("hasMore", "false");
+        }
+        return ResponseEntity.ok().headers(responseHeaders).body(slice.getContent());
     }
 
     @GetMapping("/movies/ids")

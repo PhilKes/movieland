@@ -4,6 +4,7 @@ import com.phil.movieland.data.entity.Movie;
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.TmdbMovies;
 import info.movito.themoviedbapi.model.Artwork;
+import info.movito.themoviedbapi.model.ArtworkType;
 import info.movito.themoviedbapi.model.MovieDb;
 import info.movito.themoviedbapi.model.Video;
 import info.movito.themoviedbapi.model.core.MovieResultsPage;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 /** Service for Tmdb Api interface*/
 @Service
@@ -71,7 +73,8 @@ public class TmdbApiService {
         if(images.isEmpty()) {
             return null;
         }
-        String path=IMAGE_BASE_URL + images.get(0).getFilePath();
+        Optional<Artwork> backdrop=images.stream().filter(img -> img.getArtworkType()==ArtworkType.BACKDROP).findFirst();
+        String path=IMAGE_BASE_URL + backdrop.orElse(images.get(0)).getFilePath();
         System.out.println("Loaded: " + path + " from tmdb");
         backdrops.put(movId, path);
         return path;

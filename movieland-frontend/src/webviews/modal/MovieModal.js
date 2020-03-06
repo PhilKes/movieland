@@ -51,7 +51,7 @@ export default class MovieModal extends React.Component {
     handleKeyPress(ev) {
         if (ev.charCode == 13) { //Enter pressed?
             console.log("Search: " + this.searchQuery.value);
-            axios.get('api/movies/tmdb?name=' + this.searchQuery.value)
+            axios.get('/api/movies/tmdb?name=' + this.searchQuery.value)
                 .then(res => res.data)
                 .then(data => this.setState({movies: data}));
         }

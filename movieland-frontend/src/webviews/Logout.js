@@ -1,9 +1,5 @@
 import React, {Component} from 'react'
-import AuthService from "../service/AuthenticationService";
-import history from '../history';
-import AuthenticationService from "../service/AuthenticationService";
-import {Alert, Button, Container, FormFeedback, FormGroup, Input, Label} from "reactstrap";
-import App from "../App";
+import {Container} from "reactstrap";
 
 /** /logout page Component
  *  Logout */
@@ -18,7 +14,6 @@ class Logout extends Component {
     componentDidMount() {
         this.props.onAction("Logout");
     }
-
 
     render() {
         return (

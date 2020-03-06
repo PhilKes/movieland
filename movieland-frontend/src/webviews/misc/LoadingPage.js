@@ -22,7 +22,6 @@ export default class LoadingPage extends Component {
                         color="#AAA"
                         height={80}
                         width={80}
-
                     />
                 </div>
             </Container>

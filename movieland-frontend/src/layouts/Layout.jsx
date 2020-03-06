@@ -46,19 +46,16 @@ class Layout extends Component {
         this.actions = loggedOutActions;
     }
 
+    /** Show notification at position
+     * -> is passed to Subroute components*/
     handleNotificationClick = (msg, level, position) => {
         this.state._notificationSystem.addNotification({
             title: <span data-notify="icon" className={
                 level === "error" ? "pe-7s-less" :
                     level === "warning" ? "pe-7s-close" :
                         level === "success" ? "pe-7s-like2"
-                            : "pe-7s-info"}/>
-            ,
-            message: (
-                <div>
-                    {msg}
-                </div>
-            ),
+                            : "pe-7s-info"}/>,
+            message: (<div>{msg}</div>),
             level: level,
             position: position,
             autoDismiss: 6
@@ -101,21 +98,6 @@ class Layout extends Component {
 
     componentDidMount() {
         this.setState({_notificationSystem: this.refs.notificationSystem});
-        var _notificationSystem = this.refs.notificationSystem;
-        let level = "success";
-        //Show notification
-/*    _notificationSystem.addNotification({
-      title: <span data-notify="icon" className="pe-7s-gift" />,
-      message: (
-        <div>
-          Welcome to <b>Light Bootstrap UserDashboard</b> - a beautiful freebie for
-          every web developer.
-        </div>
-      ),
-      level: level,
-      position: "tr",
-      autoDismiss: 15
-    });*/
         this.setLoggedIn(this.state.loggedIn);
     }
 

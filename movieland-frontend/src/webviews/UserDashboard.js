@@ -86,7 +86,6 @@ class UserDashboard extends Component {
         });
 
         //TODO past reservations/ACTIVE
-        //TODO only generate reservations for users not admins
         return (
             <div className="content">
                 <Container fluid>

@@ -1,5 +1,10 @@
 import React, {Component} from 'react';
-import {ButtonGroup, Table, CarouselCaption, CarouselItem, ListGroupItem, ListGroup,} from 'reactstrap';
+import {
+    ButtonGroup,
+    Table,
+    ListGroupItem,
+    ListGroup
+} from 'reactstrap';
 import Moment from 'moment';
 import axios from "axios";
 import ErrorPage from "./misc/ErrorPage";
@@ -8,10 +13,14 @@ import * as queryString from "query-string";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEye, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 import TrailerModal from "./modal/TrailerModal";
-import {Grid,Row,Col} from "react-bootstrap";
+import {Grid, Row, Col} from "react-bootstrap";
 import ReactCard from "../components/Card/Card";
 import CustomButton from "../components/CustomButton/CustomButton";
-
+import {Carousel} from "react-bootstrap";
+import Scrollchor from 'react-scrollchor';
+import {Link} from "react-router-dom";
+import InfiniteLoader from "react-infinite-loader";
+import Loader from "react-loader-spinner";
 
 /** /movies page Component
  * Shows current Movies/Shows of the week*/
@@ -20,13 +29,12 @@ class MovieList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            movies: [],
+            page: 0,
+            moviePage: {movies: [], hasMore: true},
             shows: [],
             isLoading: true,
             error: "",
             timedout: false,
-            animating: false,
-            activeIndex: 0
         };
     }
 
@@ -34,14 +42,14 @@ class MovieList extends Component {
     componentDidMount() {
         this.setState({isLoading: true});
         document.title = "MovieLand Movies";
-        //TODO get wide screen Posters for carousel
-        axios.get('/api/movies')
-            .then(res => res.data)
-            .then(data => {
-                let ids = data.map(movie => movie.tmdbId);
-                this.setState({movies: data, isLoading: true});
-                this.getShows();
-                /*  axios.get('/api/movies/tmdb/images', {
+        axios.get('/api/movies/page/' + this.state.page)
+            .then(res => {
+                let hasMore = res.headers.hasmore === 'true';
+                this.setState({moviePage: {movies: res.data, hasMore: hasMore}, isLoading: true});
+                //this.getShows();
+                let ids = res.data.slice(0, 5).map(movie => movie.tmdbId);
+
+                axios.get('/api/movies/tmdb/images', {
                       params: {
                           ids: ids
                       },
@@ -49,18 +57,42 @@ class MovieList extends Component {
                           return queryString.stringify(params)
                       }
                   }).then(resp => {
-                      data = data.map(m => {
+                    let data = res.data.map(m => {
                           //console.log("Img:"+resp.data[m.tmdbId]);
                           m.backdrop = resp.data[m.tmdbId];
                           return m;
                       });
                       this.getShows();
                       this.setState({movies: data, isLoading: true});
-                  })*/
+                })
                 //
             })
             .catch(err => this.setState({timedout: true}))
         ;
+    }
+
+    loadMovies() {
+        /* let scrollPercent=(window.scrollY) / (document.body.scrollHeight- window.innerHeight);
+         scrollPercent= Math.round(scrollPercent*100);
+         if(scrollPercent>=100) {*/
+        this.setState({page: this.state.page + 1});
+        console.log("LOAD PAGE:");
+        console.log(this.state.page);
+        axios.get('/api/movies/page/' + (this.state.page))
+            .then(res => {
+                console.log(res);
+                let hasMore = res.headers.hasmore === 'true';
+                console.log("hasMore: " + hasMore);
+                let movies = this.state.moviePage.movies;
+                res.data.forEach(movie => movies.push(movie));
+                //this.getShows();
+                this.setState({moviePage: {movies: movies, hasMore: hasMore}, isLoading: false});
+
+            })
+            .catch(err => this.setState({timedout: true}))
+        ;
+        // }
+
     }
 
     /** Fetch all shows of this week (starting from today)*/
@@ -104,69 +136,55 @@ class MovieList extends Component {
 
     /** Render List of Movies with Shows this week*/
     render() {
-        const {movies, isLoading, error, timedout, shows} = this.state;
+        const {moviePage, isLoading, error, timedout, shows} = this.state;
         if (timedout) {
             return <ErrorPage/>
         }
         if (isLoading) {
             return <LoadingPage/>;
         }
-        movies.forEach(m => m.src = m.movId);
-        const moviesDisplayed = movies.slice(0, 5);
+        moviePage.movies.forEach(m => m.src = m.movId);
+        const moviesDisplayed = moviePage.movies.slice(0, 5);
         const showcaseList = moviesDisplayed.map(movie => {
-            return (<CarouselItem
-                onExiting={() => this.setState({animating: true})}
-                onExited={() => this.setState({animating: false})}
-                key={movie.movId}>
-                <img src={movie.backdrop} alt={movie.name}/>
-                <CarouselCaption captionText={movie.description} captionHeader={movie.name}/>
-            </CarouselItem>)
+            return (<Carousel.Item key={movie.movId}>
+                <a onClick={() => document.getElementById('mov' + movie.movId)
+                    .scrollIntoView({block: 'center', behavior: 'smooth'})}
+                   className="click-icon">
+                    <img src={movie.backdrop} alt={movie.name} className="carousel-image"/>
+                </a>
+                <Carousel.Caption>
+                    <h3>{movie.name}</h3>
+                    <p>{movie.name}</p>
+                </Carousel.Caption>
+            </Carousel.Item>)
         });
 
 
-        /** Controls for Carousel */
-        const {activeIndex} = this.state;
-        const {animating} = this.state;
-
-        const next = () => {
-            if (animating) return;
-            const nextIndex = activeIndex === moviesDisplayed.length - 1 ? 0 : activeIndex + 1;
-            this.setState({activeIndex: nextIndex})
-        }
-
-        const previous = () => {
-            if (animating) return;
-            const nextIndex = activeIndex === 0 ? moviesDisplayed.length - 1 : activeIndex - 1;
-            this.setState({activeIndex: nextIndex})
-        }
-
-        const goToIndex = (newIndex) => {
-            if (animating) return;
-            this.setState({activeIndex: newIndex})
-        }
-
-        const movieList = movies.map(movie => {
+        const movieList = moviePage.movies.map(movie => {
             if (shows[movie.movId] == null) {
                 return <Row key={movie.movId}/>;
             }
 
             let days = Object.keys(shows[movie.movId]);
-            let today = Moment().locale("en").format("dd");
-            //TODO SORT days in order starting from today
+            /** Sort days relative to today */
+            let today = Moment().locale("en");
             days = days.sort((a, b) => {
-                if (a === today) {
-                    return -1;
-                } else {
-                    return 1;
+                let da = Moment(a, 'dd');
+                if (da.isBefore(today, 'day')) {
+                    da = da.add(7, 'days');
                 }
+                let db = Moment(b, 'dd');
+                if (db.isBefore(today, 'day')) {
+                    db = db.add(7, 'days');
+                }
+                return da.isAfter(db) ? 1 : -1;
             });
 
             const showList = days.map(day => {
                     const movieShowList = Object.keys(shows[movie.movId][day]).map(time => {
                             return (
                                 <ListGroupItem key={time} className="showtime-item"><a href={"/show/" + shows[movie.movId][day][time]}>
-                                    {time}</a></ListGroupItem>
-                            );
+                                    {time}</a></ListGroupItem>);
                         }
                     );
                     return (
@@ -181,14 +199,13 @@ class MovieList extends Component {
             );
 
             return (
-                <Row key={movie.movId}>
+                <Row key={movie.movId} id={'mov' + movie.movId}>
                     <Col>
-                        {/*TODO TABLE FULL WIDTH*/}
-                        <ReactCard
+                        {/*        <ReactCard
                             plain
                             ctTableFullWidth
                             ctTableResponsive
-                            content={
+                            content={*/}
                                 <Grid>
                                     <Row>
                                         <Col xs={7} sm={5} lg={3} md={3} large={10} xl={10}>
@@ -240,8 +257,8 @@ class MovieList extends Component {
                                         </Col>
                                     </Row>
                                 </Grid>
-                            }
-                        />
+                        {/*   }
+                        />*/}
                     </Col>
 
                 </Row>);
@@ -251,22 +268,27 @@ class MovieList extends Component {
             <div className="content">
                 <Grid fluid>
                     <Row>
-                        <Col md={8}>
-                            <h2>This week's Movies</h2><br/>
-                            {/* <Carousel
-                            activeIndex={activeIndex}
-                            next={next}
-                            previous={previous}
-                        >
-                            <CarouselIndicators items={moviesDisplayed} activeIndex={activeIndex}
-                                                onClickHandler={goToIndex}/>
-                            {showcaseList}
-                            <CarouselControl direction="prev" directionText="Previous" onClickHandler={previous}/>
-                            <CarouselControl direction="next" directionText="Next" onClickHandler={next}/>
-                        </Carousel><br/><br/>*/}
+                        <Col>
+                            <div className="text-center">
+                                <h2>This week's Movies</h2><br/>
+                                <div className="col-md-10 col-md-offset-1">
+                                    <Carousel className="show-carousel">
+                                        {showcaseList}
+                                    </Carousel><br/><br/>
+                                </div>
+                            </div>
                         </Col>
                     </Row>
                     {movieList}
+
+                    {this.state.moviePage.hasMore &&
+                    <Row>
+                        <Col>
+                            <InfiniteLoader onVisited={() => this.loadMovies()}
+                                            containerElement={document.querySelector('.wrapper')}
+                                            loaderStyle={{backgroundColor: "red"}}/>
+                        </Col>
+                    </Row>}
                 </Grid>
             </div>
         );

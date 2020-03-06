@@ -27,7 +27,6 @@ class App extends Component {
                     <Redirect to='/movies'/>
                 </Route>
                 <Route path="/*" render={props => <Layout {...props} ref={this.navBar} />} />
-
             </Switch>
         )
     }

@@ -38,10 +38,10 @@ class AuthenticatedRoute extends Component {
     parseMatchParams(path, params) {
         let parsed = path;
         Object.keys(params).forEach(key => {
-            console.log("Replace: :" + key + " with: " + params[key])
+            console.log("Replace: :" + key + " with: " + params[key]);
             parsed = parsed.replace(":" + key, params[key]);
         });
-        console.log("Parsed: " + parsed)
+        console.log("Parsed: " + parsed);
         return parsed;
     }
 

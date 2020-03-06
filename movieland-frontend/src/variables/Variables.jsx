@@ -121,7 +121,7 @@ var style = {
 
     success: {
       borderTop: 0,
-      backgroundColor: "#a1e82c",
+        backgroundColor: "#50b110",
       WebkitBoxShadow: 0,
       MozBoxShadow: 0,
       boxShadow: 0
@@ -129,7 +129,7 @@ var style = {
 
     error: {
       borderTop: 0,
-      backgroundColor: "#fc727a",
+        backgroundColor: "#97120b",
       WebkitBoxShadow: 0,
       MozBoxShadow: 0,
       boxShadow: 0
@@ -137,7 +137,7 @@ var style = {
 
     warning: {
       borderTop: 0,
-      backgroundColor: "#ffbc67",
+        backgroundColor: "#d76f19",
       WebkitBoxShadow: 0,
       MozBoxShadow: 0,
       boxShadow: 0
@@ -145,7 +145,7 @@ var style = {
 
     info: {
       borderTop: 0,
-      backgroundColor: "#63d8f1",
+        backgroundColor: "#1473f1",
       WebkitBoxShadow: 0,
       MozBoxShadow: 0,
       boxShadow: 0

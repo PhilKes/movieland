@@ -250,7 +250,7 @@ class Summary extends Component {
                             title="2014 Sales"
                             category="All products including Taxes"
                             stats="Data information certified"
-                            statsIcon="fa fa-check"
+                            statsIcon={<i className="fa fa-check"/>}
                             content={
                                 <div className="ct-chart">
                                     <ChartistGraph

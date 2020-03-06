@@ -19,6 +19,8 @@ import React, { Component } from "react";
 import { Tooltip, OverlayTrigger } from "react-bootstrap";
 import Checkbox from "../CustomCheckbox/CustomCheckbox.jsx";
 import Button from "../CustomButton/CustomButton.jsx";
+import {faArrowUp, faEdit, faTimes} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export class Tasks extends Component {
   handleCheckbox = event => {
@@ -55,13 +57,13 @@ export class Tasks extends Component {
           <td className="td-actions text-right">
             <OverlayTrigger placement="top" overlay={edit}>
               <Button bsStyle="info" simple type="button" bsSize="xs">
-                <i className="fa fa-edit" />
+                  <FontAwesomeIcon icon={faEdit}/>
               </Button>
             </OverlayTrigger>
 
             <OverlayTrigger placement="top" overlay={remove}>
               <Button bsStyle="danger" simple type="button" bsSize="xs">
-                <i className="fa fa-times" />
+                  <FontAwesomeIcon icon={faTimes}/>
               </Button>
             </OverlayTrigger>
           </td>

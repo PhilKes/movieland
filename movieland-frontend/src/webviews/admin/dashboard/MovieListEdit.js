@@ -7,7 +7,8 @@ import ErrorPage from "../../misc/ErrorPage";
 import LoadingPage from "../../misc/LoadingPage";
 import {Col, Grid, Row} from "react-bootstrap";
 import ReactCard from "../../../components/Card/Card";
-
+import InfiniteScroll from 'react-infinite-scroller';
+import InfiniteLoader from "react-infinite-loader";
 
 /** /movies/edit page Component
  * Shows Movies + ADD/REMOVE Movies (only for Admins)*/
@@ -15,9 +16,16 @@ class MovieListEdit extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {movies: [], isLoading: true, error: "", timedout: false};
+        this.state = {
+            page: 0,
+            moviePage: {movies: [], hasMore: true},
+            isLoading: true,
+            error: "",
+            timedout: false
+        };
         this.remove = this.remove.bind(this);
         this.searchQuery = "";
+        this.scrollParentRef = null;
     }
 
     /** Initial load all movies*/
@@ -25,19 +33,25 @@ class MovieListEdit extends Component {
         document.title = "Manage Movies";
         this.setState({isLoading: true});
 
-        axios.get('/api/movies')
-            .then(res => res.data)
-            .then(data => this.setState({movies: data, isLoading: false}))
+        axios.get('/api/movies/page/' + this.state.page)
+            .then(res => {
+                console.log(res);
+                let hasMore = res.headers.hasmore === 'true';
+                console.log("hasMore: " + hasMore);
+                this.setState({moviePage: {movies: res.data, hasMore: hasMore}, isLoading: false});
+
+            })
             .catch(err => this.setState({timedout: true}))
         ;
+        //window.addEventListener('scroll',this.loadMovies,false);
     }
 
     /** Remove movie with movieid*/
     async remove(id) {
         await axios.delete(`/api/movie/${id}`)
             .then(() => {
-                let updatedMovies = [...this.state.movies].filter(i => i.movId !== id);
-                this.setState({movies: updatedMovies});
+                let updatedMovies = [...this.state.moviePage.movies].filter(i => i.movId !== id);
+                this.setState({moviePage: {hasMore: this.state.moviePage.hasMore, movies: updatedMovies}});
             });
     }
 
@@ -55,9 +69,13 @@ class MovieListEdit extends Component {
                 .then(response => {
                     console.log(response)
                     //TODO Catch exception if movie already there
-                    return axios.get('/api/movies?name=' + this.searchQuery.value)
+                    return axios.get('/api/movies/page/' + this.state.page + '?name=' + this.searchQuery.value)
                         .then(resp => {
-                            this.setState({movies: resp.data, isLoading: false})
+                            let hasMore = resp.headers.hasmore === 'true';
+                            this.setState({
+                                moviePage: {movies: resp.data, hasMore: hasMore},
+                                isLoading: false
+                            })
                         });
                 })
                 .catch(err => {
@@ -71,21 +89,49 @@ class MovieListEdit extends Component {
     handleKeyPress(ev) {
         if (ev.charCode == 13) { //Enter pressed?
             console.log("Search: " + this.searchQuery.value);
-            axios.get('/api/movies?name=' + this.searchQuery.value)
-                .then(resp => this.setState({movies: resp.data}));
+            axios.get('/api/movies/page/' + this.state.page + '?name=' + this.searchQuery.value)
+                .then(resp => {
+                    let hasMore = resp.headers.hasmore === 'true';
+                    this.setState({moviePage: {movies: resp.data, hasMore: hasMore}})
+                });
         }
     }
 
+    loadMovies() {
+        /* let scrollPercent=(window.scrollY) / (document.body.scrollHeight- window.innerHeight);
+         scrollPercent= Math.round(scrollPercent*100);
+         if(scrollPercent>=100) {*/
+        this.setState({page: this.state.page + 1});
+        console.log("LOAD PAGE:");
+        console.log(this.state.page);
+        axios.get('/api/movies/page/' + (this.state.page))
+            .then(res => {
+                console.log(res);
+                let hasMore = res.headers.hasmore === 'true';
+                console.log("hasMore: " + hasMore);
+                let movies = this.state.moviePage.movies;
+                res.data.forEach(movie => movies.push(movie));
+                this.setState({moviePage: {movies: movies, hasMore: hasMore}, isLoading: false});
+
+            })
+            .catch(err => this.setState({timedout: true}))
+        ;
+        // }
+
+    }
+
+
+
     /** Render Movie List with Actions*/
     render() {
-        const {movies, isLoading, error, timedout} = this.state;
+        const {moviePage, isLoading, error, timedout} = this.state;
         if (timedout) {
             return <ErrorPage/>
         }
         if (isLoading) {
             return <LoadingPage/>;
         }
-        const movieList = movies.map(movie => {
+        const movieList = moviePage.movies.map(movie => {
             const descript = `${movie.description}`;
             return <tr key={movie.movId}>
                 <td><img src={movie.posterUrl} className={'img-fluid'} alt="Responsive image"/></td>
@@ -105,7 +151,7 @@ class MovieListEdit extends Component {
 
 
         return (
-            <Grid fluid>
+            <Grid fluid id="grid" ref={(ref) => this.scrollParentRef = ref}>
                 <Row>
                     <Col md={12}>
                         <h2>Movies</h2><br/>
@@ -122,34 +168,29 @@ class MovieListEdit extends Component {
                 </Row>
                 <Row>
                     <Col md={12}>
-                        <ReactCard
-                            plain
-                            ctTableFullWidth
-                            ctTableResponsive
-                            content={
-
-                                <Table className="wrap-words">
-                                    <thead>
-                                    <tr>
-                                        {/* <th width="15%">Poster</th>
-                                            <th width="6%">Name</th>
-                                            <th width="25%">Description</th>
-                                            <th width="15%">Release Date</th>
-                                            <th width="15%">Actions</th> */}
-                                        <th>Poster</th>
-                                        <th width="20vw">Name</th>
-                                        {/* <th >Description</th>*/}
-                                        <th>Release Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
+                        <Table className="wrap-words">
+                            <thead>
+                            <tr>
+                                <th>Poster</th>
+                                <th width="20vw">Name</th>
+                                <th>Release Date</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                                     {movieList}
-                                    </tbody>
-                                </Table>}
-                        />
+                            </tbody>
+                        </Table>
                     </Col>
                 </Row>
+                {this.state.moviePage.hasMore &&
+                <Row>
+                    <Col>
+                        <InfiniteLoader onVisited={() => this.loadMovies()}
+                                        containerElement={document.querySelector('.wrapper')}
+                                        loaderStyle={{backgroundColor: "red"}}/>
+                    </Col>
+                </Row>}
             </Grid>
         );
     }

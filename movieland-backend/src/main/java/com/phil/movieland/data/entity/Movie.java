@@ -107,15 +107,17 @@ public class Movie {
     public void setTmdbMovie(MovieDb tmdbMovie) {
         this.tmdbMovie=tmdbMovie;
         this.tmdbId=(long) tmdbMovie.getId();
-        this.posterUrl=TmdbApiService.POSTER_BASE_URL+tmdbMovie.getPosterPath();
-        this.length=(long)tmdbMovie.getRuntime();
+        this.posterUrl=TmdbApiService.POSTER_BASE_URL + tmdbMovie.getPosterPath();
+        this.length=(long) tmdbMovie.getRuntime();
         //TODO pipe description
 
         this.description=tmdbMovie.getOverview();
-        if(description.length()>120){
-            description=description.substring(0,120)+"...";
+        if(description.length()>120) {
+            description=description.substring(0, 120) + "...";
         }
-        this.date=DateUtils.createDateFromDateString(tmdbMovie.getReleaseDate());
+        if(tmdbMovie.getReleaseDate()!=null && !tmdbMovie.getReleaseDate().isEmpty()) {
+            this.date=DateUtils.createDateFromDateString(tmdbMovie.getReleaseDate());
+        }
         this.name=tmdbMovie.getTitle();
     }
 }

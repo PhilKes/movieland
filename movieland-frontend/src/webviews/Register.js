@@ -5,6 +5,7 @@ import {Grid} from "react-bootstrap";
 import FormInputs from "../components/FormInputs/FormInputs";
 import CustomButton from "../components/CustomButton/CustomButton";
 import Card from "../components/Card/Card";
+import Loader from "react-loader-spinner";
 
 /** /register
  * Register page*/
@@ -13,7 +14,8 @@ class Register extends Component {
         super(props)
         this.state = {
             err: 0, // 0=no error, 1= password too short, 2= repeat doesnt match, 3= username taken, 4= missing fields
-            showSuccessMessage: false
+            showSuccessMessage: false,
+            isRegistering: false
         }
         document.title = "MovieLand Register";
     }
@@ -21,6 +23,7 @@ class Register extends Component {
     /** Get Data from Form and validate to send register request*/
     registerClicked(ev) {
         ev.preventDefault();
+        this.setState({isRegistering: true});
         const data = new FormData(ev.target);
         let pwd = data.get('password'), user = data.get('username'), name = data.get('name');
         if (pwd.length < 5) {
@@ -47,13 +50,16 @@ class Register extends Component {
                 }
             })
             .then(response => {
+                this.setState({isRegistering: false});
                 this.props.showNotification("Registration successful ","success","bc");
                 console.log(response);
                 this.setState({err: 0, showSuccessMessage: true});
             })
             .catch(err => {
+                this.setState({isRegistering: false});
                 console.log(err.response.data.message);
-                this.props.showNotification("Registration failed: "+err.response.data.message,"error","bc");
+                this.props.showNotification("Registration failed: "
+                    + (err.response.data.message ? err.response.data.message : "Server is unreachable"), "error", "bc");
             });
     }
 
@@ -63,18 +69,20 @@ class Register extends Component {
                 <Grid fluid>
                     <Row>
                         <Col md={8}>
-                            <Card
-                                title="Register Account"
-                                content={
+                            <div className="whole-height">
+                                <Card
+                                    title="Register Account"
+                                    content={
                                         <form onSubmit={this.registerClicked.bind(this)}>
                                             <FormInputs
                                                 ncols={["col-md-8"]}
                                                 properties={[{
-                                                        label: "Full Name",
-                                                        name: "name",
-                                                        type: "text",
-                                                        bsClass: "form-control",
-                                                        placeholder: "Full Name"}]}
+                                                    label: "Full Name",
+                                                    name: "name",
+                                                    type: "text",
+                                                    bsClass: "form-control",
+                                                    placeholder: "Full Name"
+                                                }]}
                                             />
                                             <FormInputs
                                                 ncols={["col-md-8"]}
@@ -107,11 +115,17 @@ class Register extends Component {
                                                 }]}
                                             />
                                             <CustomButton bsStyle="primary" pullLeft fill type="submit">
-                                                Register
+                                                {this.state.isRegistering && (<Loader
+                                                    type="Oval"
+                                                    color="#FFF"
+                                                    height={16}
+                                                    width={16}
+                                                />) || "Register"}
                                             </CustomButton>
                                             <div className="clearfix"/>
                                         </form>}
-                            />
+                                />
+                            </div>
                         </Col>
                     </Row>
                 </Grid>

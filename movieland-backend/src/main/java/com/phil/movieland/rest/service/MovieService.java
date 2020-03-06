@@ -4,6 +4,8 @@ import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.repository.MovieRepository;
 import com.phil.movieland.utils.TmdbApiService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,9 +32,21 @@ public class MovieService {
         return loadTmdbMovies(movies);
     }
 
+    public Slice<Movie> getAllMoviesPaged(int page, int size) {
+        Slice<Movie> movies=movieRepository.findAllByOrderByName(PageRequest.of(page, size));
+        loadTmdbMovies(movies.getContent());
+        return movies;
+    }
+
     public List<Movie> queryAllMovies(String queryName) {
         List<Movie> movies=movieRepository.findAllByNameContainsOrderByName(queryName);
         return loadTmdbMovies(movies);
+    }
+
+    public Slice<Movie> queryAllMoviesPaged(String queryName, int page, int size) {
+        Slice<Movie> movies=movieRepository.findAllByNameContainsOrderByName(queryName, PageRequest.of(page, size));
+        loadTmdbMovies(movies.getContent());
+        return movies;
     }
 
     public Optional<Movie> queryMovie(long movieId) {

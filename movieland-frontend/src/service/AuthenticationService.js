@@ -1,6 +1,6 @@
 import axios from "axios";
 import AuthenticatedRoute from "../webviews/misc/AuthenticatedRoute";
-
+import https from 'https';
 /** Service to generate Authorization request + storing JWT Token*/
 class AuthenticationService {
 
@@ -62,11 +62,15 @@ class AuthenticationService {
     }
 
     setupaxiosInterceptors(token) {
+        const agent = new https.Agent({
+            rejectUnauthorized: false
+        });
         axios.interceptors.request.use(
             (config) => {
                 if (this.isUserLoggedIn()) {
                     config.headers.authorization = token
                 }
+                config.httpsAgent = agent;
                 return config
             }
         )

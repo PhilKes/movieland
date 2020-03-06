@@ -27,4 +27,11 @@ Full Docker Support with **Docker-compose**:
 * Starts **Spring** REST API exposed to Port 8080
 * Starts **React** Frontend exposed to Port 80
 
+## SSL (React)
+Enable/Disable HTTPS to frontend in package.json "scripts":
+
+    "start": "SET HTTPS=true&&node scripts/start.js"
+    
+* Install React's certificate in WebBrowser to trust localhost
+
 
