@@ -10,13 +10,19 @@ import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.data.entity.Seat;
 import com.phil.movieland.data.repository.SeatRepository;
 import com.phil.movieland.rest.controller.UserController;
+import com.phil.movieland.tasks.RunnableWithProgress;
 import com.phil.movieland.utils.DateUtils;
+import org.hibernate.stat.Statistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -42,19 +48,186 @@ public class StatisticsService {
         this.userController=userController;
     }
 
+    public RunnableWithProgress generateShowsBetweenTask(Date from, Date until) {
+        return generateShowsBetweenTask(from, until, 10, 4);
+    }
+
+    public RunnableWithProgress generateShowsBetweenTask(Date from, Date until, int moviesPerDay, int showsPerMovie) {
+        return new RunnableWithProgress() {
+            @Override
+            public void run() {
+                setProgress(0);
+                long days=ChronoUnit.DAYS.between(from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+                        , until.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                setProgressMax((int) days + 1);
+
+                Calendar countDate=Calendar.getInstance();
+                countDate.setTime(from);
+                /** Generate shows for each day until Date until is reached*/
+                Random rand=new Random();
+                /** Get random Movies*/
+                List<Movie> movies=movieService.getAllMovies().stream()
+                        .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
+                            Collections.shuffle(collected);
+                            return collected.stream();
+                        }))
+                        .limit(moviesPerDay)
+                        .collect(Collectors.toList());
+
+                while(countDate.getTime().before(until)) {
+                    /** For each movie generate shows every day */
+                    for(Movie movie : movies) {
+                        List<MovieShow> movieShows=new ArrayList<>();
+                        List<Integer> hours=new ArrayList<>();
+                        /** Between 2 - 5 shows every day per movie*/
+                        //int amtShows=2 + rand.nextInt(3);
+                        int amtShows=showsPerMovie;
+                        for(int i=0; i<amtShows; i++) {
+                            Calendar showTime=Calendar.getInstance();
+                            showTime.setTime(countDate.getTime());
+                            MovieShow movieShow=new MovieShow();
+                            movieShow.setMovId(movie.getMovId());
+                            int hour=-1;
+                            while(true) {
+                                /** Between 11-23 h*/
+                                hour=11 + rand.nextInt(13);
+                                final int fhour=hour;
+                                if(hours.stream().noneMatch(h -> h==fhour)) {
+                                    break;
+                                }
+                            }
+                            hours.add(hour);
+                            showTime.set(Calendar.HOUR, hour);
+                            movieShow.setDate(showTime.getTime());
+                            movieShows.add(movieShow);
+                        }
+                        movieShowService.saveShows(movieShows);
+                    }
+                    System.out.println("Generated shows for: " + countDate.getTime());
+                    countDate.add(Calendar.DATE, 1);
+                    incProgress(1);
+                }
+                precalculatedSummaries.clear();
+            }
+        };
+    }
+
+    public RunnableWithProgress generateReservationsBetweenTask(Date from, Date until, int resPerShow) {
+        return new RunnableWithProgress() {
+            @Override
+            public void run() {
+                setProgress(0);
+                long days=ChronoUnit.DAYS.between(from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+                        , until.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                setProgressMax((int) days + 1);
+                Calendar countDate=Calendar.getInstance();
+                countDate.setTime(from);
+                /** Generate reservations for each show until Date until is reached*/
+                Random rand=new Random();
+                List<Long> userIds=userController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
+                while(countDate.getTime().before(until)) {
+                    List<MovieShow> shows=movieShowService.getShowsForDate(countDate.getTime());
+                    /** For each show generate reservations */
+                    for(MovieShow show : shows) {
+                        List<ReservationWithSeats> reservations=new ArrayList<>();
+                        List<Long> users=new ArrayList<>(userIds);
+                        /** Get All free seats*/
+                        List<Seat> showsTakenSeats=reservationService.getAllSeatsOfShow(show.getShowId());
+                        List<Integer> freeSeats=IntStream.range(0, 160).boxed().collect(Collectors.toList());
+                        freeSeats.removeAll(showsTakenSeats.stream()
+                                .map(Seat::getNumber).collect(Collectors.toList()));
+                        /** Between 2 - 4 reservations per show*/
+                        //int amtReservations=2 + rand.nextInt(2);
+                        int amtReservations=Math.min(resPerShow, userIds.size());
+
+                        for(int i=0; i<amtReservations; i++) {
+                            Calendar showTime=Calendar.getInstance();
+                            showTime.setTime(countDate.getTime());
+                            Reservation reservation=new Reservation();
+                            reservation.setShowId(show.getShowId());
+                            Long user=-1L;
+
+                            /** Determine user (never 2 Reservations of same user for same show)*/
+                            user=users.remove(rand.nextInt(users.size()));
+
+                            reservation.setUserId(user);
+                            ReservationWithSeats reservationWithSeats=new ReservationWithSeats();
+                            reservationWithSeats.setReservation(reservation);
+                            /** Determine Seats of reservation*/
+                            List<Seat> seatList=new ArrayList<>();
+                            // do {
+                            //seatList.clear();
+                            int amtSeats=2 + rand.nextInt(4);
+                            if(amtSeats>freeSeats.size()) {
+                                break;
+                            }
+                            for(int j=0; j<amtSeats; j++) {
+                                Seat seat=new Seat();
+                                seat.setResId(reservation.getResId());
+                                seat.setNumber(freeSeats.remove(0));
+                                int type=rand.nextInt(4);
+                                switch(type) {
+                                    case 0:
+                                        seat.setType(Seat.Seat_Type.CHILD);
+                                        break;
+                                    case 1:
+                                        seat.setType(Seat.Seat_Type.STUDENT);
+                                        break;
+                                    case 2:
+                                        seat.setType(Seat.Seat_Type.ADULT);
+                                        break;
+                                    case 3:
+                                        seat.setType(Seat.Seat_Type.DISABLED);
+                                        break;
+                                    default:
+                                        seat.setType(Seat.Seat_Type.ADULT);
+                                        break;
+                                }
+                                seatList.add(seat);
+                            }
+                            //} while(!reservationService.areSeatsAvailable(show.getShowId(), seatList));
+                            reservationWithSeats.setSeats(seatList);
+                            reservations.add(reservationWithSeats);
+                        }
+                        reservationService.saveReservationsWithSeats(reservations);
+                    }
+                    System.out.println("Generated reservations for: " + countDate.getTime());
+                    countDate.add(Calendar.DATE, 1);
+                    incProgress(1);
+                }
+                System.out.println("Finished generation of reservations");
+                precalculatedSummaries.clear();
+            }
+        };
+    }
+
     public void generateShowsBetween(Date from, Date until) {
+        generateShowsBetween(from, until, 10, 4);
+    }
+
+    public void generateShowsBetween(Date from, Date until, int moviesPerDay, int showsPerMovie) {
         Calendar countDate=Calendar.getInstance();
         countDate.setTime(from);
         /** Generate shows for each day until Date until is reached*/
         Random rand=new Random();
-        List<Movie> movies=movieService.getAllMovies();
+        /** Get random Movies*/
+        List<Movie> movies=movieService.getAllMovies().stream()
+                .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
+                    Collections.shuffle(collected);
+                    return collected.stream();
+                }))
+                .limit(moviesPerDay)
+                .collect(Collectors.toList());
+        ;
+
         while(countDate.getTime().before(until)) {
             /** For each movie generate shows every day */
             for(Movie movie : movies) {
                 List<MovieShow> movieShows=new ArrayList<>();
                 List<Integer> hours=new ArrayList<>();
                 /** Between 2 - 5 shows every day per movie*/
-                int amtShows=2 + rand.nextInt(3);
+                //int amtShows=2 + rand.nextInt(3);
+                int amtShows=showsPerMovie;
                 for(int i=0; i<amtShows; i++) {
                     Calendar showTime=Calendar.getInstance();
                     showTime.setTime(countDate.getTime());
@@ -83,6 +256,10 @@ public class StatisticsService {
     }
 
     public void generateReservationsBetween(Date from, Date until) {
+        generateReservationsBetween(from, until, 5);
+    }
+
+    public void generateReservationsBetween(Date from, Date until, Integer resPerShow) {
         Calendar countDate=Calendar.getInstance();
         countDate.setTime(from);
         /** Generate reservations for each show until Date until is reached*/
@@ -95,7 +272,8 @@ public class StatisticsService {
                 List<ReservationWithSeats> reservations=new ArrayList<>();
                 List<Long> users=new ArrayList<>();
                 /** Between 2 - 4 reservations per show*/
-                int amtReservations=2 + rand.nextInt(2);
+                //int amtReservations=2 + rand.nextInt(2);
+                int amtReservations=resPerShow;
                 for(int i=0; i<amtReservations; i++) {
                     Calendar showTime=Calendar.getInstance();
                     showTime.setTime(countDate.getTime());
@@ -199,7 +377,15 @@ public class StatisticsService {
         Statistics statistics=new Statistics();
         long amtShows=0, amtMovies=0, amtSeats=0, amtWatchedMins=0, income=0;
         List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
-        HashMap<Date, Integer> dailyStats=new HashMap<>();
+        HashMap<String, Integer> dailyStats=new HashMap<>();
+        Calendar countDate=Calendar.getInstance();
+        countDate.setTime(from);
+        countDate.set(Calendar.HOUR_OF_DAY, 1);
+        while(countDate.getTime().before(until)) {
+            dailyStats.put(DateUtils.getDateStringFromDate(countDate.getTime()), 0);
+            countDate.add(Calendar.DATE, 1);
+        }
+
         LinkedHashMap<Long, MovieStats> movieGrossing=new LinkedHashMap<>();
         HashMap<Long, Movie> movies=getMoviesFromShows(shows);
         amtShows=shows.size();
@@ -225,9 +411,9 @@ public class StatisticsService {
             amtSeats+=daySeats;
             /** Update daily stats*/
             if(!dailyStats.containsKey(date)) {
-                dailyStats.put(date, daySeats);
+                dailyStats.put(DateUtils.getDateStringFromDate(date), daySeats);
             }else{
-                dailyStats.put(date, dailyStats.get(date)+daySeats);
+                dailyStats.put(DateUtils.getDateStringFromDate(date), dailyStats.get(date) + daySeats);
             }
             double seatsIncome=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
             income+=seatsIncome;
@@ -266,7 +452,7 @@ public class StatisticsService {
         private long amtShows, amtMovies, amtSeats;
         private long amtWatchedMins;
         private long income;
-        private HashMap<Date,Integer> dailyStats;
+        private HashMap<String, Integer> dailyStats;
         private Map<Seat.Seat_Type, Integer> seatsDistribution;
         private LinkedHashMap<Long, MovieStats> movieStats;
 
@@ -330,11 +516,11 @@ public class StatisticsService {
                     .map(e->e.getValue()).collect(Collectors.toList());
         }*/
 
-        public HashMap<Date, Integer> getDailyStats() {
+        public HashMap<String, Integer> getDailyStats() {
             return dailyStats;
         }
 
-        public void setDailyStats(HashMap<Date, Integer> dailyStats) {
+        public void setDailyStats(HashMap<String, Integer> dailyStats) {
             this.dailyStats=dailyStats;
         }
 

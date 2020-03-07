@@ -20,10 +20,10 @@ import UserProfile from "./views/UserProfile.jsx";
 import MovieShow from "./webviews/MovieShow";
 import MovieList from "./webviews/MovieList";
 import {
-    faAddressCard,
+    faAddressCard, faBolt, faCalendarAlt,
     faChartLine,
     faClipboardList,
-    faFilm, faListUl,
+    faFilm, faListUl, faRandom,
     faThList,
     faUser, faUsers,
     faVideo
@@ -32,6 +32,7 @@ import MovieListEdit from "./webviews/admin/dashboard/MovieListEdit";
 import MovieShowList from "./webviews/admin/dashboard/MovieShowList";
 import Summary from "./webviews/admin/dashboard/Summary";
 import UserListEdit from "./webviews/admin/dashboard/UserListEdit";
+import GenerateStats from "./webviews/admin/dashboard/GenerateStats";
 
 /** Defines Routes for Users/Admins*/
 const adminRoutes = [
@@ -69,6 +70,12 @@ const adminRoutes = [
                 name: "User",
                 icon: faUsers,
                 component: UserListEdit
+            },
+            {
+                path: "/generate",
+                name: "Generate",
+                icon: faCalendarAlt,
+                component: GenerateStats
             },
         ],
         icon: faClipboardList,

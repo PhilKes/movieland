@@ -55,6 +55,12 @@ public class ReservationService {
         return seatRepository.findAllByResId(resId);
     }
 
+    public List<Seat> getAllSeatsOfShow(Long showId) {
+        return seatRepository.findSeatsOfShow(showId);
+    }
+
+
+
     public void deleteAll() {
         List<Reservation> reservations=reservationRepository.findAll();
         reservations.forEach(reservation -> seatRepository.deleteAllByResId(reservation.getResId()));

@@ -17,6 +17,7 @@ import {Col, Grid, Row} from "react-bootstrap";
 import ReactCard from "../../../components/Card/Card";
 import CustomButton from "../../../components/CustomButton/CustomButton";
 import * as queryString from "query-string";
+import ScrollToTop from 'react-scroll-up';
 
 /** /shows page
  * Shows MovieShows by Date + ADD/REMOVE Shows*/
@@ -75,6 +76,11 @@ class MovieShowList extends Component {
                     return self.indexOf(value) === idx;
                 };
                 let ids = shows.map(show => show.movId).filter(distinct);
+                this.setState({shows: shows});
+                if (ids.length < 1) {
+                    this.setState({isLoading: false, movies: []});
+                    return;
+                }
                 axios.get('/api/movies/ids', {
                     params: {
                         ids: ids
@@ -84,7 +90,7 @@ class MovieShowList extends Component {
                     }
                 }).then(resp => {
 
-                    this.setState({shows: shows, movies: resp.data, isLoading: false});
+                    this.setState({movies: resp.data, isLoading: false});
                 });
             })
             .catch(err => this.setState({timedout: true}));
@@ -154,7 +160,7 @@ class MovieShowList extends Component {
         const movieList = movieKeys.map(id => {
             return <tr key={movies[id].movId}>
                 <td>
-                    <h5 className="text-center">{movies[id].name}</h5>
+                    <p className="text-center">{movies[id].name}</p>
                     <div className="text-center">
                     <img src={movies[id].posterUrl} className="img-fluid" alt="Responsive image"/>
                     </div>
@@ -163,7 +169,7 @@ class MovieShowList extends Component {
                     <Grid fluid>
                     <Row>
                         <Col md={8}>
-                            <Table bordered >
+                            <Table bordered className="margin-top">
                                 <thead><tr><th colSpan={2} className="text-center">Shows</th></tr></thead>
                                 <tbody>
                                 {shows.map(show => {
@@ -234,7 +240,8 @@ class MovieShowList extends Component {
                         </Col>
                     </Row>
                     <Row>
-                        <Col md={12}>
+                        <Col>
+                            <div className="whole-height">
                             {
                                 movieKeys.length>0?
                                     (<ReactCard
@@ -245,9 +252,9 @@ class MovieShowList extends Component {
                                     <Table className="wrap-words">
                                         <thead>
                                         <tr className="text-center">
-                                            <th className="text-center">Movie</th>
-                                            <th className="text-center">Times</th>
-                                            <th className="text-center">Actions</th>
+                                            <th width="10%" className="text-center">Movie</th>
+                                            <th width="60%" className="text-center">Times</th>
+                                            <th width="30%" className="text-center">Actions</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -257,6 +264,7 @@ class MovieShowList extends Component {
                                 />)
                                 : <h4>No Shows found for this date...</h4>
                             }
+                            </div>
                         </Col>
                     </Row>
                 </Grid>

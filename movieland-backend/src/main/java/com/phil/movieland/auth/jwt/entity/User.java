@@ -41,7 +41,7 @@ public class User extends DateAudit {
     @Size(max=100)
     private String password;
 
-    @ManyToMany(fetch=FetchType.LAZY)
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(name="USER_ROLES",
             joinColumns=@JoinColumn(name="user_id"),
             inverseJoinColumns=@JoinColumn(name="role_id"))

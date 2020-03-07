@@ -147,8 +147,11 @@ class MovieList extends Component {
         const moviesDisplayed = moviePage.movies.slice(0, 5);
         const showcaseList = moviesDisplayed.map(movie => {
             return (<Carousel.Item key={movie.movId}>
-                <a onClick={() => document.getElementById('mov' + movie.movId)
-                    .scrollIntoView({block: 'center', behavior: 'smooth'})}
+                <a onClick={() => {
+                    let item = document.getElementById('mov' + movie.movId);
+                    if (item != null)
+                        item.scrollIntoView({block: 'center', behavior: 'smooth'})
+                }}
                    className="click-icon">
                     <img src={movie.backdrop} alt={movie.name} className="carousel-image"/>
                 </a>

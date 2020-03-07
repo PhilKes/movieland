@@ -1,7 +1,10 @@
 package com.phil.movieland.rest.controller;
 
 import com.phil.movieland.rest.request.BetweenDatesRequest;
+import com.phil.movieland.rest.request.GenerateRequest;
+import com.phil.movieland.rest.request.GenerateReservationRequest;
 import com.phil.movieland.rest.service.StatisticsService;
+import com.phil.movieland.tasks.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -23,37 +26,74 @@ import java.util.Date;
 /** Controller for Statistics API to generate/calculate Summaries*/
 public class StatisticsController {
     private final StatisticsService statisticsService;
+    private final TaskService taskService;
 
     @Autowired
-    public StatisticsController(StatisticsService statisticsService) {
+    public StatisticsController(StatisticsService statisticsService, TaskService taskService) {
         this.statisticsService=statisticsService;
+        this.taskService=taskService;
     }
 
     @PostMapping("/shows")
-    public ResponseEntity<?> generateShows(@RequestBody BetweenDatesRequest datesRequest) throws URISyntaxException {
+    public ResponseEntity<?> generateShows(@RequestBody GenerateRequest generateRequest) throws URISyntaxException {
+        Date start=getDateFormDayStartOrEnd(generateRequest.getFrom(), true);
+        Date end=getDateFormDayStartOrEnd(generateRequest.getUntil(), false);
+        if(start.after(end)) {
+            return ResponseEntity.badRequest().body("From Date must be earlier than until Date!");
+        }
+        int taskId;
+        if(generateRequest.getMoviesPerDay()==null || generateRequest.getShowsPerMovie()==null) {
+            taskId=taskService.execute(statisticsService.generateShowsBetweenTask(start, end));
+        }
+        else {
+            taskId=taskService.execute(statisticsService.generateShowsBetweenTask(
+                    start, end, generateRequest.getMoviesPerDay(), generateRequest.getShowsPerMovie()));
+        }
+        System.out.println("Task " + taskId + " posted for execution");
+        return ResponseEntity.created(new URI("/api/task/" + taskId))
+                .body("Posted GenerateShows Task (taskId: " + taskId + ")");
+    }
+
+    @PostMapping("/reservations")
+    public ResponseEntity<?> generateReservations(@RequestBody GenerateReservationRequest resRequest) throws URISyntaxException {
+        Date start=getDateFormDayStartOrEnd(resRequest.getFrom(), true);
+        Date end=getDateFormDayStartOrEnd(resRequest.getUntil(), false);
+        if(start.after(end)) {
+            return ResponseEntity.badRequest().body("From Date must be earlier than until Date!");
+        }
+        int taskId;
+        taskId=taskService.execute(statisticsService.generateReservationsBetweenTask(start, end, resRequest.getResPerShow()));
+        return ResponseEntity.created(new URI("/api/task/" + taskId))
+                .body("Posted GenerateReservation Task (taskId: " + taskId + ")");
+    }
+
+  /*  @PostMapping("/shows")
+    public ResponseEntity<?> generateShows(@RequestBody GenerateRequest datesRequest) throws URISyntaxException {
         Date start=getDateFormDayStartOrEnd(datesRequest.getFrom(),true);
         Date end= getDateFormDayStartOrEnd(datesRequest.getUntil(),false);
         if(start.after(end)) {
             return ResponseEntity.badRequest().body("From Date must be earlier than until Date!");
         }
+
         statisticsService.generateShowsBetween(start, end);
+
         return ResponseEntity.created(new URI("/api/shows"))
                 .body("Created shows from " + start + " until " + end);
-    }
-
+    }*/
 
     //TODO SPEED UP WITH SQL QUERIES
-    @PostMapping("/reservations")
-    public ResponseEntity<?> generateReservations(@RequestBody BetweenDatesRequest datesRequest) throws URISyntaxException {
-        Date start=getDateFormDayStartOrEnd(datesRequest.getFrom(),true);
-        Date end= getDateFormDayStartOrEnd(datesRequest.getUntil(),false);
+    /*@PostMapping("/reservations")
+    public ResponseEntity<?> generateReservations(@RequestBody GenerateReservationRequest resRequest) throws URISyntaxException {
+        Date start=getDateFormDayStartOrEnd(resRequest.getFrom(),true);
+        Date end= getDateFormDayStartOrEnd(resRequest.getUntil(),false);
         if(start.after(end)) {
             return ResponseEntity.badRequest().body("From Date must be earlier than until Date!");
         }
-        statisticsService.generateReservationsBetween(start, end);
+        statisticsService.generateReservationsBetween(start, end,resRequest.getResPerShow());
         return ResponseEntity.created(new URI("/api/reservations"))
                 .body("Created reservations from " + start+ " until " + end);
-    }
+    }*/
+
 
     @GetMapping("/income")
     public Double getIncomeBetween(
@@ -81,7 +121,8 @@ public class StatisticsController {
         if(start.after(end)) {
             return new StatisticsService.Statistics();
         }
-        return statisticsService.calculateStatistics(start,end);
+        StatisticsService.Statistics stats=statisticsService.calculateStatistics(start, end);
+        return stats;
     }
 
     @Transactional(propagation=Propagation.REQUIRES_NEW)

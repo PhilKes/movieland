@@ -274,3 +274,24 @@
   height: 100%;
   overflow-y: auto;
 }
+
+.scroll-button {
+  left: 10px;
+  right: auto;
+  position: fixed;
+}
+
+.scroll-button-toggled {
+  left: 10px;
+  right: auto;
+  position: fixed;
+
+}
+
+.spacer-bottom {
+  margin-bottom: 16px;
+}
+
+.wrap-text {
+  width: 100%;
+}

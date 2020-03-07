@@ -36,6 +36,7 @@ import moment from "moment";
 import {faChartLine, faDollarSign, faEye, faFilm, faHome, faTicketAlt} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import SideNav, {NavItem, NavIcon, NavText} from '@trendmicro/react-sidenav';
+import {TinyButton as ScrollUpButton} from "react-scroll-up-button";
 import history from "../../history";
 // Be sure to include styles at some point, probably during your bootstraping
 import '../../assets/css/react-sidenav.css';
@@ -75,8 +76,9 @@ class AdminDashboard extends Component {
 
     //TODO
     scrollToTop() {
-        let intervalId = setInterval(this.scrollStep.bind(this), 16.66);
-        this.setState({intervalId: intervalId});
+        //let intervalId = setInterval(this.scrollStep.bind(this), 16.66);
+        //this.setState({intervalId: intervalId});
+        window.scrollTo(0, 0);
     }
 
     scrollStep() {
@@ -99,7 +101,7 @@ class AdminDashboard extends Component {
                     render={props => (
                         <prop.component
                             {...props}
-                            showNotification={this.handleNotificationClick}
+                            showNotification={this.props.showNotification}
                             onAction={prop.onAction ? () => this.onAction(prop.name) : null}
                         />
                     )}
@@ -133,7 +135,9 @@ class AdminDashboard extends Component {
             }
         };
         return (
-            <div className="content" ref={this.contentRef}>
+            <div className="content whole-height" ref={this.contentRef}>
+                <ScrollUpButton ContainerClassName="scroll-button" TransitionClassName="scroll-button-toggled"
+                />
                 <SideNav
                     onSelect={(to) => {
                         if (window.location.pathname !== "/dashboard" + to) {
@@ -160,8 +164,6 @@ class AdminDashboard extends Component {
                         }
                     </SideNav.Nav>
                 </SideNav>
-                {/*  <ScrollButton scrollStepInPx="50" delayInMs="16.66" onScroll={this.scrollToTop.bind(this)}
-                            scrollContent={this.contentRef}/>*/}
 
                 <div className="sidebar-spacer">
                     <Switch>

@@ -75,7 +75,7 @@ class Summary extends Component {
                         console.log(date)
                         console.log("Stats:")
                         console.log(summary.dailyStats[date]);
-                        labelsDaily.push(moment(date).format("DD.MM"));
+                        labelsDaily.push(moment(date, 'YYYY-MM-DD').format("DD.MM"));
                         seatsSeries.push(summary.dailyStats[date]);
                     });
                 seriesDaily.push(seatsSeries);
