@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserDashboard React - v1.3.0
+* Light Bootstrap UserReservation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -18,19 +18,20 @@
 
 import MovieShow from "./webviews/MovieShow";
 import {
-  faAddressCard,
-  faFilm,
-  faSignInAlt,
-  faSignOutAlt,
-  faUser,
-  faUserPlus,
-  faVideo
+    faAddressCard, faCreditCard,
+    faFilm,
+    faSignInAlt,
+    faSignOutAlt,
+    faUser,
+    faUserPlus,
+    faVideo
 } from "@fortawesome/free-solid-svg-icons";
 import AuthenticationService from "./service/AuthenticationService";
 import Login from "./webviews/Login";
 import Logout from "./webviews/Logout";
 import Register from "./webviews/Register";
 import UserDashboard from "./webviews/UserDashboard";
+import UserReservation from "./webviews/UserReservation";
 
 /** Defines Actions for logged in User / not logged in Visitor*/
 const loggedInActions = [
@@ -49,7 +50,8 @@ const loggedInActions = [
         onAction: true
     }
 
-];const loggedOutActions = [
+];
+const loggedOutActions = [
   {
     path: "/login",
     name: "Login",
@@ -65,5 +67,15 @@ const loggedInActions = [
     onAction: faFilm
   }
 ];
+const otherActions = [
+    {
+        path: "/user/me/reservation/:resId",
+        name: "Reservation Info",
+        icon: faCreditCard,
+        component: UserReservation,
+        onAction: false
+    }
+];
 
-export {loggedInActions,loggedOutActions};
+
+export {loggedInActions, loggedOutActions, otherActions};

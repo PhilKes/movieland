@@ -10,14 +10,16 @@ import ReactDataGrid from 'react-data-grid';
 import {Editors} from "react-data-grid-addons";
 
 import ReactDOM from "react-dom";
+import AddUserModal from "../../modal/AddUserModal";
 
 /** /dashboard/users page Component*/
 
 
 const {DropDownEditor} = Editors;
 const roleTypes = [
-    {id: "ROLE_ADMIN", value: "ROLE_ADMIN"},
     {id: "ROLE_USER", value: "ROLE_USER"},
+    {id: "ROLE_CASHIER", value: "ROLE_CASHIER"},
+    {id: "ROLE_ADMIN", value: "ROLE_ADMIN"},
 ];
 const RoleEditor = <DropDownEditor options={roleTypes}/>;
 
@@ -58,7 +60,7 @@ class UserListEdit extends Component {
         ];
 
         if (updated.roles) {
-            if (updated.roles === "ROLE_ADMIN")
+            if (updated.roles === "ROLE_ADMIN") {
                 updated.roles = [
                     {
                         "id": 1,
@@ -67,9 +69,24 @@ class UserListEdit extends Component {
                     {
                         "id": 2,
                         "name": "ROLE_ADMIN"
+                    },
+                    {
+                        "id": 3,
+                        "name": "ROLE_CASHIER"
                     }
                 ]
-            else if (updated.roles === "ROLE_USER") {
+            } else if (updated.roles === "ROLE_CASHIER") {
+                updated.roles = [
+                    {
+                        "id": 1,
+                        "name": "ROLE_USER"
+                    },
+                    {
+                        "id": 3,
+                        "name": "ROLE_CASHIER"
+                    },
+                ];
+            } else if (updated.roles === "ROLE_USER") {
                 updated.roles = [{
                     "id": 1,
                     "name": "ROLE_USER"
@@ -94,7 +111,7 @@ class UserListEdit extends Component {
                 let rows = data.map(user => {
                     let highestRole;
                     user.roles.forEach(role => {
-                        if (!highestRole || (highestRole.name === "ROLE_USER" && role.name === "ROLE_ADMIN"))
+                        if (!highestRole || role.name === "ROLE_ADMIN" || (highestRole.name === "ROLE_USER" && role.name === "ROLE_CASHIER"))
                             highestRole = role.name;
                     });
                     user.roles = highestRole;
@@ -128,6 +145,10 @@ class UserListEdit extends Component {
         }
     }
 
+    addUser(user) {
+
+    }
+
     /** Render Movie List with Actions*/
     render() {
         const {isLoading, timedout, rows, columns} = this.state;
@@ -140,6 +161,13 @@ class UserListEdit extends Component {
 
         return (
             <Grid fluid>
+                <Row>
+                    <Col>
+                        <h2>Manage Users</h2>
+                        <AddUserModal onSubmit={this.addUser.bind(this)} roleTypes={roleTypes}
+                                      showNotification={this.props.showNotification}/>
+                    </Col>
+                </Row>
                 <Row>
                     <Col md={12}>
                         <ReactDataGrid

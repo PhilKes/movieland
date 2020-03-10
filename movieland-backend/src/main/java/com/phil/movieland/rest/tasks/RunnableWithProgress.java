@@ -1,7 +1,10 @@
-package com.phil.movieland.tasks;
+package com.phil.movieland.rest.tasks;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Runnable with Progress data
+ */
 public abstract class RunnableWithProgress implements Runnable {
     private AtomicInteger progress=new AtomicInteger(0);
     private AtomicInteger progressMax=new AtomicInteger(100);

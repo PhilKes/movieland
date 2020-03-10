@@ -3,7 +3,7 @@ import {
     ButtonGroup,
     Table,
     ListGroupItem,
-    ListGroup
+    ListGroup, Button
 } from 'reactstrap';
 import Moment from 'moment';
 import axios from "axios";
@@ -122,7 +122,7 @@ class MovieList extends Component {
                     } else {
                         movieShows[movId][day][time] = show.showId;
                     }
-                    console.log("Mov:" + movId + " on:" + day + " at:" + time + " Show: " + movieShows[movId][day][time]);
+                    //console.log("Mov:" + movId + " on:" + day + " at:" + time + " Show: " + movieShows[movId][day][time]);
                 });
                 this.setState({shows: movieShows, isLoading: false});
             })
@@ -217,9 +217,9 @@ class MovieList extends Component {
                                                 <img src={movie.posterUrl} className="img-fluid text-center"/>
                                                 <div>
                                                     <ButtonGroup style={{display: "flex"}} className="img-fluid">
-                                                        <CustomButton bsStyle="light" style={{flex: 1}} >
+                                                        <Button color="light" style={{flex: 1}}>
                                                             <FontAwesomeIcon icon={faInfoCircle}/>
-                                                        </CustomButton>
+                                                        </Button>
                                                         <TrailerModal movId={movie.movId}/>
                                                     </ButtonGroup>
                                                 </div>
@@ -254,8 +254,12 @@ class MovieList extends Component {
                                                             })
                                                             }
                                                         </tr>
-                                                        {showList}
                                                         </thead>
+                                                        <tbody>
+                                                        <tr>
+                                                            {showList}
+                                                        </tr>
+                                                        </tbody>
                                                     </Table>}/>
                                         </Col>
                                     </Row>

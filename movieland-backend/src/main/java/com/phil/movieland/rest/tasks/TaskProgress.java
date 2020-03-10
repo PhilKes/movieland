@@ -1,5 +1,8 @@
-package com.phil.movieland.tasks;
+package com.phil.movieland.rest.tasks;
 
+/**
+ * Progress of a Task
+ */
 public class TaskProgress {
     private Integer progress;
     private Integer progressMax;

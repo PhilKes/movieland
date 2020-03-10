@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserDashboard React - v1.3.0
+* Light Bootstrap UserReservation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -58,7 +58,7 @@ class AdminDashboard extends Component {
     /** Fetch summary for last 7 Days*/
     componentDidMount() {
         this.contentRef = React.createRef();
-        document.title = "Admin UserDashboard";
+        document.title = "Admin UserReservation";
         this.setState({isLoading: false});
     }
 

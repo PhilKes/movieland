@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserDashboard React - v1.3.0
+* Light Bootstrap UserReservation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -28,8 +28,9 @@ import { style } from "../variables/Variables.jsx";
 import image from "../assets/img/sidebar-3.jpg";
 import AuthenticationService from "../service/AuthenticationService";
 import {adminRoutes, userRoutes} from "../routes";
-import {loggedInActions, loggedOutActions} from "../userActions";
+import {loggedInActions, loggedOutActions, otherActions} from "../userActions";
 import history from "../history";
+import AuthenticatedRoute from "../webviews/misc/AuthenticatedRoute";
 
 /** Basic Layout for all Pages*/
 class Layout extends Component {
@@ -101,6 +102,7 @@ class Layout extends Component {
         this.setLoggedIn(this.state.loggedIn);
     }
 
+
     /** Toggle nav-open if window width is small  */
     componentDidUpdate(e) {
         if (
@@ -151,6 +153,7 @@ class Layout extends Component {
                         {this.getRoutes(this.routes)}
                         {this.getRoutes(loggedInActions)}
                         {this.getRoutes(loggedOutActions)}
+                        {this.getRoutes(otherActions)}
                     </Switch>
                     <Sidebar {...this.props} routes={this.routes} actions={this.actions}
                              color={this.state.color}

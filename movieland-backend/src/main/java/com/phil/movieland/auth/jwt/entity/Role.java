@@ -24,7 +24,8 @@ public class Role implements Comparable<Role> {
 
     public enum RoleName {
         ROLE_USER,
-        ROLE_ADMIN
+        ROLE_ADMIN,
+        ROLE_CASHIER
     }
 
     @Id

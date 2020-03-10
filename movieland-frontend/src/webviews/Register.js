@@ -13,8 +13,6 @@ class Register extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            err: 0, // 0=no error, 1= password too short, 2= repeat doesnt match, 3= username taken, 4= missing fields
-            showSuccessMessage: false,
             isRegistering: false
         }
         document.title = "MovieLand Register";
@@ -23,7 +21,6 @@ class Register extends Component {
     /** Get Data from Form and validate to send register request*/
     registerClicked(ev) {
         ev.preventDefault();
-        this.setState({isRegistering: true});
         const data = new FormData(ev.target);
         let pwd = data.get('password'), user = data.get('username'), name = data.get('name');
         if (pwd.length < 5) {
@@ -39,7 +36,7 @@ class Register extends Component {
             this.props.showNotification("Passwords not matching! ","error","bc");
             return;
         }
-
+        this.setState({isRegistering: true});
         axios.post(`/api/auth/signup`, {
                 name: name, username: user, email: user + "@mail.com", password: pwd
             },
@@ -53,7 +50,6 @@ class Register extends Component {
                 this.setState({isRegistering: false});
                 this.props.showNotification("Registration successful ","success","bc");
                 console.log(response);
-                this.setState({err: 0, showSuccessMessage: true});
             })
             .catch(err => {
                 this.setState({isRegistering: false});

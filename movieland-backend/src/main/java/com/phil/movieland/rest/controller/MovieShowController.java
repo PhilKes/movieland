@@ -46,7 +46,7 @@ public class MovieShowController {
     }
 
     @GetMapping("/show/{id}")
-    ResponseEntity<MovieShow> getShow(@PathVariable Long id) {
+    public ResponseEntity<MovieShow> getShow(@PathVariable Long id) {
         Optional<MovieShow> show=movieShowService.queryShow(id);
         return show.map(response -> ResponseEntity.ok().body(response))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));

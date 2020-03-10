@@ -1,6 +1,6 @@
 package com.phil.movieland.rest.request;
 
-public class GenerateRequest extends BetweenDatesRequest {
+public class GenerateShowRequest extends BetweenDatesRequest {
     private Integer moviesPerDay;
     private Integer showsPerMovie;
 

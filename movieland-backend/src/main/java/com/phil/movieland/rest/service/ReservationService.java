@@ -1,5 +1,7 @@
 package com.phil.movieland.rest.service;
 
+import com.phil.movieland.data.entity.Movie;
+import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.data.entity.Seat;
 import com.phil.movieland.data.repository.ReservationRepository;
@@ -33,8 +35,12 @@ public class ReservationService {
                 }
             }
         }
+        /**Calculate total Sum */
+        double totalSum=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
+        reservation.setTotalSum(totalSum);
 
         Reservation result=reservationRepository.save(reservation);
+        /** Store Seats */
         seats.stream().forEach(seat -> {
             seat.setResId(result.getResId());
             seatRepository.save(seat);
@@ -60,17 +66,18 @@ public class ReservationService {
     }
 
 
-
     public void deleteAll() {
         List<Reservation> reservations=reservationRepository.findAll();
         reservations.forEach(reservation -> seatRepository.deleteAllByResId(reservation.getResId()));
         reservationRepository.deleteAll();
     }
 
-    public List<Reservation> getAllReservationsOfUser(Long userId) {
-        return reservationRepository.findAllByUserId(userId).subList(0, 6);
+    public List<Reservation> getAllReservationsOfUser(Long userId, boolean futureReservations) {
+        if(futureReservations) {
+            return reservationRepository.findFutureAllByUserId(userId, new Date());
+        }
+        return reservationRepository.findAllByUserId(userId);
     }
-
 
     public void saveReservationsWithSeats(List<StatisticsService.ReservationWithSeats> reservations) {
         reservations.stream().forEach(res -> saveReservation(res.getReservation(), res.getSeats()));
@@ -100,11 +107,53 @@ public class ReservationService {
         return true;
     }
 
-
     /**
      * Returns amount of deleted reservations
      */
     public long deleteReservationsOfShows(List<Long> showIds) {
         return reservationRepository.deleteAllByShowIdIn(showIds);
+    }
+
+    public Optional<Reservation> getReservationInfoOfUser(Long userId, Long resId) {
+        return reservationRepository.findByResIdAndUserId(resId, userId);
+    }
+
+    public static class ReservationInfo {
+        private Reservation reservation;
+        private MovieShow movieShow;
+        private Movie movie;
+        private String QRCodeURL;
+
+        public Reservation getReservation() {
+            return reservation;
+        }
+
+        public void setReservation(Reservation reservation) {
+            this.reservation=reservation;
+        }
+
+        public MovieShow getMovieShow() {
+            return movieShow;
+        }
+
+        public void setMovieShow(MovieShow movieShow) {
+            this.movieShow=movieShow;
+        }
+
+        public Movie getMovie() {
+            return movie;
+        }
+
+        public void setMovie(Movie movie) {
+            this.movie=movie;
+        }
+
+        public String getQRCodeURL() {
+            return QRCodeURL;
+        }
+
+        public void setQRCodeURL(String QRCodeURL) {
+            this.QRCodeURL=QRCodeURL;
+        }
     }
 }

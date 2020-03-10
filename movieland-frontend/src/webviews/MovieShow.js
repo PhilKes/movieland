@@ -1,16 +1,23 @@
 import React, {Component} from 'react';
-import {Button, Container, Table} from 'reactstrap';
+import {Button, Container, ListGroup, ListGroupItem, Table} from 'reactstrap';
 import Moment from 'moment';
 import axios from "axios";
-import {Col, Grid, Row, Tooltip} from "react-bootstrap";
+import {Tooltip} from "react-bootstrap";
+import {Col, Grid, Row, Modal} from "react-bootstrap";
+import {InputGroup} from "react-bootstrap";
 import OverlayTrigger from "react-bootstrap/lib/OverlayTrigger";
 import LoadingPage from "./misc/LoadingPage";
-
+import ErrorPage from "./misc/ErrorPage";
+import InputGroupAddon from "react-bootstrap/lib/InputGroupAddon";
+import InputGroupText from "reactstrap/lib/InputGroupText";
+import InputGroupButton from "react-bootstrap/lib/InputGroupButton";
+import Input from "reactstrap/lib/Input";
 
 /** /show/:showId page Component
  * Shows MovieShow details + make Reservation (if logged in)*/
 class MovieShow extends Component {
 
+    seat_types = ["ADULT", "STUDENT", "CHILD", "DISABLED"];
     constructor(props) {
         super(props);
         this.state = {
@@ -23,6 +30,10 @@ class MovieShow extends Component {
             error: "",
             timedout: false
         };
+        this.typeRefs = {};
+        this.seat_types.forEach(type => {
+            this.typeRefs[type] = React.createRef();
+        })
 
     }
 
@@ -47,6 +58,7 @@ class MovieShow extends Component {
                             console.log("Reservations:")
                             console.log(reservations)
                             let promises = [];
+                        let reservedSeats = this.state.reservedSeats;
                             reservations.forEach(reservation => {
                                 promises.push(
                                     axios.get('/api/seats/reservation/' + reservation.resId)
@@ -54,33 +66,42 @@ class MovieShow extends Component {
                                         .then(seats => {
                                             console.log(seats)
                                             seats.forEach(seat => {
-                                                let reserved = this.state.reservedSeats;
-                                                reserved[seat.number] = seat;
-                                                this.setState({reservedSeats: reserved});
+                                                reservedSeats[seat.number] = seat;
+                                                //this.setState({reservedSeats: reserved});
                                             });
                                         })
                                 );
                             });
                             axios.all(promises).then(res => {
-                                this.setState({isLoading: false})
+                                this.setState({isLoading: false, reservedSeats: reservedSeats})
                             })
                         }
                     );
             })
-            .catch(err => this.setState({timedout: true}))
+            .catch(err => this.setState({isLoading: false, timedout: true}))
         ;
     }
 
     /** onClick for seats*/
     selectSeat(idx) {
-        let seats = this.state.selectedSeats;
+        let seats = {};
+        Object.assign(seats, this.state.selectedSeats);
         if (seats[idx] != null) {
             //seats.splice(idx,1);
             delete seats[idx];
         } else {
-            seats[idx] = true;
+            seats[idx] = {number: idx, type: "ADULT"};
         }
-        this.setState({selectedSeats: seats});
+        this.updateSeatTypes(seats)
+    }
+
+    getAmountOfSeatTypes(type) {
+        let amt = 0;
+        Object.keys(this.state.selectedSeats).forEach(number => {
+            if (this.state.selectedSeats[number].type === type)
+                amt++;
+        });
+        return amt;
     }
 
     /** returns table rows*/
@@ -125,10 +146,69 @@ class MovieShow extends Component {
         axios.post('/api/reservation',
             {
                 show_id: this.state.showId,
-                seats: Object.keys(this.state.selectedSeats).map(number=>{ return {number:number,type: "CHILD"};})
+                seats: Object.keys(this.state.selectedSeats).map(number => this.state.selectedSeats[number])
             })
             .then(res => window.location.reload());
     }
+
+    updateSeatTypes(seats) {
+        let oldSeats = this.state.selectedSeats;
+        let diff = Object.keys(seats).length - Object.keys(oldSeats).length;
+        console.log("Old Diff: " + diff);
+        if (diff > 0) {
+            this.addSeatType(this.seat_types[0], diff)
+        } else if (diff < 0) {
+            let sub = 0;
+            let i = 1;
+            for (i = 1; i < this.seat_types.length; i++) {
+                let type = this.typeRefs[this.seat_types[i]].current;
+                if (type.value > 0) {
+                    let amt = Math.min(type.value, (diff * -1));
+                    type.value -= amt;
+                    diff += amt;
+                    console.log("Reduced " + this.seat_types[i] + " by " + amt);
+                    console.log("Remaining: " + diff)
+
+                }
+                if (diff === 0) {
+                    break;
+                }
+            }
+            if (diff < 0) {
+                this.addSeatType(this.seat_types[0], diff);
+                let type = this.typeRefs[this.seat_types[0]].current;
+                type.min = type.value;
+                diff = 0;
+            }
+        }
+
+        this.setState({selectedSeats: seats});
+    }
+
+
+    setSeatType(type, value) {
+        this.typeRefs[type].current.value = value;
+    }
+
+    addSeatType(type, value) {
+        console.log("Add " + value + " to: " + type);
+        let typeInput = this.typeRefs[type].current;
+        let val = parseInt(typeInput.value);
+        console.log("Val: " + typeInput.value);
+        val += value;
+        typeInput.value = val;
+        typeInput.min = val;
+    }
+
+
+    onChangeSeatType(type, ev) {
+        console.log("Type: " + type);
+        //console.log(this.typeRefs[type].current);
+        let typeInput = this.typeRefs[type].current;
+        console.log("Value:" + typeInput.value);
+        console.log("Ev value: " + ev.target.value)
+    }
+
 
 
     /** Render All Seats,highlight reserved Seats*/
@@ -136,6 +216,8 @@ class MovieShow extends Component {
         const {movie, isLoading, error, timedout, show, selectedSeats} = this.state;
         if (isLoading)
             return <LoadingPage/>;
+        if (timedout)
+            return <ErrorPage/>;
 
         //TODO add submit reservation -> Post
         return (
@@ -147,15 +229,38 @@ class MovieShow extends Component {
                             <h4>{Moment(show.date).format('DD.MM.YYYY HH:mm')}</h4>
                             <h5>{movie.description}</h5>
                             <div id="room">
-                                <div id="screen">Screen</div>
+                                {/* <div id="screen">Screen</div>*/}
                                 <Table borderless size="sm" className="seatTable">
                                     <tbody>
                                     {this.createRows(10, 16)}
                                     </tbody>
                                 </Table>
                             </div>
-                            <h4>Selection: {Object.keys(selectedSeats).length} Seats selected</h4>
-
+                            <div>
+                                <h4>Selection: {Object.keys(selectedSeats).length} Seats selected</h4>
+                                <ListGroup>
+                                    {this.seat_types.map(type =>
+                                        <ListGroupItem>
+                                            <Grid fluid>
+                                                <Row>
+                                                    <Col>
+                                                        <InputGroup>
+                                                            <InputGroupAddon
+                                                                addonType="prepend">{type}</InputGroupAddon>
+                                                            <Input
+                                                                defaultValue={0}
+                                                                innerRef={this.typeRefs[type]}
+                                                                onChange={e => this.onChangeSeatType(type, e)}
+                                                                type="number" step="1"/>
+                                                            <InputGroupAddon addonType="append">.00</InputGroupAddon>
+                                                        </InputGroup>
+                                                    </Col>
+                                                </Row>
+                                            </Grid>
+                                        </ListGroupItem>
+                                    )}
+                                </ListGroup>
+                            </div>
                             <Button color="success" onClick={this.submitReservation.bind(this)}
                                     disabled={Object.keys(selectedSeats).length === 0}
                             >Submit</Button>

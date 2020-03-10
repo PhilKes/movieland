@@ -20,7 +20,6 @@ class Login extends Component {
         }
         this.state = {
             hasLoginFailed: false,
-            showSuccessMessage: false,
             msg: msg,
             loggingIn: false
         }
@@ -51,7 +50,6 @@ class Login extends Component {
                 AuthenticationService.setUserName(user);
                 AuthenticationService.registerJwtSuccessfulLogin(resp.data.accessToken);
                 this.props.onAction("Login");
-                this.setState({showSuccessMessage: true, hasLoginFailed: false});
                 if (this.props.location.state == null || this.props.location.state.previous === "/login") {
                     console.log("to: /")
                     history.push("/");

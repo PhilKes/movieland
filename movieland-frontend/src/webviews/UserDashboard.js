@@ -1,11 +1,17 @@
 import React, {Component} from 'react'
-import {Container} from "reactstrap";
+import {Col, Container, Row} from "reactstrap";
 import axios from "axios";
 import LoadingPage from "./misc/LoadingPage";
 import moment from "moment";
+import {Grid} from "react-bootstrap";
+import Card from "../components/Card/Card";
+import {StatsCard} from "../components/StatsCard/StatsCard";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {NavIcon} from "@trendmicro/react-sidenav";
+import {faTicketAlt} from "@fortawesome/free-solid-svg-icons";
 
 /** /user/me page Component
- *  UserDashboard page showing user details, reservations*/
+ *  UserReservation page showing user details, reservations*/
 class UserDashboard extends Component {
     constructor(props) {
         super(props)
@@ -21,13 +27,13 @@ class UserDashboard extends Component {
 
     /** Fetch User data and Reservations for Shows*/
     componentDidMount() {
-        document.title = "My UserDashboard";
+        document.title = "My Dashboard";
         axios.get('/api/user/me')
             .then(res => res.data)
             .then(user => this.setState({user: user}))
             .then(x => {
                 // Get all Reservations of user
-                axios.get('/api/reservations/me')
+                axios.get('/api/reservations/me/new')
                     .then(res => res.data)
                     .then(reservations => {
                         this.setState({reservations: reservations});
@@ -77,25 +83,44 @@ class UserDashboard extends Component {
         let reservationList = reservations.map(res => {
             let show = shows[res.resId];
             let movie = movies[show.movId];
+            console.log(movie)
             return (
-                <div key={res.resId}>
-                    <a href={"/show/" + show.showId}>"{movie.name}"
-                        on {moment(show.date).format("dd DD.MM.YYYY HH:mm")}h</a>
-                </div>
+                <Col lg={3} sm={6} key={res.resId}>
+                    <StatsCard
+                        bigIcon={<a href={"me/reservation/" + res.resId}><img src={movie.posterUrl}
+                                                                              className="img-fluid small-fluid"/></a>}
+                        statsText={<a href={"me/reservation/" + res.resId}>"{movie.name}"
+                            on {moment(show.date).format("dd DD.MM.YYYY HH:mm")}h</a>}
+                        statsIcon={<FontAwesomeIcon icon={faTicketAlt}/>}
+                        statsIconText={res.validate === true ? "Validated" : "Not Validated yet"}
+                    />
+                </Col>
+
             );
         });
 
         //TODO past reservations/ACTIVE
         return (
             <div className="content">
-                <Container fluid>
-                    <h2>My Dashboard</h2>
-                    <b>Id: {user.id}</b><br/>
-                    <b>User: {user.username}</b><br/>
-                    <b>Name: {user.name}</b><br/><br/>
-                    <b>Reservations</b><br/>
-                    {reservationList}
-                </Container>
+                <Grid fluid>
+                    <Row>
+                        <Col>
+                            <div>
+                                <h2>My Dashboard</h2>
+                                <b>Id: {user.id}</b><br/>
+                                <b>User: {user.username}</b><br/>
+                                <b>Name: {user.name}</b><br/><br/>
+                                <b>Reservations</b><br/>
+                            </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <div className="whole-height">
+                            {reservationList}
+                        </div>
+                    </Row>
+
+                </Grid>
             </div>
         )
     }

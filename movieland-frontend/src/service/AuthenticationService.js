@@ -4,7 +4,10 @@ import https from 'https';
 /** Service to generate Authorization request + storing JWT Token*/
 class AuthenticationService {
 
+
     constructor() {
+        this.CancelToken = axios.CancelToken;
+        this.cancelSource = this.CancelToken.source();
     }
 
     executeBasicAuthenticationService(username, password) {
@@ -71,9 +74,16 @@ class AuthenticationService {
                     config.headers.authorization = token
                 }
                 config.httpsAgent = agent;
+                config.cancelToken = this.cancelSource.token;
                 return config
             }
         )
+    }
+
+    cancelAllAxios() {
+        this.cancelSource.cancel("Cancel all request due to redirect");
+        this.CancelToken = axios.CancelToken;
+        this.cancelSource = this.CancelToken.source();
     }
 
     isUserLoggedIn() {

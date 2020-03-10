@@ -9,6 +9,7 @@ import com.phil.movieland.auth.jwt.util.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -88,7 +89,43 @@ public class AuthenticationController {
         return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin/signup")
+    public ResponseEntity<?> registerUserAsAdmin(@Valid @RequestBody SignUpWithRoleRequest signUpRequest) {
+        if(userRepository.existsByUsername(signUpRequest.getUsername())) {
+            return new ResponseEntity(new ApiResponse(false, "Username is already taken!"),
+                    HttpStatus.BAD_REQUEST);
+        }
 
+        if(userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return new ResponseEntity(new ApiResponse(false, "Email Address already in use!"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        // Creating user's account
+        User user=new User(signUpRequest.getName(), signUpRequest.getUsername(),
+                signUpRequest.getEmail(), signUpRequest.getPassword());
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        Role role=roleRepository.findByName(Role.RoleName.valueOf(signUpRequest.getRoleName()))
+                .orElseThrow(() -> new AppException("User Role not set."));
+
+        Role userRole=roleRepository.findByName(Role.RoleName.ROLE_USER)
+                .orElseThrow(() -> new AppException("User Role not set."));
+        Set<Role> roles=new HashSet<>();
+        roles.add(userRole);
+        roles.add(role);
+        user.setRoles(roles);
+
+        User result=userRepository.save(user);
+
+        URI location=ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/api/users/{username}")
+                .buildAndExpand(result.getUsername()).toUri();
+
+        return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
+    }
 
 
 }

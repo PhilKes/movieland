@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserDashboard React - v1.3.0
+* Light Bootstrap UserReservation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -22,7 +22,8 @@ function FieldGroup({ label, ...props }) {
   return (
     <FormGroup>
       <ControlLabel>{label}</ControlLabel>
-      <FormControl {...props} />
+        <FormControl {...props} >
+        </FormControl>
     </FormGroup>
   );
 }

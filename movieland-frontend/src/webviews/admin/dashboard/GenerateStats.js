@@ -6,11 +6,6 @@ import axios from "axios";
 import ErrorPage from "../../misc/ErrorPage";
 import LoadingPage from "../../misc/LoadingPage";
 import {Col, Grid, Row} from "react-bootstrap";
-import ReactCard from "../../../components/Card/Card";
-import InfiniteScroll from 'react-infinite-scroller';
-import InfiniteLoader from "react-infinite-loader";
-import DayPicker from "react-day-picker";
-import {Helmet} from "react-helmet";
 import {DateRangePicker} from 'react-date-range';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css';
@@ -20,8 +15,8 @@ import Loader from "react-loader-spinner"; // theme css file
 import Card from "../../../components/Card/Card";
 import Checkbox from "../../../components/CustomCheckbox/CustomCheckbox";
 
-/** /movies/edit page Component
- * Shows Movies + ADD/REMOVE Movies (only for Admins)*/
+/** /dashboard/generate page Component
+ * Generate Shows/Reseravtions for Date Range*/
 class GenerateStats extends Component {
 
     constructor(props) {
@@ -40,12 +35,12 @@ class GenerateStats extends Component {
         };
     }
 
-    /** Initial load all movies*/
     componentDidMount() {
         document.title = "Generate Statistics";
         this.setState({isLoading: false});
     }
 
+    /** Handler if DateRangePicker valuess change*/
     handleSelect(ranges) {
         console.log(ranges);
         this.setState({
@@ -56,8 +51,8 @@ class GenerateStats extends Component {
         });
     }
 
-    /** Get Data from Form and validate to send register request*/
-    generateClicked(ev) {
+    /** Send Generate Requests*/
+    generateShowsClicked(ev) {
         ev.preventDefault();
         const data = new FormData(ev.target);
         let moviesPerDay = data.get('movies');
@@ -65,7 +60,7 @@ class GenerateStats extends Component {
         let resPerShow = data.get('resPerShow');
         let startDate = this.state.range.startDate;
         let endDate = this.state.range.endDate;
-        //Only shows
+        /** Only shows*/
         if (this.state.showShow) {
             axios.post(`/api/statistics/shows`, {
                     from: startDate, until: endDate, moviesPerDay: moviesPerDay, showsPerMovie: showsPerMovie
@@ -80,7 +75,7 @@ class GenerateStats extends Component {
                     this.setState({isGenerating: false});
                     this.props.showNotification("Started ShowGeneration task: " + response.headers.location, "warning", "bc");
                     console.log(response);
-                    this.waitAndGetProgress(response.headers.location, 1000);
+                    this.waitAndGetProgress(response.headers.location, 2500);
                 })
                 .catch(err => {
                     this.setState({isGenerating: false});
@@ -88,22 +83,19 @@ class GenerateStats extends Component {
                     this.props.showNotification("Generation failed: "
                         + (err.response.data.message ? err.response.data.message : "Server is unreachable"), "error", "bc");
                 });
-            if (this.state.showRes) {
-                this.setState({
-                    generateRes: true,
-                    resData: {startDate: startDate, endDate: endDate, resPerShow: resPerShow}
-                });
-            }
-        } else if (this.state.showRes) {
-            this.postGenerateRes({startDate: startDate, endDate: endDate, resPerShow: resPerShow});
         }
     }
 
-    postGenerateRes(data) {
+    generateReseravtionsClicked(ev) {
+        ev.preventDefault();
+        const data = new FormData(ev.target);
+        let resPerShow = data.get('resPerShow');
+        let startDate = this.state.range.startDate;
+        let endDate = this.state.range.endDate;
         console.log("POSTING RESERVATION TASK");
         this.setState({generateRes: false});
         axios.post(`/api/statistics/reservations`, {
-                from: data.startDate, until: data.endDate, resPerShow: data.resPerShow
+                from: startDate, until: endDate, resPerShow: resPerShow
             },
             {
                 headers: {
@@ -115,7 +107,7 @@ class GenerateStats extends Component {
                 this.setState({isGenerating: false});
                 this.props.showNotification("Started ResGeneration task: " + response.headers.location, "warning", "bc");
                 console.log(response);
-                this.waitAndGetProgress(response.headers.location, 1000);
+                this.waitAndGetProgress(response.headers.location, 2500);
             })
             .catch(err => {
                 this.setState({isGenerating: false});
@@ -123,37 +115,28 @@ class GenerateStats extends Component {
                 this.props.showNotification("Generation failed: "
                     + (err.response.data.message ? err.response.data.message : "Server is unreachable"), "error", "bc");
             });
-
     }
 
+
+    /**Get Progress of task until done */
     waitAndGetProgress(taskUri, timeout) {
-        setTimeout(() => {
-            axios.get(taskUri)
-                .then(res => res.data)
-                .then(taskProgress => {
-                    this.setState({progress: taskProgress.progress, progressMax: taskProgress.progressMax});
-                    if (this.state.progress === this.state.progressMax) {
-                        this.setState({isGenerating: false});
-                        this.props.showNotification("Finished task " + taskProgress.taskId, "success", "bc");
-                        //POST generate Reservations if enabled
-                        if (this.state.generateRes) {
-                            this.postGenerateRes(this.state.resData);
-                        }
-                    } else {
-                        this.setState({isGenerating: true});
-                        this.waitAndGetProgress(taskUri, 1000);
-                    }
-                });
-        }, timeout);
-    }
+        axios.get(taskUri, {timeout: timeout})
+            .then(res => res.data)
+            .then(taskProgress => {
+                this.setState({progress: taskProgress.progress, progressMax: taskProgress.progressMax});
+                if (this.state.progress === this.state.progressMax) {
+                    console.log("Task " + taskUri + " finished");
+                    this.setState({isGenerating: false});
+                    this.props.showNotification("Finished task " + taskProgress.taskId, "success", "bc");
 
-
-    reservationCheckChanged(state) {
-        this.setState({showRes: state});
-    }
-
-    showCheckedChanged(state) {
-        this.setState({showShow: state});
+                } else {
+                    this.setState({isGenerating: true});
+                    setTimeout(() => this.waitAndGetProgress(taskUri, timeout), timeout);
+                }
+            })
+            .catch(err => {
+                console.log("Progress update timeout")
+            });
     }
 
     /** Render Movie List with Actions*/
@@ -183,21 +166,14 @@ class GenerateStats extends Component {
                 <Row>
                     <Col>
                         <Card
-                            title="Generating Settings"
+                            title="Generate Shows"
                             content={
-                                <div>
-                                    <form onSubmit={this.generateClicked.bind(this)}>
-                                        <Checkbox
-                                            number="checkboxShow"
-                                            isChecked={this.state.showShow}
-                                            label="Generate Shows"
-                                            onChangeValue={this.showCheckedChanged.bind(this)}
-                                        />
+                                <form onSubmit={this.generateShowsClicked.bind(this)}>
                                         <div>
                                             <FormInputs
                                                 ncols={["col-md-8"]}
                                                 properties={[{
-                                                    disabled: !this.state.showShow,
+                                                    disabled: this.state.isGenerating,
                                                     label: "Movies per Day",
                                                     name: "movies",
                                                     type: "number",
@@ -209,7 +185,7 @@ class GenerateStats extends Component {
                                             <FormInputs
                                                 ncols={["col-md-8"]}
                                                 properties={[{
-                                                    disabled: !this.state.showShow,
+                                                    disabled: this.state.isGenerating,
                                                     label: "Shows per Movie per Day",
                                                     name: "shows",
                                                     type: "number",
@@ -219,17 +195,29 @@ class GenerateStats extends Component {
                                                 }]}
                                             />
                                         </div>
-                                        <Checkbox
-                                            number="checkboxRes"
-                                            isChecked={this.state.showRes}
-                                            label="Generate Reservations"
-                                            onChangeValue={this.reservationCheckChanged.bind(this)}
-                                        />
+                                    {this.state.isGenerating &&
+                                    (<div>
+                                        <div className="text-center">
+                                            {Math.round(this.state.progress / this.state.progressMax * 100)}%
+                                        </div>
+                                        <Progress value={this.state.progress} max={this.state.progressMax}
+                                                  animated={true}/>
+                                    </div>)
+                                    ||
+                                    (<CustomButton bsStyle="warning" pullLeft fill type="submit">
+                                        Generate
+                                    </CustomButton>)}
+                                </form>}
+                        />
+                        <Card
+                            title="Generate Reservations"
+                            content={
+                                <form onSubmit={this.generateReseravtionsClicked.bind(this)}>
                                         <div>
                                             <FormInputs
                                                 ncols={["col-md-8"]}
                                                 properties={[{
-                                                    disabled: !this.state.showRes,
+                                                    disabled: this.state.isGenerating,
                                                     label: "Reservations per Show",
                                                     name: "resPerShow",
                                                     type: "number",
@@ -252,7 +240,6 @@ class GenerateStats extends Component {
                                             Generate
                                         </CustomButton>)}
                                     </form>
-                                </div>
                             }
                         />
                     </Col>

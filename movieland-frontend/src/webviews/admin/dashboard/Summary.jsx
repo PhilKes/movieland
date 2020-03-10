@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserDashboard React - v1.3.0
+* Light Bootstrap UserReservation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -36,6 +36,7 @@ import moment from "moment";
 import {faChartLine, faDollarSign, faEye, faFilm, faHome, faTicketAlt} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import SideNav, {NavItem, NavIcon, NavText} from '@trendmicro/react-sidenav';
+import AuthenticationService from "../../../service/AuthenticationService";
 
 
 /** Dashboard for Admin with Statistics, Managing Users/Movies/Shows*/
@@ -51,6 +52,8 @@ class Summary extends Component {
     //TODO GENERATING TAB
     /** Fetch summary for last 7 Days*/
     componentDidMount() {
+        // console.log("Cancelling Axios");
+        //AuthenticationService.cancelAllAxios();
         document.title = "Dashboard Summary";
         let today = moment();
         axios.get('/api/statistics/summary', {

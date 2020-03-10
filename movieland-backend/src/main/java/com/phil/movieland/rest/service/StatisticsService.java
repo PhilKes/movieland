@@ -1,23 +1,17 @@
 package com.phil.movieland.rest.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.phil.movieland.auth.AuthenticationController;
 import com.phil.movieland.auth.jwt.entity.Role;
-import com.phil.movieland.auth.jwt.entity.User;
-import com.phil.movieland.data.entity.Movie;
-import com.phil.movieland.data.entity.MovieShow;
-import com.phil.movieland.data.entity.Reservation;
-import com.phil.movieland.data.entity.Seat;
+import com.phil.movieland.data.entity.*;
 import com.phil.movieland.data.repository.SeatRepository;
 import com.phil.movieland.rest.controller.UserController;
-import com.phil.movieland.tasks.RunnableWithProgress;
+import com.phil.movieland.rest.tasks.RunnableWithProgress;
 import com.phil.movieland.utils.DateUtils;
 import org.hibernate.stat.Statistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -52,6 +46,9 @@ public class StatisticsService {
         return generateShowsBetweenTask(from, until, 10, 4);
     }
 
+    /**
+     * Return Runnable for Show Generation Task
+     */
     public RunnableWithProgress generateShowsBetweenTask(Date from, Date until, int moviesPerDay, int showsPerMovie) {
         return new RunnableWithProgress() {
             @Override
@@ -112,89 +109,87 @@ public class StatisticsService {
         };
     }
 
+    /**
+     * Return Runnable for Reseravtion Generation Task
+     */
     public RunnableWithProgress generateReservationsBetweenTask(Date from, Date until, int resPerShow) {
         return new RunnableWithProgress() {
             @Override
             public void run() {
                 setProgress(0);
-                long days=ChronoUnit.DAYS.between(from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-                        , until.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                setProgressMax((int) days + 1);
-                Calendar countDate=Calendar.getInstance();
-                countDate.setTime(from);
+                System.out.println("Start generation of reservations for: " + DateUtils.getDateStringFromDate(from) + " until: " + DateUtils.getDateStringFromDate(until));
+                //TODO List<MovieShow> shows=movieShowService.getShowsForDateBetween(from,until);
+                // Iterate through all Shows, not the days -> change ProgressMax
                 /** Generate reservations for each show until Date until is reached*/
                 Random rand=new Random();
                 List<Long> userIds=userController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
-                while(countDate.getTime().before(until)) {
-                    List<MovieShow> shows=movieShowService.getShowsForDate(countDate.getTime());
-                    /** For each show generate reservations */
-                    for(MovieShow show : shows) {
-                        List<ReservationWithSeats> reservations=new ArrayList<>();
-                        List<Long> users=new ArrayList<>(userIds);
-                        /** Get All free seats*/
-                        List<Seat> showsTakenSeats=reservationService.getAllSeatsOfShow(show.getShowId());
-                        List<Integer> freeSeats=IntStream.range(0, 160).boxed().collect(Collectors.toList());
-                        freeSeats.removeAll(showsTakenSeats.stream()
-                                .map(Seat::getNumber).collect(Collectors.toList()));
-                        /** Between 2 - 4 reservations per show*/
-                        //int amtReservations=2 + rand.nextInt(2);
-                        int amtReservations=Math.min(resPerShow, userIds.size());
+                // while(countDate.getTime().before(until)) {
+                List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
+                setProgressMax(shows.size());
+                /** For each show generate reservations */
+                for(MovieShow show : shows) {
+                    List<ReservationWithSeats> reservations=new ArrayList<>();
+                    List<Long> users=new ArrayList<>(userIds);
+                    /** Get All free seats*/
+                    List<Seat> showsTakenSeats=reservationService.getAllSeatsOfShow(show.getShowId());
+                    List<Integer> freeSeats=IntStream.range(0, 160).boxed().collect(Collectors.toList());
+                    freeSeats.removeAll(showsTakenSeats.stream()
+                            .map(Seat::getNumber).collect(Collectors.toList()));
+                    /** Between 2 - 4 reservations per show*/
+                    //int amtReservations=2 + rand.nextInt(2);
+                    int amtReservations=Math.min(resPerShow, userIds.size());
 
-                        for(int i=0; i<amtReservations; i++) {
-                            Calendar showTime=Calendar.getInstance();
-                            showTime.setTime(countDate.getTime());
-                            Reservation reservation=new Reservation();
-                            reservation.setShowId(show.getShowId());
-                            Long user=-1L;
+                    for(int i=0; i<amtReservations; i++) {
+                        Reservation reservation=new Reservation();
+                        reservation.setShowId(show.getShowId());
+                        Long user=-1L;
+                        /** Determine user (never 2 Reservations of same user for same show)*/
+                        user=users.remove(rand.nextInt(users.size()));
 
-                            /** Determine user (never 2 Reservations of same user for same show)*/
-                            user=users.remove(rand.nextInt(users.size()));
-
-                            reservation.setUserId(user);
-                            ReservationWithSeats reservationWithSeats=new ReservationWithSeats();
-                            reservationWithSeats.setReservation(reservation);
-                            /** Determine Seats of reservation*/
-                            List<Seat> seatList=new ArrayList<>();
-                            // do {
-                            //seatList.clear();
-                            int amtSeats=2 + rand.nextInt(4);
-                            if(amtSeats>freeSeats.size()) {
-                                break;
-                            }
-                            for(int j=0; j<amtSeats; j++) {
-                                Seat seat=new Seat();
-                                seat.setResId(reservation.getResId());
-                                seat.setNumber(freeSeats.remove(0));
-                                int type=rand.nextInt(4);
-                                switch(type) {
-                                    case 0:
-                                        seat.setType(Seat.Seat_Type.CHILD);
-                                        break;
-                                    case 1:
-                                        seat.setType(Seat.Seat_Type.STUDENT);
-                                        break;
-                                    case 2:
-                                        seat.setType(Seat.Seat_Type.ADULT);
-                                        break;
-                                    case 3:
-                                        seat.setType(Seat.Seat_Type.DISABLED);
-                                        break;
-                                    default:
-                                        seat.setType(Seat.Seat_Type.ADULT);
-                                        break;
-                                }
-                                seatList.add(seat);
-                            }
-                            //} while(!reservationService.areSeatsAvailable(show.getShowId(), seatList));
-                            reservationWithSeats.setSeats(seatList);
-                            reservations.add(reservationWithSeats);
+                        reservation.setUserId(user);
+                        ReservationWithSeats reservationWithSeats=new ReservationWithSeats();
+                        reservationWithSeats.setReservation(reservation);
+                        /** Determine Seats of reservation*/
+                        List<Seat> seatList=new ArrayList<>();
+                        // do {
+                        //seatList.clear();
+                        int amtSeats=2 + rand.nextInt(4);
+                        if(amtSeats>freeSeats.size()) {
+                            break;
                         }
-                        reservationService.saveReservationsWithSeats(reservations);
+                        for(int j=0; j<amtSeats; j++) {
+                            Seat seat=new Seat();
+                            seat.setResId(reservation.getResId());
+                            seat.setNumber(freeSeats.remove(0));
+                            int type=rand.nextInt(4);
+                            switch(type) {
+                                case 0:
+                                    seat.setType(Seat.Seat_Type.CHILD);
+                                    break;
+                                case 1:
+                                    seat.setType(Seat.Seat_Type.STUDENT);
+                                    break;
+                                case 2:
+                                    seat.setType(Seat.Seat_Type.ADULT);
+                                    break;
+                                case 3:
+                                    seat.setType(Seat.Seat_Type.DISABLED);
+                                    break;
+                                default:
+                                    seat.setType(Seat.Seat_Type.ADULT);
+                                    break;
+                            }
+                            seatList.add(seat);
+                        }
+                        //} while(!reservationService.areSeatsAvailable(show.getShowId(), seatList));
+                        reservationWithSeats.setSeats(seatList);
+                        reservations.add(reservationWithSeats);
                     }
-                    System.out.println("Generated reservations for: " + countDate.getTime());
-                    countDate.add(Calendar.DATE, 1);
+                    reservationService.saveReservationsWithSeats(reservations);
                     incProgress(1);
                 }
+
+                //}
                 System.out.println("Finished generation of reservations");
                 precalculatedSummaries.clear();
             }
@@ -339,6 +334,7 @@ public class StatisticsService {
 
     }
 
+    //TODO speed up with sql
     public void deleteStatisticsBetween(Date from, Date until) {
         System.out.println("Deleting Statistics from: " + from + " until " + until);
         List<Long> showIds=movieShowService.getShowsForBetween(from, until).stream().map(MovieShow::getShowId).collect(Collectors.toList());
@@ -362,7 +358,6 @@ public class StatisticsService {
         }
         return sum;
     }
-
 
     /**
      * Calculates income based on reservation from Date to Date until
@@ -438,6 +433,10 @@ public class StatisticsService {
         precalculatedSummaries.put(summaryKey, statistics);
         System.out.println("Finished calculating statistics for: " + from + " until: " + until);
         return statistics;
+    }
+
+    public List<IntermediateStatistic> getIntermediates(Date from, Date until) {
+        return seatRepository.findDailyStatisticsBetweenDate(from,until);
     }
 
     private HashMap<Long, Movie> getMoviesFromShows(List<MovieShow> shows) {
@@ -564,6 +563,123 @@ public class StatisticsService {
             this.income=income;
         }
     }
+
+    //TODO
+    public static class DayStatistic {
+        private long amtShows, amtMovies, amtSeats;
+        private long amtWatchedMins;
+        private long income;
+        private Map<Seat.Seat_Type, Integer> seatsDistribution;
+        private LinkedHashMap<Long, MovieStats> movieStats;
+
+        public DayStatistic() {
+            seatsDistribution=new HashMap<>();
+            for(Seat.Seat_Type type : Seat.Seat_Type.values()) {
+                seatsDistribution.put(type, 0);
+            }
+        }
+
+        public DayStatistic(long amtShows, long amtMovies, long amtSeats) {
+
+        }
+
+        //TODO SHOW in REACT
+        //TODO USE Highest & LowestGrossing to determine bounds for Chart
+        public MovieStats getHighestGrossingMovie() {
+            return movieStats.values().stream().max(Comparator.comparing(MovieStats::getGrossing)).orElse(new MovieStats());
+        }
+
+        public MovieStats getLowestGrossingMovie() {
+            return movieStats.values().stream().min(Comparator.comparing(MovieStats::getGrossing)).orElse(new MovieStats());
+        }
+
+        public Map<Seat.Seat_Type, Integer> getSeatsDistribution() {
+            return seatsDistribution;
+        }
+
+        public void setSeatsDistribution(Map<Seat.Seat_Type, Integer> seatsDistribution) {
+            this.seatsDistribution=seatsDistribution;
+        }
+
+        public void addSeatsDistributions(Map<Seat.Seat_Type, Integer> seatsDistribution) {
+            seatsDistribution.entrySet().forEach(entry -> {
+                this.seatsDistribution.put(entry.getKey(), this.seatsDistribution.get(entry.getKey()) + entry.getValue());
+            });
+        }
+
+        public void addSeatsDistribution(Map.Entry<Seat.Seat_Type, Integer> entry) {
+            this.seatsDistribution.put(entry.getKey(), this.seatsDistribution.get(entry.getKey()) + entry.getValue());
+        }
+
+        @Transient
+        @JsonIgnore
+        public Map<Long, MovieStats> getMovieStats() {
+            return movieStats;
+        }
+
+        /**
+         * Sorts and sets moveStats Map
+         */
+        public void setMovieStats(LinkedHashMap<Long, MovieStats> movieStats) {
+            LinkedHashMap<Long, MovieStats> sorted=movieStats.entrySet().stream()
+                    .sorted((e1, e2) -> Double.compare(e1.getValue().getGrossing(), e2.getValue().getGrossing()) * -1)
+                    .collect(toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (a, b) -> {
+                                throw new AssertionError();
+                            },
+                            LinkedHashMap::new
+                    ));
+            this.movieStats=sorted;
+        }
+
+       /* public List<Integer> getSortedDailyStats(){
+            return dailyStats.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+                    .map(e->e.getValue()).collect(Collectors.toList());
+        }*/
+
+        public long getAmtShows() {
+            return amtShows;
+        }
+
+        public void setAmtShows(long amtShows) {
+            this.amtShows=amtShows;
+        }
+
+        public long getAmtMovies() {
+            return amtMovies;
+        }
+
+        public void setAmtMovies(long amtMovies) {
+            this.amtMovies=amtMovies;
+        }
+
+        public long getAmtSeats() {
+            return amtSeats;
+        }
+
+        public void setAmtSeats(long amtSeats) {
+            this.amtSeats=amtSeats;
+        }
+
+        public long getAmtWatchedMins() {
+            return amtWatchedMins;
+        }
+
+        public void setAmtWatchedMins(long amtWatchedMins) {
+            this.amtWatchedMins=amtWatchedMins;
+        }
+
+        public long getIncome() {
+            return income;
+        }
+
+        public void setIncome(long income) {
+            this.income=income;
+        }
+    }
+
 
     public static class MovieStats {
         private long movId=-1;

@@ -1,10 +1,10 @@
 package com.phil.movieland.rest.controller;
 
-import com.phil.movieland.rest.request.BetweenDatesRequest;
-import com.phil.movieland.rest.request.GenerateRequest;
+import com.phil.movieland.data.entity.IntermediateStatistic;
+import com.phil.movieland.rest.request.GenerateShowRequest;
 import com.phil.movieland.rest.request.GenerateReservationRequest;
 import com.phil.movieland.rest.service.StatisticsService;
-import com.phil.movieland.tasks.TaskService;
+import com.phil.movieland.rest.tasks.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 @RestController
@@ -34,8 +36,11 @@ public class StatisticsController {
         this.taskService=taskService;
     }
 
+    /**
+     * Post Generation execution to ThreadPool and return task reference
+     */
     @PostMapping("/shows")
-    public ResponseEntity<?> generateShows(@RequestBody GenerateRequest generateRequest) throws URISyntaxException {
+    public ResponseEntity<?> generateShows(@RequestBody GenerateShowRequest generateRequest) throws URISyntaxException {
         Date start=getDateFormDayStartOrEnd(generateRequest.getFrom(), true);
         Date end=getDateFormDayStartOrEnd(generateRequest.getUntil(), false);
         if(start.after(end)) {
@@ -54,6 +59,9 @@ public class StatisticsController {
                 .body("Posted GenerateShows Task (taskId: " + taskId + ")");
     }
 
+    /**
+     * Post Generation execution to ThreadPool and return task reference
+     */
     @PostMapping("/reservations")
     public ResponseEntity<?> generateReservations(@RequestBody GenerateReservationRequest resRequest) throws URISyntaxException {
         Date start=getDateFormDayStartOrEnd(resRequest.getFrom(), true);
@@ -107,6 +115,21 @@ public class StatisticsController {
             return 0.0;
         }
         return statisticsService.calculateIncomeBetween(start, end);
+    }
+
+    @GetMapping("/inter")
+    public List<IntermediateStatistic> getIntermediates(
+            @DateTimeFormat(pattern="yyyy-MM-dd")
+            @RequestParam(value="from") Date from
+            , @DateTimeFormat(pattern="yyyy-MM-dd")
+            @RequestParam(value="until") Date until) throws URISyntaxException {
+        Date start=getDateFormDayStartOrEnd(from, true);
+        Date end=getDateFormDayStartOrEnd(until, false);
+        if(start.after(end)) {
+            return new ArrayList<>();
+        }
+        List<IntermediateStatistic> inter=statisticsService.getIntermediates(start, end);
+        return inter;
     }
 
     @PreAuthorize("hasRole('ADMIN')")

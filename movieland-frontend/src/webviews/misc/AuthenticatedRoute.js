@@ -4,34 +4,33 @@ import AuthenticationService from "../../service/AuthenticationService";
 import history from "../../history";
 
 /** Redirects to login if not authenticated*/
-class AuthenticatedRoute extends Component {
-    constructor(props) {
-        super(props);
-        this.checkAdmin = props.admin;
-    }
+class AuthenticatedRoute extends Route {
+
 
     /**Immediately redirect to login page if not logged in or Layout required*/
-    componentDidMount() {
-        if (!AuthenticationService.isUserLoggedIn()) {
-            console.log("path: " + this.props.computedMatch.params.showId);
-            let path = this.props.path;
-            if (Object.keys(this.props.computedMatch.params).length > 0) {
-                path = this.parseMatchParams(path, this.props.computedMatch.params)
-            }
-            history.push({
-                pathname: "/login", state: {
-                    previous: path,
-                    msg: "Must be logged in to access"
-                }
-            });
-        } else if (this.checkAdmin && !AuthenticationService.isAdmin()) {
-            history.push({
-                pathname: "/login", state: {
-                    previous: this.props.path,
-                    msg: "Must be logged in as Layout to access!"
-                }
-            });
-        }
+    componentWillMount() {
+        console.log("Cancelling Axios");
+        AuthenticationService.cancelAllAxios();
+        /* if (!AuthenticationService.isUserLoggedIn()) {
+             console.log("path: " + this.props.computedMatch.params.showId);
+             let path = this.props.path;
+             if (Object.keys(this.props.computedMatch.params).length > 0) {
+                 path = this.parseMatchParams(path, this.props.computedMatch.params)
+             }
+             history.push({
+                 pathname: "/login", state: {
+                     previous: path,
+                     msg: "Must be logged in to access"
+                 }
+             });
+         } else if (this.checkAdmin && !AuthenticationService.isAdmin()) {
+             history.push({
+                 pathname: "/login", state: {
+                     previous: this.props.path,
+                     msg: "Must be logged in as Layout to access!"
+                 }
+             });
+         }*/
     }
 
     /** Replace path match params with values (e.g showId)*/
@@ -46,12 +45,9 @@ class AuthenticatedRoute extends Component {
     }
 
     render() {
-        if (AuthenticationService.isUserLoggedIn()) {
-            return <Route {...this.props} />
-        } else {
-            return (<div>Empty</div>);
-        }
+        return <Route {...this.props} />
     }
+
 }
 
 export default AuthenticatedRoute

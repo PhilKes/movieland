@@ -53,12 +53,22 @@
     margin-left: auto;
     margin-right: auto;
     width: 100%;
-    min-width: 24px;
-    min-height: 24px;
-    max-width: 28px;
+  min-width: 3vw;
+  min-height: 3vw;
+  max-width: 3vw;
+  max-height: 3vw;
     border-top-left-radius: 40%;
     border-top-right-radius: 40%;
     background-color: darkgrey;
+}
+
+@media only screen and (min-width: 600px) {
+  .seatimg {
+    min-width: 24px;
+    min-height: 24px;
+    max-width: 24px;
+    max-height: 24px;
+  }
 }
 
 
@@ -69,9 +79,8 @@
 
 .seatTable {
     table-layout: fixed;
-    position: relative;
-    left: 50%;
-    min-width: 410px;
+  //position: relative;
+  min-width: 22vw;
 }
 
 #screen {
@@ -80,8 +89,8 @@
 }
 
 #room {
-    width: 50%;
-    min-width: 364px;
+  //width: 50%;
+  //min-width: 364px;
 }
 
 .reserved {
@@ -108,6 +117,7 @@
 }
 .showtime-item{
     font-size: 12pt;
+  border: none;
 }
 
 .nav-link{

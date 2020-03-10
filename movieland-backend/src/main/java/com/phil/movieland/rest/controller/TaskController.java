@@ -1,10 +1,8 @@
 package com.phil.movieland.rest.controller;
 
-import com.phil.movieland.rest.request.BetweenDatesRequest;
-import com.phil.movieland.rest.request.GenerateRequest;
 import com.phil.movieland.rest.service.StatisticsService;
-import com.phil.movieland.tasks.TaskProgress;
-import com.phil.movieland.tasks.TaskService;
+import com.phil.movieland.rest.tasks.TaskProgress;
+import com.phil.movieland.rest.tasks.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -37,7 +33,10 @@ public class TaskController {
     @GetMapping("/{taskId}")
     public TaskProgress getTaskProgress(@PathVariable(value="taskId") Integer taskId) {
         //TODO DELETE taskId if completed
-        return taskService.getTaskProgress(taskId);
+        TaskProgress progress=taskService.getTaskProgress(taskId);
+        //if(progress.getProgress().intValue()==progress.getProgressMax().intValue())
+        //    taskService.removeTask(taskId);
+        return progress;
     }
 
     @PreAuthorize("hasRole('ADMIN')")

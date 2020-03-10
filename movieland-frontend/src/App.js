@@ -14,6 +14,15 @@ class App extends Component {
         this.navBar = React.createRef();
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        console.log("Cancelling Axios");
+        AuthenticationService.cancelAllAxios();
+    }
+
+    componentWillMount() {
+
+    }
+
     /** Notify navbar if loggedIn user changed*/
     setUserLogin(loggedIn, currUser) {
         this.navBar.current.setLoggedIn(loggedIn, currUser);

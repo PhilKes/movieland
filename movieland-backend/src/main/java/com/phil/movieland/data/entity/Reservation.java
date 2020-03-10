@@ -18,6 +18,12 @@ public class Reservation {
     @Column(name="USER_ID")
     private long userId;
 
+    @Column(name="VALIDATED")
+    private boolean validated=false;
+
+    @Column(name="TOTAL_SUM")
+    private Double totalSum;
+
     public long getResId() {
         return resId;
     }
@@ -40,5 +46,21 @@ public class Reservation {
 
     public void setUserId(long userId) {
         this.userId=userId;
+    }
+
+    public boolean isValidated() {
+        return validated;
+    }
+
+    public void setValidated(boolean validated) {
+        this.validated=validated;
+    }
+
+    public Double getTotalSum() {
+        return totalSum;
+    }
+
+    public void setTotalSum(Double totalSum) {
+        this.totalSum=totalSum;
     }
 }
