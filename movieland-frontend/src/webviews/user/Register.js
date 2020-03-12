@@ -1,20 +1,21 @@
-import React, {Component} from 'react'
+import React from 'react'
 import {Col, Row} from "reactstrap";
 import axios from "axios";
 import {Grid} from "react-bootstrap";
-import FormInputs from "../components/FormInputs/FormInputs";
-import CustomButton from "../components/CustomButton/CustomButton";
-import Card from "../components/Card/Card";
+import FormInputs from "../../components/FormInputs/FormInputs";
+import CustomButton from "../../components/CustomButton/CustomButton";
+import Card from "../../components/Card/Card";
 import Loader from "react-loader-spinner";
+import MountedComponent from "../misc/MountedComponent";
 
 /** /register
  * Register page*/
-class Register extends Component {
+class Register extends MountedComponent {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             isRegistering: false
-        }
+        };
         document.title = "MovieLand Register";
     }
 

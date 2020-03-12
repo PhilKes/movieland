@@ -1,14 +1,15 @@
-import React, {Component, useState} from 'react';
-import {Collapse, Container, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink} from 'reactstrap';
+import React from 'react';
+import {Container} from 'reactstrap';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner';
-/** Navigation Bar ,sticky on top*/
-export default class LoadingPage extends Component {
+import MountedComponent from "./MountedComponent";
+
+/** LoadingPage if Fetching data from Server*/
+export default class LoadingPage extends MountedComponent {
 
     constructor(props) {
         super(props);
         this.state = {message: ""};
-        //TODO SHOW PROGRESS?
     }
 
 

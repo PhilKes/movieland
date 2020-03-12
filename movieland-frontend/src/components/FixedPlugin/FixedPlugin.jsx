@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserReservation React - v1.3.0
+* Light Bootstrap ReservationValidation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -16,7 +16,7 @@
 
 */
 /*eslint-disable*/
-import React, { Component } from "react";
+import React, {Component} from "react";
 import Toggle from "react-toggle";
 
 import imagine1 from "assets/img/sidebar-1.jpg";

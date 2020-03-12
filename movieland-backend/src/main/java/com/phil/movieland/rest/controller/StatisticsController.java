@@ -1,8 +1,8 @@
 package com.phil.movieland.rest.controller;
 
 import com.phil.movieland.data.entity.IntermediateStatistic;
-import com.phil.movieland.rest.request.GenerateShowRequest;
 import com.phil.movieland.rest.request.GenerateReservationRequest;
+import com.phil.movieland.rest.request.GenerateShowRequest;
 import com.phil.movieland.rest.service.StatisticsService;
 import com.phil.movieland.rest.tasks.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,8 +153,8 @@ public class StatisticsController {
     @DeleteMapping("/statistics")
     public ResponseEntity<?> deleteStatistics(
             @DateTimeFormat(pattern="yyyy-MM-dd")
-            @RequestParam(value="from") Date from
-            , @DateTimeFormat(pattern="yyyy-MM-dd")
+            @RequestParam(value="from") Date from,
+            @DateTimeFormat(pattern="yyyy-MM-dd")
             @RequestParam(value="until") Date until) {
         Date start=getDateFormDayStartOrEnd(from, true);
         Date end=getDateFormDayStartOrEnd(until, false);

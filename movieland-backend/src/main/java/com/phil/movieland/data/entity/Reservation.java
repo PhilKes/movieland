@@ -1,5 +1,7 @@
 package com.phil.movieland.data.entity;
 
+import com.phil.movieland.rest.request.ReservationValidationRequest;
+
 import javax.persistence.*;
 
 
@@ -23,6 +25,12 @@ public class Reservation {
 
     @Column(name="TOTAL_SUM")
     private Double totalSum;
+
+    @Column(name="METHOD")
+    private ReservationValidationRequest.PaymentMethod method=ReservationValidationRequest.PaymentMethod.CASH;
+
+    @Column(name="CASHIER_ID")
+    private Long cashierId;
 
     public long getResId() {
         return resId;
@@ -62,5 +70,21 @@ public class Reservation {
 
     public void setTotalSum(Double totalSum) {
         this.totalSum=totalSum;
+    }
+
+    public ReservationValidationRequest.PaymentMethod getMethod() {
+        return method;
+    }
+
+    public void setMethod(ReservationValidationRequest.PaymentMethod method) {
+        this.method=method;
+    }
+
+    public Long getCashierId() {
+        return cashierId;
+    }
+
+    public void setCashierId(Long cashierId) {
+        this.cashierId=cashierId;
     }
 }

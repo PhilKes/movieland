@@ -1,24 +1,17 @@
 import React from 'react';
-import {
-    Button,
-    ListGroup,
-    ListGroupItem,
-    ButtonGroup,
-} from 'reactstrap';
+import {Button, ListGroup, ListGroupItem,} from 'reactstrap';
 import Moment from "moment";
-import {Link} from "react-router-dom";
-import {faSearch, faClock} from "@fortawesome/free-solid-svg-icons";
+import {faClock, faSearch} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import {Col, Grid,Row, Modal} from "react-bootstrap";
-import {InputGroup} from "react-bootstrap";
+import {Col, Grid, InputGroup, Modal, Row} from "react-bootstrap";
 import InputGroupAddon from "react-bootstrap/lib/InputGroupAddon";
 import InputGroupText from "reactstrap/lib/InputGroupText";
-import InputGroupButton from "react-bootstrap/lib/InputGroupButton";
 import Input from "reactstrap/lib/Input";
+import MountedComponent from "../misc/MountedComponent";
 
 /** Modal for adding a new MovieShow with movieId + time*/
-export default class MovieShowModal extends React.Component {
+export default class MovieShowModal extends MountedComponent {
 
     constructor(props) {
         super(props);
@@ -30,6 +23,7 @@ export default class MovieShowModal extends React.Component {
     }
 
     componentDidMount() {
+        super.componentDidMount();
         this.setState({isLoading: true});
 
         axios.get('/api/movies')

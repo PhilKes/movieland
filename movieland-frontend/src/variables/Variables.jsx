@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserReservation React - v1.3.0
+* Light Bootstrap ReservationValidation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -601,6 +601,11 @@ var legendBar = {
   types: ["info", "danger"]
 };
 
+var seat_types = ["ADULT", "STUDENT", "CHILD", "DISABLED"];
+var seat_prices = [7.00, 6.00, 5.50, 5.50];
+
+var payment_methods = ["CASH", "DEBITCARD", "PAYPAL"];
+
 module.exports = {
   style, // For notifications (App container and Notifications view)
   thArray,
@@ -615,5 +620,8 @@ module.exports = {
   dataBar,
   optionsBar,
   responsiveBar,
-    legendBar // For charts (UserReservation view)
+    legendBar, // For charts (ReservationValidation view)
+    seat_prices,
+    seat_types,
+    payment_methods
 };

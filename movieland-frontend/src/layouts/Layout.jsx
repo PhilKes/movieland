@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserReservation React - v1.3.0
+* Light Bootstrap ReservationValidation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -15,22 +15,17 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { Component } from "react";
-import {Redirect, Route, Switch} from "react-router-dom";
+import React, {Component} from "react";
+import {Route, Switch} from "react-router-dom";
 import NotificationSystem from "react-notification-system";
 import TopNavbar from "../components/Navbars/TopNavbar";
-import Footer from "../components/Footer/Footer";
 import Sidebar from "../components/Sidebar/Sidebar";
 
-import { style } from "../variables/Variables.jsx";
-
-
-import image from "../assets/img/sidebar-3.jpg";
+import {style} from "../variables/Variables.jsx";
 import AuthenticationService from "../service/AuthenticationService";
-import {adminRoutes, userRoutes} from "../routes";
+import {adminRoutes, cashierRoutes, userRoutes} from "../routes";
 import {loggedInActions, loggedOutActions, otherActions} from "../userActions";
 import history from "../history";
-import AuthenticatedRoute from "../webviews/misc/AuthenticatedRoute";
 
 /** Basic Layout for all Pages*/
 class Layout extends Component {
@@ -134,7 +129,8 @@ class Layout extends Component {
     /** Reaload user/admin routes and actions if loggedin changes*/
     setLoggedIn(loggedIn) {
         let isAdmin = loggedIn && AuthenticationService.isAdmin();
-        this.routes = isAdmin ? adminRoutes : userRoutes;
+        let isCashier = loggedIn && AuthenticationService.isCashier();
+        this.routes = isAdmin ? adminRoutes : isCashier ? cashierRoutes : userRoutes;
         this.actions = loggedIn ? loggedInActions : loggedOutActions;
         this.setState({loggedIn: loggedIn, isAdmin: isAdmin});
     }
@@ -164,7 +160,7 @@ class Layout extends Component {
                             Phil Kes
                         </a>
 
-                        <div className="py-2">All Movie details, images from{" "}
+                        <div className="py-2">Movie details from{" "}
                             <a href="https://www.themoviedb.org/" target="_blank">TMDB</a>
                             , Template by{' '}
                             <a href="http://www.creative-tim.com?ref=lbr-footer">

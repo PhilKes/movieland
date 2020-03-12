@@ -1,31 +1,24 @@
-import React, {Component} from 'react';
-import {
-    Button,
-    Container,
-    Table,
-    Input,
-    FormGroup, Label, InputGroup, InputGroupAddon, Form
-} from 'reactstrap';
+import React from 'react';
+import {Button, Form, FormGroup, Input, InputGroup, InputGroupAddon, Label, Table} from 'reactstrap';
 import MovieShowModal from "../../modal/MovieShowModal";
 import Moment from 'moment';
 import {faMinusCircle} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import ErrorPage from "../../misc/ErrorPage";
-import LoadingPage from "../../misc/LoadingPage";
 import {Col, Grid, Row} from "react-bootstrap";
 import ReactCard from "../../../components/Card/Card";
 import CustomButton from "../../../components/CustomButton/CustomButton";
 import * as queryString from "query-string";
-import ScrollToTop from 'react-scroll-up';
+import {dateToString} from "../../../variables/Util";
+import LoadingComponent from "../../misc/LoadingComponent";
 
 /** /shows page
  * Shows MovieShows by Date + ADD/REMOVE Shows*/
-class MovieShowList extends Component {
+class MovieShowList extends LoadingComponent {
 
     constructor(props) {
         super(props);
-        this.state = {shows: [], isLoading: true, timedout: false};
+        this.state = {...this.state, shows: []};
         this.remove = this.remove.bind(this);
         this.searchQuery = "";
         this.params = new URLSearchParams(this.props.location.search);
@@ -35,13 +28,14 @@ class MovieShowList extends Component {
 
     /** Initial load all shows*/
     componentDidMount() {
+        super.componentDidMount();
         this.params = new URLSearchParams(this.props.location.search);
 
         this.dateParam = this.params.get('date');
         document.title = "Manage Shows";
-        this.setState({isLoading: true});
+        this.setLoading(true);
         if (this.dateParam == null || this.dateParam.length < 9) {
-            this.dateParam = Moment().format("YYYY-MM-DD");
+            this.dateParam = dateToString(Moment());
             this.updateDateParam();
         }
         this.updateShowList()
@@ -52,7 +46,7 @@ class MovieShowList extends Component {
     changeDate(date) {
         this.dateParam = date.target.value;
         if (this.dateParam.length < 9) {
-            this.dateParam = Moment().format("YYYY-MM-DD");
+            this.dateParam = dateToString(Moment());
         }
         this.updateDateParam();
         this.updateShowList();
@@ -62,6 +56,7 @@ class MovieShowList extends Component {
     updateDateParam() {
         console.log("Changed Date to" + this.dateParam);
         let newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?date=' + this.dateParam;
+        //TODO use history?
         window.history.pushState({path: newurl}, '', newurl);
         console.log("Date: " + this.dateParam);
     }
@@ -78,7 +73,8 @@ class MovieShowList extends Component {
                 let ids = shows.map(show => show.movId).filter(distinct);
                 this.setState({shows: shows});
                 if (ids.length < 1) {
-                    this.setState({isLoading: false, movies: []});
+                    this.setState({movies: []});
+                    this.setLoading(false);
                     return;
                 }
                 axios.get('/api/movies/ids', {
@@ -89,11 +85,11 @@ class MovieShowList extends Component {
                         return queryString.stringify(params)
                     }
                 }).then(resp => {
-
-                    this.setState({movies: resp.data, isLoading: false});
+                    this.setState({movies: resp.data});
+                    this.setLoading(false);
                 });
             })
-            .catch(err => this.setState({timedout: true}));
+            .catch(err => this.setTimedOut(true));
     }
 
     /** Remove movie with movieid=id */
@@ -147,14 +143,11 @@ class MovieShowList extends Component {
     }
 
     render() {
-        const {shows, movies, isLoading, timedout} = this.state;
-        if (timedout) {
-            return <ErrorPage/>
-        }
-        if (isLoading) {
-            return <LoadingPage/>;
-        }
+        let loading = super.render();
+        if (loading)
+            return loading;
 
+        const {shows, movies} = this.state;
         /** Generate table rows for each movie containing its shows on dateParam*/
         let movieKeys=Object.keys(movies);
         const movieList = movieKeys.map(id => {

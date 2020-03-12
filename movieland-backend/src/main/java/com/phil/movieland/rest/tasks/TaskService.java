@@ -40,10 +40,13 @@ public class TaskService {
 
     /** Return current Progress of Task*/
     public TaskProgress getTaskProgress(int taskId) {
-        if(taskId>taskList.size()) {
+        if(taskId >= taskList.size()) {
             return null;
         }
         RunnableWithProgress task=taskList.get(taskId);
+        if(task==null) {
+            return null;
+        }
         return new TaskProgress(task.getProgressMax(), task.getProgress(), taskId, null);
     }
 

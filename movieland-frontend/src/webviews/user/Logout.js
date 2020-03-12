@@ -1,9 +1,10 @@
-import React, {Component} from 'react'
+import React from 'react'
 import {Container} from "reactstrap";
+import MountedComponent from "../misc/MountedComponent";
 
 /** /logout page Component
  *  Logout */
-class Logout extends Component {
+class Logout extends MountedComponent {
     constructor(props) {
         super(props);
         this.state = {}
@@ -12,6 +13,7 @@ class Logout extends Component {
 
     /** Immediately trigger Logout -> onAction prop in Layout*/
     componentDidMount() {
+        super.componentDidMount();
         this.props.onAction("Logout");
     }
 

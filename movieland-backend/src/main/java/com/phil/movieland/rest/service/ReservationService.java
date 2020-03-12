@@ -9,7 +9,9 @@ import com.phil.movieland.data.repository.SeatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReservationService {
@@ -24,6 +26,9 @@ public class ReservationService {
     }
 
 
+    public Reservation updateReservation(Reservation reservation) {
+        return reservationRepository.save(reservation);
+    }
     public Reservation saveReservation(Reservation reservation, List<Seat> seats) {
         /** Check if seats are already taken*/
         List<Reservation> reservations=reservationRepository.findAllByShowId(reservation.getShowId());
@@ -63,6 +68,10 @@ public class ReservationService {
 
     public List<Seat> getAllSeatsOfShow(Long showId) {
         return seatRepository.findSeatsOfShow(showId);
+    }
+
+    public Optional<Reservation> getReservationById(Long resId) {
+        return reservationRepository.findById(resId);
     }
 
 

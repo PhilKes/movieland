@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserReservation React - v1.3.0
+* Light Bootstrap ReservationValidation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -15,15 +15,13 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { Component } from "react";
-import { Navbar } from "react-bootstrap";
+import React, {Component} from "react";
+import {Navbar} from "react-bootstrap";
 
 import NavbarLinks from "./NavbarLinks.jsx";
 
 import logo from "../../assets/img/movie_land_icon.png";
 import menuIcon from "../../assets/img/menu.svg";
-import Sidebar from "../Sidebar/Sidebar";
-import {loggedInActions, loggedOutActions} from "../../userActions";
 
 /** Top Navbar / showing sidebar on toggle*/
 class TopNavbar extends Component {

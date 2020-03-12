@@ -1,51 +1,39 @@
-import React, {Component} from 'react';
-import {
-    ButtonGroup,
-    Table,
-    ListGroupItem,
-    ListGroup, Button
-} from 'reactstrap';
+import React from 'react';
+import {Button, ButtonGroup, ListGroup, ListGroupItem, Table} from 'reactstrap';
 import Moment from 'moment';
 import axios from "axios";
-import ErrorPage from "./misc/ErrorPage";
-import LoadingPage from "./misc/LoadingPage";
 import * as queryString from "query-string";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEye, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
-import TrailerModal from "./modal/TrailerModal";
-import {Grid, Row, Col} from "react-bootstrap";
-import ReactCard from "../components/Card/Card";
-import CustomButton from "../components/CustomButton/CustomButton";
-import {Carousel} from "react-bootstrap";
-import Scrollchor from 'react-scrollchor';
-import {Link} from "react-router-dom";
+import {faInfoCircle} from "@fortawesome/free-solid-svg-icons";
+import TrailerModal from "../modal/TrailerModal";
+import {Carousel, Col, Grid, Row} from "react-bootstrap";
+import ReactCard from "../../components/Card/Card";
 import InfiniteLoader from "react-infinite-loader";
-import Loader from "react-loader-spinner";
+import LoadingComponent from "../misc/LoadingComponent";
 
 /** /movies page Component
  * Shows current Movies/Shows of the week*/
-class MovieList extends Component {
+class MovieList extends LoadingComponent {
 
     constructor(props) {
         super(props);
         this.state = {
+            ...this.state,
             page: 0,
             moviePage: {movies: [], hasMore: true},
             shows: [],
-            isLoading: true,
-            error: "",
-            timedout: false,
         };
     }
 
     /** Initial load all Shows with Movies*/
     componentDidMount() {
-        this.setState({isLoading: true});
+        super.componentDidMount();
         document.title = "MovieLand Movies";
         axios.get('/api/movies/page/' + this.state.page)
             .then(res => {
                 let hasMore = res.headers.hasmore === 'true';
-                this.setState({moviePage: {movies: res.data, hasMore: hasMore}, isLoading: true});
+                this.setState({moviePage: {movies: res.data, hasMore: hasMore}});
+                this.setLoading(true);
                 //this.getShows();
                 let ids = res.data.slice(0, 5).map(movie => movie.tmdbId);
 
@@ -63,11 +51,13 @@ class MovieList extends Component {
                           return m;
                       });
                       this.getShows();
-                      this.setState({movies: data, isLoading: true});
+                    this.setState({movies: data});
+                    this.setLoading(true);
+
                 })
                 //
             })
-            .catch(err => this.setState({timedout: true}))
+            .catch(err => this.setTimedOut(true))
         ;
     }
 
@@ -86,10 +76,10 @@ class MovieList extends Component {
                 let movies = this.state.moviePage.movies;
                 res.data.forEach(movie => movies.push(movie));
                 //this.getShows();
-                this.setState({moviePage: {movies: movies, hasMore: hasMore}, isLoading: false});
+                this.setState({moviePage: {movies: movies, hasMore: hasMore}});
 
             })
-            .catch(err => this.setState({timedout: true}))
+            .catch(err => this.setTimedOut(true))
         ;
         // }
 
@@ -124,7 +114,8 @@ class MovieList extends Component {
                     }
                     //console.log("Mov:" + movId + " on:" + day + " at:" + time + " Show: " + movieShows[movId][day][time]);
                 });
-                this.setState({shows: movieShows, isLoading: false});
+                this.setState({shows: movieShows});
+                this.setLoading(false);
             })
         /* .catch(err => {
              console.log("Get shows failed")
@@ -136,13 +127,12 @@ class MovieList extends Component {
 
     /** Render List of Movies with Shows this week*/
     render() {
-        const {moviePage, isLoading, error, timedout, shows} = this.state;
-        if (timedout) {
-            return <ErrorPage/>
-        }
-        if (isLoading) {
-            return <LoadingPage/>;
-        }
+        let loading = super.render();
+        if (loading)
+            return loading;
+
+        const {moviePage, shows} = this.state;
+
         moviePage.movies.forEach(m => m.src = m.movId);
         const moviesDisplayed = moviePage.movies.slice(0, 5);
         const showcaseList = moviesDisplayed.map(movie => {
@@ -161,8 +151,6 @@ class MovieList extends Component {
                 </Carousel.Caption>
             </Carousel.Item>)
         });
-
-
         const movieList = moviePage.movies.map(movie => {
             if (shows[movie.movId] == null) {
                 return <Row key={movie.movId}/>;

@@ -1,46 +1,45 @@
-import React, {Component} from 'react'
-import {Col, Container, Row} from "reactstrap";
+import React from 'react'
+import {Col, Row} from "reactstrap";
 import axios from "axios";
-import LoadingPage from "./misc/LoadingPage";
 import moment from "moment";
 import {Grid} from "react-bootstrap";
-import ErrorPage from "./misc/ErrorPage";
+import LoadingComponent from "../misc/LoadingComponent";
+import QRCode from "qrcode.react";
 
 /** /user/me/reservation/:resId page Component
  *  Shows Reservation QRCode to validate to Info*/
 //TODO PAGE FOR CAHSIERS TO VALIDATE via QRCODE + payment method
-class UserReservation extends Component {
+class UserReservation extends LoadingComponent {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
+            ...this.state,
             resId: this.props.match.params.resId,
             reservation: null,
             movie: null,
             show: null,
-            err: false, // 0=no error, 1= password too short, 2= repeat doesnt match, 3= username taken, 4= missing fields
             user: null,
-            isLoading: true,
         }
     }
 
     /** Fetch User data and Reservations for Shows*/
     componentDidMount() {
+        super.componentDidMount();
         document.title = "UserReservation";
-        this.setState({isLoading: true});
         axios.get('/api/reservation/me/' + this.state.resId)
             .then(res => res.data)
             .then(data => {
                 // Get all Reservations of user
                 this.setState({
                     movie: data.movie, show: data.movieShow,
-                    reservation: data.reservation, qrcode: data.qrcodeURL,
-                    isLoading: false
+                    reservation: data.reservation, qrcode: data.qrcodeURL
                 });
+                this.setLoading(false);
                 document.title = "Reservation for \"" + data.movie.name + "\"";
             })
             .catch(err => {
-                this.setState({isLoading: false, err: true});
-                console.log(err)
+                this.setLoading(false);
+                console.log(err);
                 this.props.showNotification("Fetch Reservation failed: "
                     + (err.response.data.message ? err.response.data.message : "Server is unreachable"), "error", "bc");
             });
@@ -49,24 +48,29 @@ class UserReservation extends Component {
 
     /** Render User Data and Reservations*/
     render() {
-        let {err, reservation, show, movie, qrcode} = this.state;
-        if (this.state.isLoading) {
-            return <LoadingPage/>;
-        }
-        if (this.state.err) {
-            return <ErrorPage/>;
-        }
+        let loading = super.render();
+        if (loading)
+            return loading;
+
+        let {reservation, show, movie, qrcode} = this.state;
+
+        let codeData = {
+            resId: reservation.resId, userId: reservation.userId, showId: reservation.showId,
+            movId: movie.movId
+        };
         return (
             <div className="content">
                 <Grid fluid>
                     <Row>
                         <Col>
                             <div className="whole-height">
-                                <h3>{movie.name}</h3>
+                                <h3><b>{movie.name}</b></h3>
                                 <h3><a href={'/show/' + show.showId}>{moment(show.date).format('DD.MM.YYYY HH:mm')}</a>
                                 </h3>
-                                <h4>Validated: {reservation.validated === true ? 'Yes' : 'No'}</h4><br/>
-                                <img src={qrcode}/>
+                                <h3><b>Code</b>: {reservation.resId}</h3>
+                                <h3><b>Total</b>: {reservation.totalSum.toFixed(2)} $</h3>
+                                <h4><b>Validated</b>: {reservation.validated === true ? 'Yes' : 'No'}</h4><br/>
+                                <QRCode value={JSON.stringify(codeData)} size={256} level={'H'}/>
                             </div>
                         </Col>
                     </Row>

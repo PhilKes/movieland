@@ -5,13 +5,19 @@ import YouTube from "react-youtube";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faVideo} from "@fortawesome/free-solid-svg-icons";
 import {Modal} from "react-bootstrap";
+import LoadingComponent from "../misc/LoadingComponent";
 
 /** Modal for watching Trailer from youtube*/
-export default class TrailerModal extends React.Component {
+export default class TrailerModal extends LoadingComponent {
 
     constructor(props) {
         super(props);
-        this.state = {modal: false, movId: props.movId, ytId: -1, isLoading: true};
+        this.state = {
+            ...this.state,
+            modal: false,
+            movId: props.movId,
+            ytId: -1
+        };
         this.toggle = this.toggle.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.setWrapperRef = this.setWrapperRef.bind(this);
@@ -29,13 +35,15 @@ export default class TrailerModal extends React.Component {
 
     /** Fetch Trailer URL (YouTube)*/
     componentDidMount() {
+        super.componentDidMount();
         axios.get('/api/movie/trailer/' + this.state.movId)
             .then(res => res.data)
             .then(trailerId => {
-                this.setState({ytId: trailerId, isLoading: false})
+                this.setState({ytId: trailerId});
+                this.setLoading(false);
             })
             .catch(err => {
-                this.setState({isLoading: true})
+                this.setLoading(true);
             });
     }
 
@@ -62,7 +70,7 @@ export default class TrailerModal extends React.Component {
         };
         return (
             <div ref={this.setWrapperRef}>
-                <Button color="light" style={{flex: 1}} onClick={this.toggle}>
+                <Button color="primary" style={{flex: 2}} onClick={this.toggle}>
                     <FontAwesomeIcon icon={faVideo}/>
                 </Button>
                 <Modal show={this.state.modal} className="modal-trailer"  onRequestClose={this.toggle}>

@@ -1,24 +1,21 @@
-import React, {Component} from 'react'
-import {Col, Container, Row} from "reactstrap";
+import React from 'react'
+import {Col, Row} from "reactstrap";
 import axios from "axios";
-import LoadingPage from "./misc/LoadingPage";
 import moment from "moment";
 import {Grid} from "react-bootstrap";
-import Card from "../components/Card/Card";
-import {StatsCard} from "../components/StatsCard/StatsCard";
+import {StatsCard} from "../../components/StatsCard/StatsCard";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {NavIcon} from "@trendmicro/react-sidenav";
 import {faTicketAlt} from "@fortawesome/free-solid-svg-icons";
+import LoadingComponent from "../misc/LoadingComponent";
 
 /** /user/me page Component
- *  UserReservation page showing user details, reservations*/
-class UserDashboard extends Component {
+ *  ReservationValidation page showing user details, reservations*/
+class UserDashboard extends LoadingComponent {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
-            err: 0, // 0=no error, 1= password too short, 2= repeat doesnt match, 3= username taken, 4= missing fields
+            ...this.state,
             user: null,
-            isLoading: true,
             reservations: [],
             shows: [],
             movies: {}
@@ -27,6 +24,7 @@ class UserDashboard extends Component {
 
     /** Fetch User data and Reservations for Shows*/
     componentDidMount() {
+        super.componentDidMount();
         document.title = "My Dashboard";
         axios.get('/api/user/me')
             .then(res => res.data)
@@ -65,25 +63,28 @@ class UserDashboard extends Component {
                                 })
                                 axios.all(moviePromises)
                                     .then(() => {
-                                        this.setState({shows: reservationShows, movies: movies, isLoading: false})
+                                        this.setState({shows: reservationShows, movies: movies})
+                                        this.setLoading(false);
                                     })
 
                             });
                     })
             })
+            .catch(err => this.setTimedOut(true));
     }
 
 
     /** Render User Data and Reservations*/
     render() {
-        let {err, user, reservations, shows, movies} = this.state;
-        if (this.state.isLoading) {
-            return <LoadingPage/>;
-        }
+        let loading = super.render();
+        if (loading)
+            return loading;
+
+        let {user, reservations, shows, movies} = this.state;
         let reservationList = reservations.map(res => {
             let show = shows[res.resId];
             let movie = movies[show.movId];
-            console.log(movie)
+            console.log(movie);
             return (
                 <Col lg={3} sm={6} key={res.resId}>
                     <StatsCard
@@ -91,8 +92,9 @@ class UserDashboard extends Component {
                                                                               className="img-fluid small-fluid"/></a>}
                         statsText={<a href={"me/reservation/" + res.resId}>"{movie.name}"
                             on {moment(show.date).format("dd DD.MM.YYYY HH:mm")}h</a>}
+                        statsValue={res.totalSum.toFixed(2) + '$'}
                         statsIcon={<FontAwesomeIcon icon={faTicketAlt}/>}
-                        statsIconText={res.validate === true ? "Validated" : "Not Validated yet"}
+                        statsIconText={res.validated === true ? "Validated" : "Not Validated yet"}
                     />
                 </Col>
 

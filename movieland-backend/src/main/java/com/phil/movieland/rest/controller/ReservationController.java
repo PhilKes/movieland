@@ -6,6 +6,7 @@ import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.rest.request.ReservationRequest;
+import com.phil.movieland.rest.request.ReservationValidationRequest;
 import com.phil.movieland.rest.service.MovieService;
 import com.phil.movieland.rest.service.MovieShowService;
 import com.phil.movieland.rest.service.ReservationService;
@@ -15,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -36,15 +36,27 @@ public class ReservationController {
         this.movieShowService=movieShowService;
     }
 
+    @PreAuthorize("hasRole('CASHIER')")
     @GetMapping("/reservations")
     public List<?> getReservations() {
         List<Reservation> userReservations=reservationService.getAllReservations();
         return userReservations;
     }
 
+    //TODO Do not expose other reservation to user
     @GetMapping("/reservations/show/{showId}")
     List<Reservation> getReservationsofShow(@PathVariable Long showId) {
         return reservationService.getAllReservationsOfShow(showId);
+    }
+
+    @PreAuthorize("hasRole('CASHIER')")
+    @GetMapping("/reservation/{resId}")
+    public ResponseEntity<?> getReservation(@PathVariable(name="resId") Long resId) {
+        Optional<Reservation> reservation=reservationService.getReservationById(resId);
+        if(reservation.isEmpty()) {
+            return ResponseEntity.badRequest().body("Reservation not found");
+        }
+        return ResponseEntity.ok(reservation.get());
     }
 
     @PostMapping("/reservation")
@@ -58,6 +70,26 @@ public class ReservationController {
             return ResponseEntity.badRequest()
                     .body("Seats already taken!");
         }
+        return ResponseEntity.created(new URI("/api/reservation/" + result.getResId()))
+                .body(result);
+    }
+
+    //TODO Cashier Page to scan and validate Reservations
+    @PreAuthorize("hasRole('CASHIER')")
+    @PostMapping("/reservation/validate")
+    public ResponseEntity<?> postReservationValidation(@RequestBody ReservationValidationRequest reservationRequest,
+                                                       @CurrentUser UserPrincipal cashierUser) throws URISyntaxException {
+        Optional<Reservation> reservation=reservationService.getReservationById(reservationRequest.getResId());
+        if(reservation.isEmpty()) {
+            return ResponseEntity.badRequest().body("Reservation for Validation not found");
+        }
+        reservationRequest.setCashierId(cashierUser.getId());
+        reservation.get().setValidated(reservationRequest.isValidate());
+        reservation.get().setMethod(reservationRequest.getMethod());
+        reservation.get().setCashierId(reservationRequest.getCashierId());
+        System.out.println("Validating Reservation: " + reservation.get().getResId());
+        Reservation result=reservationService.updateReservation(reservation.get());
+
         return ResponseEntity.created(new URI("/api/reservation/" + result.getResId()))
                 .body(result);
     }

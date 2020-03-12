@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserReservation React - v1.3.0
+* Light Bootstrap ReservationValidation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -15,51 +15,48 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, {Component} from "react";
+import React from "react";
 import ChartistGraph from "react-chartist";
-import {Grid, Row, Col} from "react-bootstrap";
+import {Col, Grid, Row} from "react-bootstrap";
 import {Card} from "../../../components/Card/Card.jsx";
 import {StatsCard} from "../../../components/StatsCard/StatsCard.jsx";
 import {Tasks} from "../../../components/Tasks/Tasks.jsx";
 import {
-    responsiveSales,
-    legendSales,
     dataBar,
+    legendBar,
+    legendSales,
     optionsBar,
     responsiveBar,
-    legendBar
+    responsiveSales
 } from "../../../variables/Variables.jsx";
 import axios from "axios";
 import * as queryString from "query-string";
-import LoadingPage from "../../misc/LoadingPage";
 import moment from "moment";
-import {faChartLine, faDollarSign, faEye, faFilm, faHome, faTicketAlt} from "@fortawesome/free-solid-svg-icons";
+import {faDollarSign, faEye, faFilm, faTicketAlt} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import SideNav, {NavItem, NavIcon, NavText} from '@trendmicro/react-sidenav';
-import AuthenticationService from "../../../service/AuthenticationService";
+import {dateToString} from "../../../variables/Util";
+import LoadingComponent from "../../misc/LoadingComponent";
 
 
 /** Dashboard for Admin with Statistics, Managing Users/Movies/Shows*/
-class Summary extends Component {
+class Summary extends LoadingComponent {
     constructor(props) {
         super(props);
         this.state = {
-            isLoading: true,
+            ...this.state,
             dailyStats: null
         }
     }
 
-    //TODO GENERATING TAB
     /** Fetch summary for last 7 Days*/
     componentDidMount() {
-        // console.log("Cancelling Axios");
-        //AuthenticationService.cancelAllAxios();
+        super.componentDidMount();
         document.title = "Dashboard Summary";
         let today = moment();
         axios.get('/api/statistics/summary', {
             params: {
-                until: today.format("YYYY-MM-DD"),
-                from: today.subtract(7, "days").format("YYYY-MM-DD")
+                until: dateToString(today),
+                from: dateToString(today.subtract(7, "days"))
             },
             paramsSerializer: params => {
                 return queryString.stringify(params)
@@ -67,6 +64,8 @@ class Summary extends Component {
         })
             .then(res => res.data)
             .then(summary => {
+                if (!this._isMounted)
+                    return;
                 console.log("daily stats: " + summary.dailyStats);
                 let labelsDaily = [];
                 let seatsSeries = [];
@@ -74,9 +73,9 @@ class Summary extends Component {
                 Object.keys(summary.dailyStats)
                     .sort((k1, k2) => moment(k1).isAfter(moment(k2)) ? 1 : -1)
                     .forEach(date => {
-                        console.log("day: ")
-                        console.log(date)
-                        console.log("Stats:")
+                        console.log("day: ");
+                        console.log(date);
+                        console.log("Stats:");
                         console.log(summary.dailyStats[date]);
                         labelsDaily.push(moment(date, 'YYYY-MM-DD').format("DD.MM"));
                         seatsSeries.push(summary.dailyStats[date]);
@@ -85,7 +84,12 @@ class Summary extends Component {
 
                 let labels = [];
                 let typeSeries = [];
-                Object.keys(summary.seatsDistribution)
+                Object.keys(summary.seatsDistribution).sort((a, b) => {
+                    if (summary.seatsDistribution[a] > summary.seatsDistribution[b])
+                        return -1;
+                    else
+                        return 1;
+                })
                     .forEach(type => {
                         console.log("Type: " + type)
                         console.log(summary.seatsDistribution[type]);
@@ -94,7 +98,6 @@ class Summary extends Component {
                     });
 
                 this.setState({
-                    isLoading: false,
                     income: summary.income,
                     amtShows: summary.amtShows,
                     amtMovies: summary.amtMovies,
@@ -104,8 +107,10 @@ class Summary extends Component {
                     highestMovie: summary.highestGrossingMovie,
                     lowestMovie: summary.lowestGrossingMovie,
                     seatsDistr: {labels: labels, series: typeSeries}
-                })
+                });
+                this.setLoading(false);
             })
+            .catch(err => this.setTimedOut(true));
     }
 
     /** Returns legend for Charts */
@@ -123,11 +128,12 @@ class Summary extends Component {
 
     /** Render Cards with Statistics, Charts,...*/
     render() {
-        if (this.state.isLoading) {
-            return <LoadingPage/>
-        }
+        let loading = super.render();
+        if (loading)
+            return loading;
 
         var optionsVisitorChart = {
+            low: 0,
             showArea: false,
             height: "245px",
             axisX: {

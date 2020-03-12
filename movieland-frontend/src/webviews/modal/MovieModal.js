@@ -1,10 +1,11 @@
 import React from 'react';
-import {Button, ListGroupItem, ListGroup, Input} from 'reactstrap';
+import {Button, Input, ListGroup, ListGroupItem} from 'reactstrap';
 import axios from "axios";
 import {Modal} from "react-bootstrap";
+import MountedComponent from "../misc/MountedComponent";
 
 /** Modal for adding a new Movie by name*/
-export default class MovieModal extends React.Component {
+export default class MovieModal extends MountedComponent {
 
     constructor(props) {
         super(props);
@@ -14,9 +15,6 @@ export default class MovieModal extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    componentDidMount() {
-
-    }
 
     /** Open/Close Modal*/
     toggle() {

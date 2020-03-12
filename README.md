@@ -14,7 +14,9 @@
 * React **User Interface** Webpage (<a href="https://www.creative-tim.com/product/light-bootstrap-dashboard-react" target="_blank">Bootstrap Template</a>)
 * Persistent **Database** for Movies, Shows, User
 * Webpages for User Login/Registration, Reservations
-* Admin Dashboard Page for Statistics, Managing
+* Admin Dashboard Page for Statistics, Managing, Generating
+* Async REST-Tasks interface with Progress
+* QRCode Scanning of Reservation to validate payment
 * Access to <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>
 
 ## Docker

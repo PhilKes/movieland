@@ -7,7 +7,6 @@ import com.phil.movieland.data.repository.SeatRepository;
 import com.phil.movieland.rest.controller.UserController;
 import com.phil.movieland.rest.tasks.RunnableWithProgress;
 import com.phil.movieland.utils.DateUtils;
-import org.hibernate.stat.Statistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
@@ -161,23 +160,18 @@ public class StatisticsService {
                             Seat seat=new Seat();
                             seat.setResId(reservation.getResId());
                             seat.setNumber(freeSeats.remove(0));
-                            int type=rand.nextInt(4);
-                            switch(type) {
-                                case 0:
-                                    seat.setType(Seat.Seat_Type.CHILD);
-                                    break;
-                                case 1:
-                                    seat.setType(Seat.Seat_Type.STUDENT);
-                                    break;
-                                case 2:
-                                    seat.setType(Seat.Seat_Type.ADULT);
-                                    break;
-                                case 3:
-                                    seat.setType(Seat.Seat_Type.DISABLED);
-                                    break;
-                                default:
-                                    seat.setType(Seat.Seat_Type.ADULT);
-                                    break;
+                            int type=rand.nextInt(11);
+                            if(type<=4) {
+                                seat.setType(Seat.Seat_Type.ADULT);
+                            }
+                            else if(type<=7) {
+                                seat.setType(Seat.Seat_Type.STUDENT);
+                            }
+                            else if(type<=9) {
+                                seat.setType(Seat.Seat_Type.CHILD);
+                            }
+                            else {
+                                seat.setType(Seat.Seat_Type.DISABLED);
                             }
                             seatList.add(seat);
                         }
@@ -405,10 +399,10 @@ public class StatisticsService {
             int daySeats=seats.size();
             amtSeats+=daySeats;
             /** Update daily stats*/
-            if(!dailyStats.containsKey(date)) {
+            if(!dailyStats.containsKey(DateUtils.getDateStringFromDate(date))) {
                 dailyStats.put(DateUtils.getDateStringFromDate(date), daySeats);
             }else{
-                dailyStats.put(DateUtils.getDateStringFromDate(date), dailyStats.get(date) + daySeats);
+                dailyStats.put(DateUtils.getDateStringFromDate(date), dailyStats.get(DateUtils.getDateStringFromDate(date)) + daySeats);
             }
             double seatsIncome=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
             income+=seatsIncome;

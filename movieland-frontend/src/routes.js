@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserReservation React - v1.3.0
+* Light Bootstrap ReservationValidation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -16,16 +16,15 @@
 
 */
 import AdminDashboard from "./webviews/admin/AdminDashboard.jsx";
-import UserProfile from "./views/UserProfile.jsx";
-import MovieShow from "./webviews/MovieShow";
-import MovieList from "./webviews/MovieList";
+import MovieShow from "./webviews/user/MovieShow";
+import MovieList from "./webviews/user/MovieList";
 import {
-    faAddressCard, faBolt, faCalendarAlt,
+    faCalendarAlt,
     faChartLine,
     faClipboardList,
-    faFilm, faListUl, faRandom,
-    faThList,
-    faUser, faUsers,
+    faFilm,
+    faTicketAlt,
+    faUsers,
     faVideo
 } from "@fortawesome/free-solid-svg-icons";
 import MovieListEdit from "./webviews/admin/dashboard/MovieListEdit";
@@ -33,6 +32,7 @@ import MovieShowList from "./webviews/admin/dashboard/MovieShowList";
 import Summary from "./webviews/admin/dashboard/Summary";
 import UserListEdit from "./webviews/admin/dashboard/UserListEdit";
 import GenerateStats from "./webviews/admin/dashboard/GenerateStats";
+import ReservationValidation from "./webviews/cashier/ReservationValidation";
 
 /** Defines Routes for Users/Admins*/
 const adminRoutes = [
@@ -89,6 +89,13 @@ const adminRoutes = [
         component: MovieShow,
         show: false,
     },
+    {
+        path: "/reservation/validate",
+        name: "Validation",
+        icon: faTicketAlt,
+        component: ReservationValidation,
+        show: true,
+    },
     /*
   {
     path: "/table",
@@ -110,6 +117,30 @@ const adminRoutes = [
   },*/
 ];
 
+const cashierRoutes = [
+    {
+        path: "/movies",
+        name: "Movies",
+        icon: faFilm,
+        component: MovieList,
+        show: true,
+    },
+    {
+        path: "/reservation/validate",
+        name: "Validation",
+        icon: faTicketAlt,
+        component: ReservationValidation,
+        show: true,
+    },
+    {
+        path: "/show/:showId",
+        name: "Show",
+        icon: faVideo,
+        component: MovieShow,
+        show: false,
+    },
+];
+
 const userRoutes = [
   {
     path: "/movies",
@@ -127,4 +158,4 @@ const userRoutes = [
   },
 ];
 
-export {userRoutes,adminRoutes};
+export {userRoutes, adminRoutes, cashierRoutes};

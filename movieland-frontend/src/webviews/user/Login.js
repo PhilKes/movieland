@@ -1,17 +1,18 @@
-import React, {Component} from 'react'
-import AuthService from "../service/AuthenticationService";
-import history from '../history';
-import AuthenticationService from "../service/AuthenticationService";
+import React from 'react'
+import AuthService from "../../service/AuthenticationService";
+import AuthenticationService from "../../service/AuthenticationService";
+import history from '../../history';
 import {Col, Row} from "reactstrap";
-import CustomButton from "../components/CustomButton/CustomButton";
+import CustomButton from "../../components/CustomButton/CustomButton";
 import {Grid} from "react-bootstrap";
-import Card from "../components/Card/Card";
-import FormInputs from "../components/FormInputs/FormInputs";
+import Card from "../../components/Card/Card";
+import FormInputs from "../../components/FormInputs/FormInputs";
 import Loader from "react-loader-spinner";
+import MountedComponent from "../misc/MountedComponent";
 
 /** /login page Component
  *  Logout Page for JWT Authentication*/
-class Login extends Component {
+class Login extends MountedComponent {
     constructor(props) {
         super(props);
         let msg = null;
@@ -22,14 +23,14 @@ class Login extends Component {
             hasLoginFailed: false,
             msg: msg,
             loggingIn: false
-        }
-        this.loginClicked = this.loginClicked.bind(this)
+        };
+        this.loginClicked = this.loginClicked.bind(this);
 
         document.title = "MovieLand Logout";
     }
 
     componentDidMount() {
-
+        super.componentDidMount();
     }
 
 

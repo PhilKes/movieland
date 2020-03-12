@@ -1,27 +1,23 @@
-import React, {Component} from 'react';
-import {Button, ButtonGroup, Table, Input, Alert} from 'reactstrap';
+import React from 'react';
+import {Alert, Button, ButtonGroup, Input, Table} from 'reactstrap';
 import MovieModal from "../../modal/MovieModal";
 import Moment from 'moment';
 import axios from "axios";
-import ErrorPage from "../../misc/ErrorPage";
-import LoadingPage from "../../misc/LoadingPage";
 import {Col, Grid, Row} from "react-bootstrap";
 import ReactCard from "../../../components/Card/Card";
-import InfiniteScroll from 'react-infinite-scroller';
 import InfiniteLoader from "react-infinite-loader";
+import LoadingComponent from "../../misc/LoadingComponent";
 
 /** /movies/edit page Component
  * Shows Movies + ADD/REMOVE Movies (only for Admins)*/
-class MovieListEdit extends Component {
+class MovieListEdit extends LoadingComponent {
 
     constructor(props) {
         super(props);
         this.state = {
+            ...this.state,
             page: 0,
             moviePage: {movies: [], hasMore: true},
-            isLoading: true,
-            error: "",
-            timedout: false
         };
         this.remove = this.remove.bind(this);
         this.searchQuery = "";
@@ -30,19 +26,20 @@ class MovieListEdit extends Component {
 
     /** Initial load all movies*/
     componentDidMount() {
+        super.componentDidMount();
         document.title = "Manage Movies";
-        this.setState({isLoading: true});
+        this.setLoading(true);
 
         axios.get('/api/movies/page/' + this.state.page)
             .then(res => {
                 console.log(res);
                 let hasMore = res.headers.hasmore === 'true';
                 console.log("hasMore: " + hasMore);
-                this.setState({moviePage: {movies: res.data, hasMore: hasMore}, isLoading: false});
+                this.setState({moviePage: {movies: res.data, hasMore: hasMore}});
+                this.setLoading(false);
 
             })
-            .catch(err => this.setState({timedout: true}))
-        ;
+            .catch(err => this.setTimedOut(true));
         //window.addEventListener('scroll',this.loadMovies,false);
     }
 
@@ -72,16 +69,13 @@ class MovieListEdit extends Component {
                     return axios.get('/api/movies/page/' + this.state.page + '?name=' + this.searchQuery.value)
                         .then(resp => {
                             let hasMore = resp.headers.hasmore === 'true';
-                            this.setState({
-                                moviePage: {movies: resp.data, hasMore: hasMore},
-                                isLoading: false
-                            })
+                            this.setState({moviePage: {movies: resp.data, hasMore: hasMore}});
+                            this.setLoading(false);
                         });
                 })
                 .catch(err => {
                     console.log(err.response.data.msg);
                     this.setState({error: err.response.data.msg});
-
                 });
     }
 
@@ -111,11 +105,11 @@ class MovieListEdit extends Component {
                 console.log("hasMore: " + hasMore);
                 let movies = this.state.moviePage.movies;
                 res.data.forEach(movie => movies.push(movie));
-                this.setState({moviePage: {movies: movies, hasMore: hasMore}, isLoading: false});
+                this.setState({moviePage: {movies: movies, hasMore: hasMore}});
+                this.setLoading(false);
 
             })
-            .catch(err => this.setState({timedout: true}))
-        ;
+            .catch(err => this.setTimedOut(true));
         // }
 
     }
@@ -124,13 +118,12 @@ class MovieListEdit extends Component {
 
     /** Render Movie List with Actions*/
     render() {
-        const {moviePage, isLoading, error, timedout} = this.state;
-        if (timedout) {
-            return <ErrorPage/>
-        }
-        if (isLoading) {
-            return <LoadingPage/>;
-        }
+        let loading = super.render();
+        if (loading)
+            return loading;
+
+        const {moviePage, error} = this.state;
+
         const movieList = moviePage.movies.map(movie => {
             const descript = `${movie.description}`;
             return <tr key={movie.movId}>
@@ -167,20 +160,26 @@ class MovieListEdit extends Component {
                     </Col>
                 </Row>
                 <Row>
-                    <Col md={12}>
+                    <Col>
+                        <ReactCard
+                            plain
+                            ctTableFullWidth
+                            ctTableResponsive
+                            content={
                         <Table className="wrap-words">
                             <thead>
                             <tr>
                                 <th>Poster</th>
-                                <th width="20vw">Name</th>
-                                <th>Release Date</th>
-                                <th>Actions</th>
+                                <th width="20%">Name</th>
+                                <th width="20%">Release Date</th>
+                                <th width="40%">Actions</th>
                             </tr>
                             </thead>
                             <tbody>
                                     {movieList}
                             </tbody>
-                        </Table>
+                        </Table>}
+                        />
                     </Col>
                 </Row>
                 {this.state.moviePage.hasMore &&

@@ -1,23 +1,13 @@
 import React from 'react';
-import {
-    Button,
-    ListGroup,
-    ListGroupItem,
-    ButtonGroup, FormGroup,
-} from 'reactstrap';
-import Moment from "moment";
-import {Link} from "react-router-dom";
-import {faSearch, faClock} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Button, FormGroup,} from 'reactstrap';
 import axios from "axios";
-import {Col, Grid, Row, Modal, ControlLabel, FormControl} from "react-bootstrap";
+import {Col, ControlLabel, Grid, Modal, Row} from "react-bootstrap";
 import FormInputs from "../../components/FormInputs/FormInputs";
 import Input from "reactstrap/lib/Input";
-import Loader from "react-loader-spinner";
-import CustomButton from "../../components/CustomButton/CustomButton";
+import MountedComponent from "../misc/MountedComponent";
 
 /** Modal for adding a new User*/
-export default class AddUserModal extends React.Component {
+export default class AddUserModal extends MountedComponent {
 
     constructor(props) {
         super(props);
@@ -29,6 +19,7 @@ export default class AddUserModal extends React.Component {
     }
 
     componentDidMount() {
+        super.componentDidMount();
         this.setState({isLoading: false});
     }
 
@@ -146,11 +137,11 @@ export default class AddUserModal extends React.Component {
                                                     placeholder: "Repeat"
                                                 }]}
                                             />
-                                            <FormGroup controlId="exampleForm.ControlSelect1">
+                                            <FormGroup>
                                                 <ControlLabel>Role</ControlLabel>
                                                 <Input type="select" name="role">
                                                     {this.props.roleTypes.map(role =>
-                                                        <option>{role.value}</option>
+                                                        <option key={role.value}>{role.value}</option>
                                                     )}
                                                 </Input>
                                             </FormGroup>

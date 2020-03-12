@@ -1,6 +1,6 @@
 import axios from "axios";
-import AuthenticatedRoute from "../webviews/misc/AuthenticatedRoute";
 import https from 'https';
+
 /** Service to generate Authorization request + storing JWT Token*/
 class AuthenticationService {
 
@@ -11,7 +11,7 @@ class AuthenticationService {
     }
 
     executeBasicAuthenticationService(username, password) {
-        return axios.get('api/auth', {
+        return axios.get('/api/auth', {
                 headers: {authorization: this.createBasicAuthToken(username, password)}
             }
         );
@@ -49,6 +49,18 @@ class AuthenticationService {
         let payload = this.parseJwt(token);
         return payload.authorities.find(auth => auth.authority === "ROLE_ADMIN") != null;
     }
+
+    isCashier() {
+        let token = sessionStorage.getItem("JWT_TOKEN");
+        let payload = this.parseJwt(token);
+        return payload.authorities.find(auth => auth.authority === "ROLE_CASHIER") != null;
+    }
+
+    /*  getLoggedInUserId() {
+          let token = sessionStorage.getItem("JWT_TOKEN");
+          let payload = this.parseJwt(token);
+          return payload.userId;
+      }*/
 
     parseJwt(token) {
         var base64Url = token.split('.')[1];

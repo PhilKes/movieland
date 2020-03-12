@@ -1,16 +1,10 @@
-import React, {Component, useState} from 'react';
-import {Button, ButtonGroup, Table, Input, Alert} from 'reactstrap';
-import MovieModal from "../../modal/MovieModal";
-import Moment from 'moment';
+import React from 'react';
 import axios from "axios";
-import ErrorPage from "../../misc/ErrorPage";
-import LoadingPage from "../../misc/LoadingPage";
 import {Col, Grid, Row} from "react-bootstrap";
 import ReactDataGrid from 'react-data-grid';
 import {Editors} from "react-data-grid-addons";
-
-import ReactDOM from "react-dom";
 import AddUserModal from "../../modal/AddUserModal";
+import LoadingComponent from "../../misc/LoadingComponent";
 
 /** /dashboard/users page Component*/
 
@@ -21,13 +15,16 @@ const roleTypes = [
     {id: "ROLE_CASHIER", value: "ROLE_CASHIER"},
     {id: "ROLE_ADMIN", value: "ROLE_ADMIN"},
 ];
-const RoleEditor = <DropDownEditor options={roleTypes}/>;
+const RoleEditor = <DropDownEditor value={"ROLE_USER"} options={roleTypes}/>;
 
-class UserListEdit extends Component {
+class UserListEdit extends LoadingComponent {
 
     constructor(props) {
         super(props);
-        this.state = {movies: [], isLoading: true, error: "", timedout: false};
+        this.state = {
+            ...this.state,
+            movies: []
+        };
         this.searchQuery = "";
     }
 
@@ -43,6 +40,7 @@ class UserListEdit extends Component {
             return {rows};
         });
     };
+
 
 
     submitUpdateUser(user, updated) {
@@ -101,9 +99,9 @@ class UserListEdit extends Component {
 
     /** Initial load all movies*/
     componentDidMount() {
+        super.componentDidMount();
         document.title = "Manage Movies";
-        this.setState({isLoading: true});
-
+        this.setLoading(true);
         axios.get('/api/user/all')
             .then(res => res.data)
             .then(data => {
@@ -119,9 +117,10 @@ class UserListEdit extends Component {
                 });
                 console.log("Rows:")
                 console.log(rows)
-                this.setState({rows: rows, isLoading: false})
+                this.setState({rows: rows})
+                this.setLoading(false);
             })
-            .catch(err => this.setState({timedout: true}))
+            .catch(err => this.setTimedOut(true))
         ;
 
         const columns = [
@@ -151,14 +150,11 @@ class UserListEdit extends Component {
 
     /** Render Movie List with Actions*/
     render() {
-        const {isLoading, timedout, rows, columns} = this.state;
-        if (timedout) {
-            return <ErrorPage/>
-        }
-        if (isLoading) {
-            return <LoadingPage/>;
-        }
+        let loading = super.render();
+        if (loading)
+            return loading;
 
+        const {rows, columns} = this.state;
         return (
             <Grid fluid>
                 <Row>

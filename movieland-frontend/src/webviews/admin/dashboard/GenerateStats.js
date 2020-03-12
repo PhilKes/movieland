@@ -1,30 +1,25 @@
-import React, {Component} from 'react';
-import {Button, ButtonGroup, Table, Input, Alert, Label, FormGroup, Progress, CustomInput} from 'reactstrap';
-import MovieModal from "../../modal/MovieModal";
-import Moment from 'moment';
+import React from 'react';
+import {Progress} from 'reactstrap';
 import axios from "axios";
-import ErrorPage from "../../misc/ErrorPage";
-import LoadingPage from "../../misc/LoadingPage";
 import {Col, Grid, Row} from "react-bootstrap";
-import {DateRangePicker} from 'react-date-range';
+import {DateRange, DateRangePicker} from 'react-date-range';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css';
 import FormInputs from "../../../components/FormInputs/FormInputs";
 import CustomButton from "../../../components/CustomButton/CustomButton";
-import Loader from "react-loader-spinner"; // theme css file
 import Card from "../../../components/Card/Card";
-import Checkbox from "../../../components/CustomCheckbox/CustomCheckbox";
+import {dateToString} from "../../../variables/Util";
+import MediaQuery from "react-responsive";
+import LoadingComponent from "../../misc/LoadingComponent";
 
 /** /dashboard/generate page Component
  * Generate Shows/Reseravtions for Date Range*/
-class GenerateStats extends Component {
+class GenerateStats extends LoadingComponent {
 
     constructor(props) {
         super(props);
         this.state = {
-            isLoading: true,
-            error: "",
-            timedout: false,
+            ...this.state,
             range: {startDate: new Date(), endDate: new Date(), key: 'selection'},
             isGenerating: false,
             progress: 0,
@@ -33,9 +28,11 @@ class GenerateStats extends Component {
             showShow: true,
             generateRes: false
         };
+        console.log(this.state);
     }
 
     componentDidMount() {
+        super.componentDidMount();
         document.title = "Generate Statistics";
         this.setState({isLoading: false});
     }
@@ -49,6 +46,24 @@ class GenerateStats extends Component {
                 endDate: ranges.selection.endDate, key: 'selection'
             }
         });
+    }
+
+    deleteStats() {
+        let startDate = this.state.range.startDate;
+        let endDate = this.state.range.endDate;
+        this.setState({isGenerating: true});
+        axios.delete('/api/statistics/statistics?from=' + dateToString(startDate) + "&until=" + dateToString(endDate))
+            .then(resp => {
+                this.setState({isGenerating: false});
+                console.log(resp);
+                this.props.showNotification("Deleted Statistics", "success", "bc");
+            })
+            .catch(err => {
+                this.setState({isGenerating: false});
+                console.log(err);
+                this.props.showNotification("Delete Statistics failed: "
+                    + (err.response.data.message ? err.response.data.message : "Server is unreachable"), "error", "bc");
+            });
     }
 
     /** Send Generate Requests*/
@@ -117,7 +132,6 @@ class GenerateStats extends Component {
             });
     }
 
-
     /**Get Progress of task until done */
     waitAndGetProgress(taskUri, timeout) {
         axios.get(taskUri, {timeout: timeout})
@@ -141,25 +155,55 @@ class GenerateStats extends Component {
 
     /** Render Movie List with Actions*/
     render() {
-        const {isLoading, error, timedout, range} = this.state;
-        if (timedout) {
-            return <ErrorPage/>
-        }
-        if (isLoading) {
-            return <LoadingPage/>;
-        }
+        let loading = super.render();
+        if (loading)
+            return loading;
+
+        const {range} = this.state;
 
         return (
             <Grid fluid>
                 <Row>
                     <Col>
-                        <h2>Generate Statistics</h2><br/>
-                        <h4>Choose Date Range</h4>
-                        <DateRangePicker
-                            ranges={[range]}
-                            onChange={this.handleSelect.bind(this)}
-                        />
-                        <div className="spacer-bottom"/>
+                        <h2>Generate Statistics</h2> <br/>
+                        <Card
+                            plain
+                            ctTableResponsive
+                            title={"Choose Date Range"}
+                            content={
+                                <Grid>
+                                    <Row>
+                                        <Col>
+                                            <MediaQuery maxWidth={675}>
+                                                <DateRange
+                                                    className="daterange-picker"
+                                                    ranges={[range]}
+                                                    onChange={this.handleSelect.bind(this)}
+                                                    editableDateInputs={true}
+                                                    moveRangeOnFirstSelection={false}
+                                                />
+                                            </MediaQuery>
+                                            <MediaQuery minWidth={676}>
+                                                <DateRangePicker
+                                                    className="daterange-picker"
+                                                    ranges={[range]}
+                                                    onChange={this.handleSelect.bind(this)}
+                                                    editableDateInputs={true}
+                                                    moveRangeOnFirstSelection={false}
+                                                />
+                                            </MediaQuery>
+                                            <div className="spacer-bottom"/>
+                                        </Col>
+                                        <Col>
+                                            <CustomButton bsStyle="danger" fill type="submit"
+                                                          onClick={this.deleteStats.bind(this)}
+                                                          disabled={this.state.isGenerating}>
+                                                Delete Statistics
+                                            </CustomButton>
+                                        </Col>
+                                    </Row>
+                                </Grid>
+                            }/>
                     </Col>
                 </Row>
 
@@ -204,7 +248,7 @@ class GenerateStats extends Component {
                                                   animated={true}/>
                                     </div>)
                                     ||
-                                    (<CustomButton bsStyle="warning" pullLeft fill type="submit">
+                                    (<CustomButton bsStyle="warning" fill type="submit">
                                         Generate
                                     </CustomButton>)}
                                 </form>}
@@ -236,7 +280,7 @@ class GenerateStats extends Component {
                                                       animated={true}/>
                                         </div>)
                                         ||
-                                        (<CustomButton bsStyle="warning" pullLeft fill type="submit">
+                                        (<CustomButton bsStyle="warning" fill type="submit">
                                             Generate
                                         </CustomButton>)}
                                     </form>

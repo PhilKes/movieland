@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserReservation React - v1.3.0
+* Light Bootstrap ReservationValidation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -15,41 +15,22 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { Component } from "react";
-import ChartistGraph from "react-chartist";
-import { Grid, Row, Col } from "react-bootstrap";
-import {Card} from "../../components/Card/Card.jsx";
-import {StatsCard} from "../../components/StatsCard/StatsCard.jsx";
-import {Tasks} from "../../components/Tasks/Tasks.jsx";
-import {
-    responsiveSales,
-    legendSales,
-    dataBar,
-    optionsBar,
-    responsiveBar,
-    legendBar
-} from "../../variables/Variables.jsx";
-import axios from "axios";
-import * as queryString from "query-string";
-import LoadingPage from "../misc/LoadingPage";
-import moment from "moment";
-import {faChartLine, faDollarSign, faEye, faFilm, faHome, faTicketAlt} from "@fortawesome/free-solid-svg-icons";
+import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import SideNav, {NavItem, NavIcon, NavText} from '@trendmicro/react-sidenav';
+import SideNav, {NavIcon, NavItem, NavText} from '@trendmicro/react-sidenav';
 import {TinyButton as ScrollUpButton} from "react-scroll-up-button";
 import history from "../../history";
 // Be sure to include styles at some point, probably during your bootstraping
 import '../../assets/css/react-sidenav.css';
-import ScrollButton from "../../components/Misc/ScrollButton";
-import Summary from "./dashboard/Summary";
 import {Redirect, Route, Switch} from "react-router-dom";
+import LoadingComponent from "../misc/LoadingComponent";
 
 /** Dashboard for Admin with Statistics, Managing Users/Movies/Shows*/
-class AdminDashboard extends Component {
+class AdminDashboard extends LoadingComponent {
     constructor(props) {
         super(props);
         this.state = {
-            isLoading: true,
+            ...this.state,
             dailyStats: null
         }
     }
@@ -57,9 +38,10 @@ class AdminDashboard extends Component {
     //TODO GENERATING TAB
     /** Fetch summary for last 7 Days*/
     componentDidMount() {
+        super.componentDidMount();
         this.contentRef = React.createRef();
-        document.title = "Admin UserReservation";
-        this.setState({isLoading: false});
+        document.title = "Admin ReservationValidation";
+        this.setLoading(false);
     }
 
     /** Returns legend for Charts */
@@ -113,9 +95,9 @@ class AdminDashboard extends Component {
 
     /** Render Cards with Statistics, Charts,...*/
     render() {
-        if (this.state.isLoading) {
-            return <LoadingPage/>
-        }
+        let loading = super.render();
+        if (loading)
+            return loading;
 
         var optionsVisitorChart = {
             showArea: false,

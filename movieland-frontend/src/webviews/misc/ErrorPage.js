@@ -1,18 +1,16 @@
-import React, {Component, useState} from 'react';
-import {Collapse, Container, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink} from 'reactstrap';
+import React from 'react';
 import {Col, Grid, Row} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faClock, faSync} from "@fortawesome/free-solid-svg-icons";
-import InputGroupText from "reactstrap/lib/InputGroupText";
+import {faSync} from "@fortawesome/free-solid-svg-icons";
+import MountedComponent from "./MountedComponent";
 
-/** Navigation Bar ,sticky on top*/
-export default class ErrorPage extends Component {
+/** Error Page is Server Error occurred*/
+export default class ErrorPage extends MountedComponent {
 
     constructor(props) {
         super(props);
         this.state = {message: "Server is unreachable at the moment"};
     }
-
 
     render() {
         return (

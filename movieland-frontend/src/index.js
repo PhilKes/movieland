@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserReservation React - v1.3.0
+* Light Bootstrap ReservationValidation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -17,10 +17,6 @@
 */
 import React from "react";
 import ReactDOM from "react-dom";
-
-import { Route, Switch, Redirect } from "react-router-dom";
-
-import "bootstrap/dist/css/bootstrap.min.css";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./assets/css/animate.min.css";

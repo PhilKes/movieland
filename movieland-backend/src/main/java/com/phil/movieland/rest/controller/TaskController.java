@@ -31,12 +31,15 @@ public class TaskController {
     }
 
     @GetMapping("/{taskId}")
-    public TaskProgress getTaskProgress(@PathVariable(value="taskId") Integer taskId) {
+    public ResponseEntity<?> getTaskProgress(@PathVariable(value="taskId") Integer taskId) {
         //TODO DELETE taskId if completed
         TaskProgress progress=taskService.getTaskProgress(taskId);
+        if(progress==null) {
+            return ResponseEntity.badRequest().body("Task not found");
+        }
         //if(progress.getProgress().intValue()==progress.getProgressMax().intValue())
         //    taskService.removeTask(taskId);
-        return progress;
+        return ResponseEntity.ok(progress);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

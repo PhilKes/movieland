@@ -1,7 +1,7 @@
 /*!
 
 =========================================================
-* Light Bootstrap UserReservation React - v1.3.0
+* Light Bootstrap ReservationValidation React - v1.3.0
 =========================================================
 
 * Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
@@ -15,12 +15,10 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { Component } from "react";
-import { NavItem, Nav, NavDropdown, MenuItem } from "react-bootstrap";
+import React, {Component} from "react";
+import {Nav, NavItem} from "react-bootstrap";
 import {NavLink} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faFilm, faSignOutAlt, faUser} from "@fortawesome/free-solid-svg-icons";
-import {loggedInActions, loggedOutActions} from "../../userActions";
 import AuthenticationService from "../../service/AuthenticationService";
 
 /** NavLinks either shown on top or in Sidebar
