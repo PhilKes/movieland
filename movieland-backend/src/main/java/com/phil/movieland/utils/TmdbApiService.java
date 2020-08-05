@@ -28,7 +28,7 @@ public class TmdbApiService {
     public static final String POSTER_BASE_URL="https://image.tmdb.org/t/p/w185/";
     public static final String IMAGE_BASE_URL="https://image.tmdb.org/t/p/original";
 
-    private static final String API_KEY="86d157bbb36335ea938b606634e1c4ab";
+    private static final String API_KEY="<YOUR_KEY>";
     private static final TmdbApi tmdbApi= new TmdbApi(API_KEY);
     private static final TmdbMovies tmdbMovies= tmdbApi.getMovies();
 
