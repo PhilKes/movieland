@@ -8,29 +8,27 @@ import info.movito.themoviedbapi.model.ArtworkType;
 import info.movito.themoviedbapi.model.MovieDb;
 import info.movito.themoviedbapi.model.Video;
 import info.movito.themoviedbapi.model.core.MovieResultsPage;
-import info.movito.themoviedbapi.tools.ApiUrl;
-import info.movito.themoviedbapi.tools.RequestMethod;
-
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-/** Service for Tmdb Api interface*/
+/**
+ * Service for Tmdb Api interface
+ */
 @Service
 public class TmdbApiService {
     public static final String POSTER_BASE_URL="https://image.tmdb.org/t/p/w185/";
     public static final String IMAGE_BASE_URL="https://image.tmdb.org/t/p/original";
 
-    private static final String API_KEY="<YOUR_KEY>";
-    private static final TmdbApi tmdbApi= new TmdbApi(API_KEY);
-    private static final TmdbMovies tmdbMovies= tmdbApi.getMovies();
+    private static final String API_KEY="86d157bbb36335ea938b606634e1c4ab";
+    private static final TmdbApi tmdbApi=new TmdbApi(API_KEY);
+    private static final TmdbMovies tmdbMovies=tmdbApi.getMovies();
+
+    private Logger log=LoggerFactory.getLogger(TmdbApiService.class);
 
     /**
      * Additional backdrops stored in memory
@@ -75,7 +73,7 @@ public class TmdbApiService {
         }
         Optional<Artwork> backdrop=images.stream().filter(img -> img.getArtworkType()==ArtworkType.BACKDROP).findFirst();
         String path=IMAGE_BASE_URL + backdrop.orElse(images.get(0)).getFilePath();
-        System.out.println("Loaded: " + path + " from tmdb");
+        log.info("Loaded: " + path + " from tmdb");
         backdrops.put(movId, path);
         return path;
     }

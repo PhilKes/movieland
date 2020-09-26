@@ -5,6 +5,8 @@ import com.phil.movieland.rest.request.GenerateReservationRequest;
 import com.phil.movieland.rest.request.GenerateShowRequest;
 import com.phil.movieland.rest.service.StatisticsService;
 import com.phil.movieland.rest.tasks.TaskService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,8 @@ public class StatisticsController {
     private final StatisticsService statisticsService;
     private final TaskService taskService;
 
+    private Logger log=LoggerFactory.getLogger(StatisticsController.class);
+
     @Autowired
     public StatisticsController(StatisticsService statisticsService, TaskService taskService) {
         this.statisticsService=statisticsService;
@@ -54,7 +58,7 @@ public class StatisticsController {
             taskId=taskService.execute(statisticsService.generateShowsBetweenTask(
                     start, end, generateRequest.getMoviesPerDay(), generateRequest.getShowsPerMovie()));
         }
-        System.out.println("Task " + taskId + " posted for execution");
+        log.info("Task " + taskId + " posted for execution");
         return ResponseEntity.created(new URI("/api/task/" + taskId))
                 .body("Posted GenerateShows Task (taskId: " + taskId + ")");
     }
@@ -164,7 +168,7 @@ public class StatisticsController {
 
     @PostConstruct
     public void init() {
-        System.out.println("Generating initial 7 Day summary");
+        log.info("Generating initial 7 Day summary");
         Date today=new Date();
         Calendar lastWeek=Calendar.getInstance();
         lastWeek.setTime(today);

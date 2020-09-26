@@ -6,6 +6,8 @@ import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.data.entity.Seat;
 import com.phil.movieland.data.repository.ReservationRepository;
 import com.phil.movieland.data.repository.SeatRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,8 @@ public class ReservationService {
 
     private final SeatRepository seatRepository;
     private final ReservationRepository reservationRepository;
+
+    private Logger log=LoggerFactory.getLogger(ReservationService.class);
 
     @Autowired
     public ReservationService(SeatRepository seatRepository, ReservationRepository reservationRepository) {
@@ -109,7 +113,7 @@ public class ReservationService {
         return true;*/
         for(Seat seat : seatList) {
             if(!seatRepository.findSeatDuplicates(seat.getNumber(), showId).isEmpty()) {
-                System.out.println("Seat taken("+seat.getNumber()+",show: "+showId+")");
+                log.info("Seat taken(" + seat.getNumber() + ",show: " + showId + ")");
                 return false;
             }
         }

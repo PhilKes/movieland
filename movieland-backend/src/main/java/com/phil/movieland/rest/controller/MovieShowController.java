@@ -3,6 +3,8 @@ package com.phil.movieland.rest.controller;
 import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.rest.service.MovieShowService;
 import com.phil.movieland.utils.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class MovieShowController {
     private final MovieShowService movieShowService;
+    private Logger log=LoggerFactory.getLogger(MovieShowController.class);
 
     @Autowired
     public MovieShowController(MovieShowService movieShowService) {
@@ -33,8 +36,8 @@ public class MovieShowController {
             @RequestParam(value="date",required=true)String dateString){
         List<MovieShow> shows= null;
         Date date= DateUtils.createDateFromDateString(dateString);
-        System.out.println("Query for "+date);
-        shows= movieShowService.getShowsForDate(date);
+        log.info("Query for " + date);
+        shows=movieShowService.getShowsForDate(date);
         return shows;
     }
 
@@ -55,7 +58,7 @@ public class MovieShowController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/show")
     public ResponseEntity<MovieShow> postMovieShow(@RequestBody MovieShow show) throws URISyntaxException {
-        System.out.println("Post Show( MovId:"+show.getMovId()+" Date: "+show.getDate());
+        log.info("Post Show( MovId:" + show.getMovId() + " Date: " + show.getDate());
         MovieShow result=movieShowService.saveShow(show);
         return ResponseEntity.created(new URI("/api/show/" + result.getShowId()))
                 .body(result);

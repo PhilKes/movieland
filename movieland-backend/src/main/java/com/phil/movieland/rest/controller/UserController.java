@@ -3,7 +3,6 @@ package com.phil.movieland.rest.controller;
 import com.phil.movieland.auth.jwt.entity.*;
 import com.phil.movieland.auth.jwt.util.CurrentUser;
 import com.phil.movieland.auth.jwt.util.ResourceNotFoundException;
-import com.phil.movieland.data.entity.Movie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +27,7 @@ public class UserController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    private static final Logger logger=LoggerFactory.getLogger(UserController.class);
+    private static final Logger log=LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/user/me")
     @PreAuthorize("hasRole('USER')")

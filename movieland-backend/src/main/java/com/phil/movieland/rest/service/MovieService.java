@@ -3,6 +3,8 @@ package com.phil.movieland.rest.service;
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.repository.MovieRepository;
 import com.phil.movieland.utils.TmdbApiService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -20,6 +22,8 @@ public class MovieService {
 
     private final MovieRepository movieRepository;
     private final TmdbApiService tmdbApiService;
+
+    private Logger log=LoggerFactory.getLogger(MovieService.class);
 
     @Autowired
     public MovieService(MovieRepository movieRepository, TmdbApiService tmdbApiService) {
@@ -80,11 +84,11 @@ public class MovieService {
         Optional<Movie> duplicate=movieRepository.findFirstByTmdbId(movie.getTmdbId());
         if(duplicate.isPresent()) {
             if(duplicate.get().getMovId()!=movie.getMovId()) {
-                System.out.println(movie.getName()+" already in Database!");
+                log.info(movie.getName() + " already in Database!");
                 throw new Exception(movie.getName()+" is already in the Database!");
             }
         }
-        System.out.println("Saving: " + movie.getName());
+        log.info("Saving: " + movie.getName());
         return movieRepository.save(movie);
     }
 
@@ -108,7 +112,7 @@ public class MovieService {
 
     private void setTmdbData(Movie movie, boolean update) {
         if(movie.getTmdbId()==null) {
-            System.out.println("Updating: " + movie.getName());
+            log.info("Updating: " + movie.getName());
             movie.setTmdbMovie(tmdbApiService.getMovieFromTmdb(movie));
             if(update) {
                 updateMovie(movie);

@@ -3,6 +3,9 @@ package com.phil.movieland.rest.controller;
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.rest.service.MovieService;
 import com.phil.movieland.rest.service.MovieShowService;
+import com.phil.movieland.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpHeaders;
@@ -12,7 +15,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class MovieController {
     private final MovieService movieService;
     private final MovieShowService movieShowService;
+    private Logger log=LoggerFactory.getLogger(MovieController.class);
 
     @Autowired
     public MovieController(MovieService movieService,MovieShowService movieShowService) {
@@ -38,10 +41,10 @@ public class MovieController {
         List<Movie> movies= null;
         if(null==search) {
             //TODO PAGING
-            System.out.println("No query entered");
+            log.info("No query entered");
             movies=movieService.getAllMovies();
         }else{
-            System.out.println("Searched for: "+search);
+            log.info("Searched for: " + search);
             movies=movieService.queryAllMovies(search);
         }
         return movies;
@@ -54,12 +57,12 @@ public class MovieController {
         HttpHeaders responseHeaders=new HttpHeaders();
         Slice<Movie> slice;
         if(null==search) {
-            System.out.println("No query entered");
+            log.info("No query entered");
             slice=movieService.getAllMoviesPaged(page, 10);
 
         }
         else {
-            System.out.println("Searched for: " + search);
+            log.info("Searched for: " + search);
             slice=movieService.queryAllMoviesPaged(search, page, 10);
         }
         if(slice.hasNext()) {
@@ -77,8 +80,7 @@ public class MovieController {
         List<Movie> movies=movieService.queryMoviesByIds(movIds);
         Map<Long, Movie> moviesMap=movies.stream()
                 .collect(Collectors.toMap(Movie::getMovId, Function.identity()));
-        System.out.println("Movies by ids:");
-        System.out.println(moviesMap);
+        log.info("Movies by ids:", Utils.printMap(moviesMap));
         return moviesMap;
     }
 
@@ -88,10 +90,10 @@ public class MovieController {
             @RequestParam(value="name",required=false)String search){
         List<Movie> movies= null;
         if(null==search) {
-            System.out.println("No query entered");
-            movies= new ArrayList<>();
+            log.info("No query entered");
+            movies=new ArrayList<>();
         }else{
-            System.out.println("Searched for: "+search);
+            log.info("Searched for: " + search);
             movies=movieService.queryTmdbMovies(search);
         }
         return movies;
@@ -105,9 +107,9 @@ public class MovieController {
     @GetMapping("/movies/tmdb/images")
     public HashMap<Long, String> getTmdbImages(@RequestParam(value="ids") List<Long> movIds) {
         HashMap<Long, String> backdrops=new HashMap<>();
-        System.out.println("Requesting backdrops...");
+        log.info("Requesting backdrops...");
         for(Long movId : movIds) {
-            //System.out.println("Mov: "+movId);
+            //log.info("Mov: "+movId);
             backdrops.put(movId, movieService.getBackdrop(movId));
         }
         return backdrops;

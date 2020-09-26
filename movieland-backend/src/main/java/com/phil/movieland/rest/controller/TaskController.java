@@ -3,6 +3,8 @@ package com.phil.movieland.rest.controller;
 import com.phil.movieland.rest.service.StatisticsService;
 import com.phil.movieland.rest.tasks.TaskProgress;
 import com.phil.movieland.rest.tasks.TaskService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ import java.util.Date;
 public class TaskController {
     private final StatisticsService statisticsService;
     private final TaskService taskService;
+
+    private Logger log=LoggerFactory.getLogger(TaskController.class);
 
     @Autowired
     public TaskController(StatisticsService statisticsService, TaskService taskService) {
@@ -73,7 +77,7 @@ public class TaskController {
 
     @PostConstruct
     public void init() {
-        System.out.println("Generating initial 7 Day summary");
+        log.info("Generating initial 7 Day summary");
         Date today=new Date();
         Calendar lastWeek=Calendar.getInstance();
         lastWeek.setTime(today);

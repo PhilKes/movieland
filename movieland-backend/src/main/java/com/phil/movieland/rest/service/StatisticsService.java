@@ -7,6 +7,8 @@ import com.phil.movieland.data.repository.SeatRepository;
 import com.phil.movieland.rest.controller.UserController;
 import com.phil.movieland.rest.tasks.RunnableWithProgress;
 import com.phil.movieland.utils.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class StatisticsService {
     private final ReservationService reservationService;
 
     private final static HashMap<String, Statistics> precalculatedSummaries=new HashMap<>();
+
+    private Logger log=LoggerFactory.getLogger(StatisticsService.class);
 
     @Autowired
     public StatisticsService(SeatRepository seatRepository, ReservationService reservationService,
@@ -99,7 +103,7 @@ public class StatisticsService {
                         }
                         movieShowService.saveShows(movieShows);
                     }
-                    System.out.println("Generated shows for: " + countDate.getTime());
+                    log.info("Generated shows for: " + countDate.getTime());
                     countDate.add(Calendar.DATE, 1);
                     incProgress(1);
                 }
@@ -116,7 +120,7 @@ public class StatisticsService {
             @Override
             public void run() {
                 setProgress(0);
-                System.out.println("Start generation of reservations for: " + DateUtils.getDateStringFromDate(from) + " until: " + DateUtils.getDateStringFromDate(until));
+                log.info("Start generation of reservations for: " + DateUtils.getDateStringFromDate(from) + " until: " + DateUtils.getDateStringFromDate(until));
                 //TODO List<MovieShow> shows=movieShowService.getShowsForDateBetween(from,until);
                 // Iterate through all Shows, not the days -> change ProgressMax
                 /** Generate reservations for each show until Date until is reached*/
@@ -184,7 +188,7 @@ public class StatisticsService {
                 }
 
                 //}
-                System.out.println("Finished generation of reservations");
+                log.info("Finished generation of reservations");
                 precalculatedSummaries.clear();
             }
         };
@@ -238,7 +242,7 @@ public class StatisticsService {
                 }
                 movieShowService.saveShows(movieShows);
             }
-            System.out.println("Generated shows for: " + countDate.getTime());
+            log.info("Generated shows for: " + countDate.getTime());
             countDate.add(Calendar.DATE, 1);
         }
         precalculatedSummaries.clear();
@@ -321,7 +325,7 @@ public class StatisticsService {
                 }
                 reservationService.saveReservationsWithSeats(reservations);
             }
-            System.out.println("Generated reservations for: " + countDate.getTime());
+            log.info("Generated reservations for: " + countDate.getTime());
             countDate.add(Calendar.DATE, 1);
         }
         precalculatedSummaries.clear();
@@ -330,12 +334,12 @@ public class StatisticsService {
 
     //TODO speed up with sql
     public void deleteStatisticsBetween(Date from, Date until) {
-        System.out.println("Deleting Statistics from: " + from + " until " + until);
+        log.info("Deleting Statistics from: " + from + " until " + until);
         List<Long> showIds=movieShowService.getShowsForBetween(from, until).stream().map(MovieShow::getShowId).collect(Collectors.toList());
         long deletedRes=reservationService.deleteReservationsOfShows(showIds);
-        System.out.println("Deleted " + deletedRes + " Reservations");
+        log.info("Deleted " + deletedRes + " Reservations");
         long deletedShows=movieShowService.deleteShowsByIds(showIds);
-        System.out.println("Deleted " + deletedShows + " Shows");
+        log.info("Deleted " + deletedShows + " Shows");
         precalculatedSummaries.clear();
 
     }
@@ -359,10 +363,10 @@ public class StatisticsService {
     public Statistics calculateStatistics(Date from, Date until) {
         String summaryKey=DateUtils.getDateRangeStringFromDate(from, until);
         if(precalculatedSummaries.containsKey(summaryKey)) {
-            System.out.println("Already calculated statistics for: " + from + " until: " + until);
+            log.info("Already calculated statistics for: " + from + " until: " + until);
             return precalculatedSummaries.get(summaryKey);
         }
-        System.out.println("Calculating statistics for: "+from+" until: "+until);
+        log.info("Calculating statistics for: " + from + " until: " + until);
         Statistics statistics=new Statistics();
         long amtShows=0, amtMovies=0, amtSeats=0, amtWatchedMins=0, income=0;
         List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
@@ -425,7 +429,7 @@ public class StatisticsService {
         statistics.setDailyStats(dailyStats);
         statistics.setMovieStats(movieGrossing);
         precalculatedSummaries.put(summaryKey, statistics);
-        System.out.println("Finished calculating statistics for: " + from + " until: " + until);
+        log.info("Finished calculating statistics for: " + from + " until: " + until);
         return statistics;
     }
 

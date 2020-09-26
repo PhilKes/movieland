@@ -10,6 +10,8 @@ import com.phil.movieland.rest.request.ReservationValidationRequest;
 import com.phil.movieland.rest.service.MovieService;
 import com.phil.movieland.rest.service.MovieShowService;
 import com.phil.movieland.rest.service.ReservationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +29,8 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final MovieService movieService;
     private final MovieShowService movieShowService;
+
+    private Logger log=LoggerFactory.getLogger(ReservationController.class);
 
     @Autowired
     public ReservationController(ReservationService reservationService,
@@ -87,7 +91,7 @@ public class ReservationController {
         reservation.get().setValidated(reservationRequest.isValidate());
         reservation.get().setMethod(reservationRequest.getMethod());
         reservation.get().setCashierId(reservationRequest.getCashierId());
-        System.out.println("Validating Reservation: " + reservation.get().getResId());
+        log.info("Validating Reservation: " + reservation.get().getResId());
         Reservation result=reservationService.updateReservation(reservation.get());
 
         return ResponseEntity.created(new URI("/api/reservation/" + result.getResId()))

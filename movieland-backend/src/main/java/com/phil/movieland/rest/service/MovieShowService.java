@@ -4,26 +4,32 @@ import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.data.repository.MovieShowRepository;
 import com.phil.movieland.utils.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-/** Service to interface movieShowRepository */
+/**
+ * Service to interface movieShowRepository
+ */
 @Service
 public class MovieShowService {
 
     private final MovieShowRepository movieShowRepository;
+
+    private Logger log=LoggerFactory.getLogger(MovieShowService.class);
 
     @Autowired
     public MovieShowService(MovieShowRepository movieShowRepository) {
         this.movieShowRepository=movieShowRepository;
     }
 
-    public List<MovieShow> getShowsForMovie(Movie movie){
-        List<MovieShow> shows= movieShowRepository.findAllByMovId(movie.getMovId());
+    public List<MovieShow> getShowsForMovie(Movie movie) {
+        List<MovieShow> shows=movieShowRepository.findAllByMovId(movie.getMovId());
         for(MovieShow show : shows) {
-            System.out.println("Show at: "+show.getDate());
+            log.info("Show at: " + show.getDate());
         }
         return shows;
     }
@@ -33,33 +39,33 @@ public class MovieShowService {
         Date[] betweenDates=getBetweenDates(date);
         List<MovieShow> shows=movieShowRepository.findAllByMovIdAndDateBetweenOrderByDate(movie.getMovId(), betweenDates[0], betweenDates[1]);
         for(MovieShow show : shows) {
-            System.out.println("Show at: "+show.getDate());
+            log.info("Show at: " + show.getDate());
         }
         return shows;
     }
 
-    public void postMovieShow(Long movieId,Date date){
+    public void postMovieShow(Long movieId,Date date) {
         MovieShow show=new MovieShow();
         show.setMovId(movieId);
         show.setDate(date);
 
-        System.out.println("ADD NEW SHOW");
-        System.out.println("MovId: "+show.getMovId());
-        System.out.println("DateTime: "+show.getDate());
+        log.info("ADD NEW SHOW");
+        log.info("MovId: " + show.getMovId());
+        log.info("DateTime: " + show.getDate());
         movieShowRepository.save(show);
     }
 
     public void deleteMovieShow(Long showid){
-        System.out.println("Deleting: "+showid);
+        log.info("Deleting: " + showid);
         movieShowRepository.deleteById(showid);
     }
      public void deleteAllMovieShows(){
-            System.out.println("Deleting all Shows");
-            movieShowRepository.deleteAll();
+         log.info("Deleting all Shows");
+         movieShowRepository.deleteAll();
         }
 
     public List<MovieShow> getShowsForDate(Date date) {
-        System.out.println("Getting MovieShows for: "+date);
+        log.info("Getting MovieShows for: " + date);
         Date[] betweenDates=getBetweenDates(date);
         List<MovieShow> shows=movieShowRepository.findAllByDateBetween(betweenDates[0],betweenDates[1]);
         return shows;
@@ -103,7 +109,7 @@ public class MovieShowService {
         in7Days.set(Calendar.MINUTE, 59);
         in7Days.set(Calendar.SECOND,59);
         in7Days.add(Calendar.DATE, 7);
-        System.out.println("Looking for shows between: " + date + " and " + in7Days.getTime());
+        log.info("Looking for shows between: " + date + " and " + in7Days.getTime());
         return movieShowRepository.findAllByDateBetween(date, in7Days.getTime());
     }
 
