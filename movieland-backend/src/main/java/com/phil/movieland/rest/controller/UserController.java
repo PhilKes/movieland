@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import static com.phil.movieland.auth.jwt.entity.Role.RoleName.ROLE_ADMIN;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
@@ -29,7 +29,7 @@ public class UserController {
 
     private static final Logger log=LoggerFactory.getLogger(UserController.class);
 
-    @GetMapping("/user/me")
+    @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public UserSummary getCurrentUser(@CurrentUser UserPrincipal currentUser) {
         UserSummary userSummary=new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PutMapping("/user/me")
+    @PutMapping("/me")
     ResponseEntity<?> updateUserMe(@CurrentUser UserPrincipal currUser, @RequestBody User user) {
         User beforeUser=fillUserUpdate(currUser.getId(), user);
         User result=userRepository.save(beforeUser);
@@ -45,7 +45,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/user/{id}")
+    @PutMapping("/{id}")
     ResponseEntity<?> updateUser(@PathVariable long id, @RequestBody User user) {
         User beforeUser=fillUserUpdate(id, user);
         if(user.getRoles()!=null) {
@@ -73,21 +73,21 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/user/all")
+    @GetMapping("/all")
     public List<User> getAllUsers() {
         return userRepository.findAll();
 
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/user/users")
+    @GetMapping("/users")
     public List<User> getUsersOfRoleUsers() {
         return getAllUserOfRole(Role.RoleName.ROLE_USER);
 
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/user/admins")
+    @GetMapping("/admins")
     public List<User> getUsersOfRoleAdmins() {
         Role role=roleRepository.findByName(ROLE_ADMIN).get();
         return userRepository.findAllByRolesContaining(role);
@@ -122,7 +122,7 @@ public class UserController {
         }
     */
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/users/{username}")
+    @GetMapping("/{username}")
     public UserProfile getUserProfile(@PathVariable(value="username") String username) {
         User user=userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));

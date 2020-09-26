@@ -20,7 +20,7 @@ import java.util.Date;
 
 @RestController
 @PreAuthorize("hasRole('ADMIN')")
-@RequestMapping("/api/task")
+@RequestMapping("/api/tasks")
 /** Controller for Statistics API to generate/calculate Summaries*/
 public class TaskController {
     private final StatisticsService statisticsService;

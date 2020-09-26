@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 /** REST Controller for Movies*/
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/movies")
 public class MovieController {
     private final MovieService movieService;
     private final MovieShowService movieShowService;
@@ -35,7 +35,7 @@ public class MovieController {
         this.movieShowService=movieShowService;
     }
 
-    @GetMapping("/movies")
+    @GetMapping
     public Collection<Movie> getMovies(
             @RequestParam(value="name",required=false)String search){
         List<Movie> movies= null;
@@ -50,7 +50,7 @@ public class MovieController {
         return movies;
     }
 
-    @GetMapping("/movies/page/{page}")
+    @GetMapping("/page/{page}")
     public ResponseEntity<Collection<Movie>> getMoviesPaged(
             @RequestParam(value="name", required=false) String search,
             @PathVariable(value="page") Integer page) {
@@ -74,7 +74,7 @@ public class MovieController {
         return ResponseEntity.ok().headers(responseHeaders).body(slice.getContent());
     }
 
-    @GetMapping("/movies/ids")
+    @GetMapping("/ids")
     public Map<Long, Movie> getMoviesList(
             @RequestParam(value="ids") List<Long> movIds) {
         List<Movie> movies=movieService.queryMoviesByIds(movIds);
@@ -85,7 +85,7 @@ public class MovieController {
     }
 
 
-    @GetMapping("/movies/tmdb")
+    @GetMapping("/tmdb")
     public Collection<Movie> getTmdbMovies(
             @RequestParam(value="name",required=false)String search){
         List<Movie> movies= null;
@@ -99,12 +99,12 @@ public class MovieController {
         return movies;
     }
 
-    @GetMapping("/movies/tmdb/top")
+    @GetMapping("/tmdb/top")
     public Collection<Movie> getTmdbTopMovies(){
         return movieService.querTmdbTop10Movies();
     }
 
-    @GetMapping("/movies/tmdb/images")
+    @GetMapping("/tmdb/images")
     public HashMap<Long, String> getTmdbImages(@RequestParam(value="ids") List<Long> movIds) {
         HashMap<Long, String> backdrops=new HashMap<>();
         log.info("Requesting backdrops...");
@@ -115,14 +115,14 @@ public class MovieController {
         return backdrops;
     }
 
-    @GetMapping("/movie/{id}")
+    @GetMapping("/{id}")
     ResponseEntity<Movie> getMovie(@PathVariable Long id) {
         Optional<Movie> movie = movieService.queryMovie(id);
         return movie.map(response -> ResponseEntity.ok().body(response))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping("/movie/trailer/{movId}")
+    @GetMapping("/trailer/{movId}")
     ResponseEntity<String> getMovieTrailer(@PathVariable Long movId) {
         Optional<String> trailer=movieService.getTrailer(movId);
         return trailer.map(response -> ResponseEntity.ok().body(response))
@@ -130,7 +130,7 @@ public class MovieController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/movie")
+    @PostMapping
     ResponseEntity<?> createMovie(@RequestBody Movie movie) throws URISyntaxException {
         try {
             Movie result=movieService.saveMovie(movie);
@@ -143,7 +143,7 @@ public class MovieController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/movie/{id}")
+    @PutMapping("/{id}")
     ResponseEntity<Movie> updateMovie(@Valid @RequestBody Movie movie) {
         Movie result =null;
         try {
@@ -157,7 +157,7 @@ public class MovieController {
 
     //TODO PREAUTHORIZATION??
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/movie/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteMovie(@PathVariable Long id) {
         movieService.deleteById(id);
         return ResponseEntity.ok().build();

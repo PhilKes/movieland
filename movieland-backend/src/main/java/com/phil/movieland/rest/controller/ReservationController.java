@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/reservations")
 public class ReservationController {
     private final ReservationService reservationService;
     private final MovieService movieService;
@@ -41,7 +41,7 @@ public class ReservationController {
     }
 
     @PreAuthorize("hasRole('CASHIER')")
-    @GetMapping("/reservations")
+    @GetMapping
     public List<?> getReservations() {
         List<Reservation> userReservations=reservationService.getAllReservations();
         return userReservations;
@@ -54,7 +54,7 @@ public class ReservationController {
     }
 
     @PreAuthorize("hasRole('CASHIER')")
-    @GetMapping("/reservation/{resId}")
+    @GetMapping("/{resId}")
     public ResponseEntity<?> getReservation(@PathVariable(name="resId") Long resId) {
         Optional<Reservation> reservation=reservationService.getReservationById(resId);
         if(reservation.isEmpty()) {
@@ -63,7 +63,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservation.get());
     }
 
-    @PostMapping("/reservation")
+    @PostMapping
     public ResponseEntity<?> createReservation(@RequestBody ReservationRequest reservationRequest,
                                                @CurrentUser UserPrincipal currentUser) throws URISyntaxException {
         Reservation reservation=new Reservation();
@@ -80,7 +80,7 @@ public class ReservationController {
 
     //TODO Cashier Page to scan and validate Reservations
     @PreAuthorize("hasRole('CASHIER')")
-    @PostMapping("/reservation/validate")
+    @PostMapping("/validate")
     public ResponseEntity<?> postReservationValidation(@RequestBody ReservationValidationRequest reservationRequest,
                                                        @CurrentUser UserPrincipal cashierUser) throws URISyntaxException {
         Optional<Reservation> reservation=reservationService.getReservationById(reservationRequest.getResId());
@@ -100,21 +100,21 @@ public class ReservationController {
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/reservations")
+    @DeleteMapping
     public ResponseEntity<?> deleteReservations() {
         reservationService.deleteAll();
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/reservations/me/new")
     @PreAuthorize("hasRole('USER')")
+    @GetMapping("/me/new")
     public List<Reservation> getCurrentUsersNewReservations(@CurrentUser UserPrincipal currentUser) {
         //UserSummary userSummary=new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
         return reservationService.getAllReservationsOfUser(currentUser.getId(), true);
     }
 
-    @GetMapping("/reservation/me/{resId}")
     @PreAuthorize("hasRole('USER')")
+    @GetMapping("/me/{resId}")
     public ResponseEntity<?> getCurrentUserReservationInfo(@CurrentUser UserPrincipal currentUser,
                                                            @PathVariable(name="resId") Long resId) {
         //UserSummary userSummary=new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
