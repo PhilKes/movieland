@@ -6,7 +6,6 @@ import com.phil.movieland.auth.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
@@ -85,7 +84,9 @@ public class MovielandSpringConfiguration extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js")
                 .permitAll()
-                .antMatchers("/api/auth/**", "/api/movies", "/api/shows/week")
+                .antMatchers("/**swagger**", "/swagger-resources/configuration/**")
+                .permitAll()
+                .antMatchers("/api/auth/**", "/api/movies", "/api/shows/week", "/v2/**")
                 .permitAll()
                 .antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
                 .permitAll()

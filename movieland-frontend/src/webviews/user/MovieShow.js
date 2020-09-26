@@ -75,7 +75,6 @@ class MovieShow extends LoadingComponent {
                         })
                     });
             })
-            //TODO do not setState if unmounted
             .catch(err => {
                 this.setTimedOut(true);
                 this.setLoading(false);
