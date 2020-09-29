@@ -1,11 +1,9 @@
 package com.phil.movieland.auth;
 
 import com.phil.movieland.auth.jwt.*;
-import com.phil.movieland.auth.jwt.entity.Role;
-import com.phil.movieland.auth.jwt.entity.RoleRepository;
-import com.phil.movieland.auth.jwt.entity.User;
-import com.phil.movieland.auth.jwt.entity.UserRepository;
+import com.phil.movieland.auth.jwt.entity.*;
 import com.phil.movieland.auth.jwt.util.AppException;
+import com.phil.movieland.auth.jwt.util.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +13,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -55,6 +57,13 @@ public class AuthenticationController {
 
         String jwt=tokenProvider.generateToken(authentication);
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/signout")
+    public ResponseEntity<?> signOutUser(@CurrentUser UserPrincipal currentUser) {
+        //TODO Keep track of Logout ?
+        return ResponseEntity.ok("Logged Out");
     }
 
     @PostMapping("/signup")

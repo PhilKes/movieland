@@ -48,7 +48,7 @@ public class ReservationController {
     }
 
     //TODO Do not expose other reservation to user
-    @GetMapping("/reservations/show/{showId}")
+    @GetMapping("/shows/{showId}")
     List<Reservation> getReservationsofShow(@PathVariable Long showId) {
         return reservationService.getAllReservationsOfShow(showId);
     }
