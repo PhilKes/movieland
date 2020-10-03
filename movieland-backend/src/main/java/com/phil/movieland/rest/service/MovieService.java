@@ -138,4 +138,8 @@ public class MovieService {
     public List<Movie> queryMoviesByIds(List<Long> movIds) {
         return movieRepository.findAllByMovIdIn(movIds);
     }
+
+    public void deleteAll() {
+        movieRepository.deleteAll();
+    }
 }

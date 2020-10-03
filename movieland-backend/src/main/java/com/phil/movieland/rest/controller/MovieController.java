@@ -163,4 +163,11 @@ public class MovieController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping
+    public ResponseEntity<?> deleteAllMovies() {
+        movieService.deleteAll();
+        return ResponseEntity.ok().build();
+    }
+
 }

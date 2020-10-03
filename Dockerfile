@@ -1,11 +1,11 @@
 #### Stage 1: Build the application
 FROM openjdk:12-oracle as build
 
-# Set the current working directory inside the image
+# Set the current working directory inside the posterUrl
 WORKDIR /app
 
 EXPOSE 8080
-# Copy maven executable to the image
+# Copy maven executable to the posterUrl
 COPY mvnw .
 COPY .mvn .mvn
 
@@ -24,7 +24,7 @@ COPY src src
 RUN ./mvnw package -DskipTests
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
-#### Stage 2: A minimal docker image with command to run the app
+#### Stage 2: A minimal docker posterUrl with command to run the app
 FROM openjdk:12-oracle
 
 ARG DEPENDENCY=/app/target/dependency
