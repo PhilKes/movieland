@@ -86,7 +86,7 @@ public class MovielandSpringConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/**swagger**", "/swagger-resources/configuration/**")
                 .permitAll()
-                .antMatchers("/api/auth/**", "/api/movies", "/api/shows/week", "/v2/**")
+                .antMatchers("/api/auth/**", "/api/movies", "/api/shows/**", "/api/shows/week", "/v2/**")
                 .permitAll()
                 .antMatchers("/api/users/checkUsernameAvailability", "/api/users/checkEmailAvailability")
                 .permitAll()

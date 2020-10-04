@@ -1,6 +1,8 @@
 package com.phil.movieland.rest.controller;
 
+import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
+import com.phil.movieland.rest.service.MovieService;
 import com.phil.movieland.rest.service.MovieShowService;
 import com.phil.movieland.utils.DateUtils;
 import org.slf4j.Logger;
@@ -19,26 +21,45 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-/** REST Controller for MovieShows*/
+/**
+ * REST Controller for MovieShows
+ */
 @RestController
 @RequestMapping("/api/shows")
 public class MovieShowController {
     private final MovieShowService movieShowService;
+    private final MovieService movieService;
     private Logger log=LoggerFactory.getLogger(MovieShowController.class);
 
     @Autowired
-    public MovieShowController(MovieShowService movieShowService) {
+    public MovieShowController(MovieShowService movieShowService, MovieService movieService) {
         this.movieShowService=movieShowService;
+        this.movieService=movieService;
     }
 
     @GetMapping
-    public Collection<MovieShow> getMovieShows(
-            @RequestParam(value="date",required=true)String dateString){
-        List<MovieShow> shows= null;
-        Date date= DateUtils.createDateFromDateString(dateString);
+    public Collection<MovieShow> getMoviesShows(
+            @RequestParam(value="date", required=true) String dateString) {
+        List<MovieShow> shows=null;
+        Date date=DateUtils.createDateFromDateString(dateString);
         log.info("Query for " + date);
         shows=movieShowService.getShowsForDate(date);
         return shows;
+    }
+
+    @GetMapping("/movies/{id}")
+    public ResponseEntity<Collection<MovieShow>> getMovieShows(@PathVariable Long id,
+                                                               @RequestParam(value="date", required=false) String dateString) {
+        List<MovieShow> shows=null;
+        Date date=dateString==null ? new Date() : DateUtils.createDateFromDateString(dateString);
+        log.info("Query for " + date);
+        Optional<Movie> movie=movieService.queryMovie(id);
+        if(!movie.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        //shows=movieShowService.getShowsForMovieDate(movie.get(),dateString);
+        shows=movieShowService.getMovieShowsForWeekOf(movie.get(), date);
+        return ResponseEntity.ok(shows);
     }
 
     @GetMapping("/week")
@@ -67,7 +88,7 @@ public class MovieShowController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     ResponseEntity<MovieShow> updateShow(@Valid @RequestBody MovieShow show) {
-        MovieShow result = movieShowService.saveShow(show);
+        MovieShow result=movieShowService.saveShow(show);
         return ResponseEntity.ok().body(result);
     }
 

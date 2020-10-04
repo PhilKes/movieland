@@ -107,10 +107,23 @@ public class MovieShowService {
         in7Days.setTime(date);
         in7Days.set(Calendar.HOUR_OF_DAY, 23);
         in7Days.set(Calendar.MINUTE, 59);
-        in7Days.set(Calendar.SECOND,59);
+        in7Days.set(Calendar.SECOND, 59);
         in7Days.add(Calendar.DATE, 7);
         log.info("Looking for shows between: " + date + " and " + in7Days.getTime());
         return movieShowRepository.findAllByDateBetween(date, in7Days.getTime());
+    }
+
+    public List<MovieShow> getMovieShowsForWeekOf(Movie movie, Date date) {
+        date.setHours(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
+        Calendar in7Days=Calendar.getInstance();
+        in7Days.setTime(date);
+        in7Days.set(Calendar.HOUR_OF_DAY, 23);
+        in7Days.set(Calendar.MINUTE, 59);
+        in7Days.set(Calendar.SECOND, 59);
+        in7Days.add(Calendar.DATE, 7);
+        return movieShowRepository.findAllByMovIdAndDateBetweenOrderByDate(movie.getMovId(), date, in7Days.getTime());
     }
 
     public void saveShows(List<MovieShow> movieShows) {
@@ -118,10 +131,12 @@ public class MovieShowService {
     }
 
     public List<MovieShow> getShowsForBetween(Date from, Date until) {
-        return movieShowRepository.findAllByDateBetween(from,until);
+        return movieShowRepository.findAllByDateBetween(from, until);
     }
 
     public long deleteShowsByIds(List<Long> showIds) {
         return movieShowRepository.deleteAllByShowIdIn(showIds);
     }
+
+
 }
