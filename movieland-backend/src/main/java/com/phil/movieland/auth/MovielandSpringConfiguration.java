@@ -6,7 +6,6 @@ import com.phil.movieland.auth.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -86,11 +85,9 @@ public class MovielandSpringConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/**swagger**", "/swagger-resources/configuration/**")
                 .permitAll()
-                .antMatchers("/api/auth/**", "/api/movies", "/api/shows/**", "/api/shows/week", "/v2/**")
+                .antMatchers("/api/**", "/api/shows/week", "/v2/**")
                 .permitAll()
                 .antMatchers("/api/users/checkUsernameAvailability", "/api/users/checkEmailAvailability")
-                .permitAll()
-                .antMatchers(HttpMethod.GET, "/api/movies/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated();

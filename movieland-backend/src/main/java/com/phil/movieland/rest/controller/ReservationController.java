@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +64,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservation.get());
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     public ResponseEntity<?> createReservation(@RequestBody ReservationRequest reservationRequest,
                                                @CurrentUser UserPrincipal currentUser) throws URISyntaxException {
@@ -114,7 +116,21 @@ public class ReservationController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/me/{resId}")
+    @GetMapping("/me/info")
+    public ResponseEntity<?> getCurrentUsersReservationsInfo(@CurrentUser UserPrincipal currentUser) {
+        List<Reservation> reservations=reservationService.getAllReservationsOfUser(currentUser.getId(), false);
+        List<ReservationService.ReservationInfo> infos;
+        try {
+            infos=getReservationInfos(reservations);
+        }
+        catch(Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok(infos);
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/me/id/{resId}")
     public ResponseEntity<?> getCurrentUserReservationInfo(@CurrentUser UserPrincipal currentUser,
                                                            @PathVariable(name="resId") Long resId) {
         //UserSummary userSummary=new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
@@ -122,19 +138,39 @@ public class ReservationController {
         if(res.isEmpty()) {
             return ResponseEntity.badRequest().body("Reservation not found");
         }
+        ReservationService.ReservationInfo info;
+        try {
+            info=getReservationInfo(res.get());
+        }
+        catch(Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        return ResponseEntity.ok().body(info);
+    }
+
+    private ReservationService.ReservationInfo getReservationInfo(Reservation res) throws Exception {
         ReservationService.ReservationInfo info=new ReservationService.ReservationInfo();
-        info.setReservation(res.get());
-        Optional<MovieShow> show=movieShowService.queryShow(res.get().getShowId());
+        info.setReservation(res);
+        Optional<MovieShow> show=movieShowService.queryShow(res.getShowId());
         if(show.isEmpty()) {
-            return ResponseEntity.badRequest().body("Show of Reservation not found");
+            throw new Exception("Show of Reservation not found");
         }
         info.setMovieShow(show.get());
         Optional<Movie> movie=movieService.queryMovie(show.get().getMovId());
         if(movie.isEmpty()) {
-            return ResponseEntity.badRequest().body("Movie of Show not found");
+            throw new Exception("Movie of Show not found");
         }
         info.setMovie(movie.get());
-        info.setQRCodeURL("https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + res.get().getResId());
-        return ResponseEntity.ok().body(info);
+        info.setQRCodeURL("https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + res.getResId());
+        return info;
+    }
+
+    private List<ReservationService.ReservationInfo> getReservationInfos(List<Reservation> reservations) throws Exception {
+        List<ReservationService.ReservationInfo> infos=new ArrayList<>();
+        for(Reservation reservation : reservations) {
+            infos.add(getReservationInfo(reservation));
+        }
+        return infos;
     }
 }

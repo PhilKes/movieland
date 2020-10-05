@@ -35,6 +35,7 @@ public class ReservationService {
     }
     public Reservation saveReservation(Reservation reservation, List<Seat> seats) {
         /** Check if seats are already taken*/
+        //TOD Use seatRepository.findAllOfShow
         List<Reservation> reservations=reservationRepository.findAllByShowId(reservation.getShowId());
         for(Reservation res : reservations) {
             List<Seat> seatList=seatRepository.findAllByResId(res.getResId());

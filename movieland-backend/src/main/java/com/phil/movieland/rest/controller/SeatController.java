@@ -20,9 +20,14 @@ public class SeatController {
         this.reservationService=reservationService;
     }
 
-    @GetMapping("/reservation/{resId}")
-    List<Seat> getSeatsOfReservation(@PathVariable Long resId) {
+    @GetMapping("/reservations/{resId}")
+    public List<Seat> getSeatsOfReservation(@PathVariable Long resId) {
         return reservationService.getAllSeatsOfReservation(resId);
+    }
+
+    @GetMapping("/shows/{showId}")
+    public List<Seat> getSeatsOfShow(@PathVariable Long showId) {
+        return reservationService.getAllSeatsOfShow(showId);
     }
 
 }
