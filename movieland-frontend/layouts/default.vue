@@ -1,24 +1,19 @@
 <template>
   <v-app dark>
 
-    <v-app-bar color="primary" dark
-               fixed
-               app
-    >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"/>
-      <v-toolbar-title v-text="title"/>
+    <v-app-bar color="primary" dark fixed app>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="ml-1 mr-5">
+       <v-icon large>fas fa-bars</v-icon>
+      </v-app-bar-nav-icon>
+      <v-img class="hover-pointer" @click="$router.push('/')"
+        :src="logo" max-height="60" position="start" contain />
       <v-spacer/>
       <template v-if="!$auth.loggedIn">
-        <v-btn
-          text
-          @click="showLoginDialog">
+        <v-btn text @click="showLoginDialog">
           <v-icon class="mr-2">mdi-login</v-icon>
           Login
         </v-btn>
-        <v-btn
-          text
-          @click="showRegisterDialog"
-        >
+        <v-btn text @click="showRegisterDialog">
           <v-icon class="mr-2">mdi-account-plus</v-icon>
           Register
         </v-btn>
@@ -28,17 +23,22 @@
           <v-icon class="mr-2">mdi-account</v-icon>
           {{$auth.user.username}}
         </v-btn>
-        <v-btn
-          text
-          @click="$auth.logout()"
-          class="mr-5"
-        >
+        <v-btn text @click="$auth.logout()" class="mr-5">
           <v-icon class="mr-2">mdi-logout</v-icon>
           Logout
         </v-btn>
       </template>
     </v-app-bar>
-    <v-navigation-drawer v-model="drawer" app temporary>
+    <v-navigation-drawer v-model="drawer" app temporary color="primary" dark>
+
+      <v-row justify="center" no-gutters dense>
+        <v-col cols="6">
+          <v-img :src="logo" class="hover-pointer" @click="$router.push('/')" />
+        </v-col>
+
+      </v-row>
+
+      <v-divider/>
       <v-list>
         <v-list-item v-for="(item, i) in routes" :key="i" :to="item.to" router exact>
           <v-list-item-action>
@@ -67,6 +67,7 @@
 <script>
   import LoginForm from "../components/forms/LoginForm";
   import RegisterForm from "../components/forms/RegisterForm";
+  import logo from "../static/img/movie_land_icon.png"
 
   export default {
     data() {
@@ -86,7 +87,8 @@
             to: '/prices'
           }
         ],
-        title: 'MovieLand'
+        title: 'MovieLand',
+        logo
       }
     },
     methods: {

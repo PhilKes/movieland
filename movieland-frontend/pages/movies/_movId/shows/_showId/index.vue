@@ -20,13 +20,12 @@
 
 <script>
   import MovieCard from "../../../../../components/cards/MovieCard";
-  import BasicCard from "../../../../../components/cards/BasicCard";
   import ShowCard from "../../../../../components/cards/ShowCard";
   import ReservationSuccessForm from "../../../../../components/forms/ReservationSuccessForm";
 
   export default {
     name: "ShowDetails",
-    components: {ShowCard, BasicCard, MovieCard},
+    components: {ShowCard, MovieCard},
     beforeCreate() {
       this.loading = true
     },
