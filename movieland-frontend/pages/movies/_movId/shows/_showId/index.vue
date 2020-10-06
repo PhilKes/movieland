@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <movie-card :movie="movie" no-link/>
+        <movie-card :loading="loading" :movie="movie" no-link/>
       </v-col>
     </v-row>
     <v-row>

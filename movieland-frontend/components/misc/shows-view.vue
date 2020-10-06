@@ -8,8 +8,8 @@
           </v-list-item-action>
         </v-list-item>
       </v-list>-->
-  <div>
-    <v-skeleton-loader v-if="!days" type="card" :loading="!days"/>
+  <div style="overflow: hidden" >
+    <v-skeleton-loader v-if="loading" type="table" />
     <v-simple-table v-else dense class="shows-table">
       <template v-slot:default>
         <thead>
@@ -45,7 +45,8 @@
     name: "ShowsView",
     props: {
       shows: Array,
-      movId: Number
+      movId: Number,
+      loading: Boolean
     },
     computed: {
       days: {

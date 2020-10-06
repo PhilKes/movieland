@@ -1,22 +1,52 @@
 <template>
-  <v-skeleton-loader v-if="!movie" type="card" loading/>
-  <a v-else :class="{'card-link':!noLink, 'card-link-noHover':noLink===true}"
-     :href="noLink? null : '/movies/'+movie.movId">
-    <article :class="{'movie-card':true,'transparent-card':transparent}">
-      <img class="post-image hover-pointer" :src="movie.posterUrl"/>
-      <div class="movie-details">
-        <h4 class="movie-title">{{ movie.name }}</h4>
-        <p class="post-description">{{ movie.description }}</p>
-        <p class="post-author">Directed by {{ movie.director }}</p>
-      </div>
-    </article>
-  </a>
+  <v-skeleton-loader v-if="loading" type="card" loading/>
+  <div v-else>
+    <v-list-item :class="{'elevation-2':!transparent, 'rounded-lg':true,
+     'card-wrapper':!noLink,'card-wrapper-noHover':noLink===true,
+     'pa-0':true,'m-0':true}"
+                 three-line :to="noLink? null : '/movies/'+movie.movId">
+      <v-list-item-avatar rounded="0"
+                          height="370" :width="240"
+                          max-height="370" max-width="240"
+                          horizontal :class="{'ma-0':true, 'pa-0':true, 'mr-4':true, 'card-avatar':noLink===true}">
+        <v-img class="card-img rounded-l-lg" :src="movie.posterUrl" style="height:100%!important;"/>
+      </v-list-item-avatar>
+      <v-list-item-content class="movie-details">
+        <v-list-item-title class="movie-title">{{movie.name}}</v-list-item-title>
+        <v-list-item-subtitle class="post-description">{{movie.description}}</v-list-item-subtitle>
+        <v-row justify="start">
+          <shows-view v-if="showView" :loading="loading" :shows="shows" :mov-id="movie.movId"/>
+        </v-row>
+        <v-list-item-title class="post-author">
+          <v-row dense no-gutters justify="space-between">
+            <v-col cols="9">
+              Directed by {{movie.director}}
+            </v-col>
+            <v-spacer/>
+            <v-col>
+              <v-btn icon v-on:click.prevent="openTrailer(movie.movId)">
+                <v-icon>fas fa-video</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+
+        </v-list-item-title>
+      </v-list-item-content>
+
+    </v-list-item>
+  </div>
+
 </template>
 
 <script>
 
+  import ShowsView from "../misc/shows-view";
+  import LoginForm from "../forms/LoginForm";
+  import TrailerDialog from "../misc/TrailerDialog";
+
   export default {
     name: "MovieCard",
+    components: {ShowsView},
     props: {
       movie: {
         movId: Number,
@@ -25,10 +55,21 @@
         director: String,
         description: String,
       },
+      shows: Array,
+      showView: Boolean,
       noLink: Boolean,
-      transparent: Boolean
+      transparent: Boolean,
+      loading: Boolean
     },
-    methods: {}
+    methods: {
+      async openTrailer(movId){
+        let trailerUrl= await this.$repos.movies.trailer(movId);
+        console.log(trailerUrl)
+        let trailerDialog = await this.$dialog.showAndWait(TrailerDialog,{trailerUrl})
+          .then(resp => resp);
+        console.log("trailer",trailerDialog)
+      }
+    }
   }
 </script>
 
@@ -55,31 +96,6 @@
     }
   }
 
-  body {
-    display: flex;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 400;
-    color: $text;
-    background: $bg;
-    font-size: 0.9375rem;
-    min-height: 100vh;
-    margin: 0;
-    line-height: 1.6;
-    align-items: center;
-    justify-content: center;
-    text-rendering: optimizeLegibility;
-  }
-
-  #container {
-    width: 30rem;
-    height: 18.625rem;
-  }
-
-  .big {
-    width: 100% !important;
-    border: 1px solid black;
-  }
-
   .movie-card {
     display: flex;
     flex-direction: row;
@@ -95,58 +111,48 @@
     border-radius: 0;
   }
 
-  .card-link {
-    position: relative;
-    display: block;
-    color: inherit;
-    text-decoration: none;
+  .card-wrapper {
+    background: $white;
+
+    &:hover {
+      cursor: pointer;
+
+    }
 
     &:hover .movie-title {
       @include transition(color 0.3s ease);
       color: $red;
     }
 
-    &:hover .post-image {
+    &:hover .card-img {
       @include transition(opacity 0.3s ease);
       opacity: 0.75;
     }
   }
 
-  .card-link-noHover {
-    position: relative;
-    display: block;
-    color: inherit;
-    text-decoration: none;
+  .card-avatar {
+    transition: width 1s;
 
+    /* &:hover {
+       width:240px!important;
+       transition: width 1s;
+     }*/
+  }
+
+
+  .card-wrapper-noHover {
     &:hover * {
       cursor: auto;
     }
 
-    /*   &:hover .movie-title {
-         @include transition(color 0.3s ease);
-         color: $red;
-       }
-
-       &:hover .post-image {
-         @include transition(opacity 0.3s ease);
-         opacity: 0.75;
-       }*/
+    &:hover {
+      background: $white;
+    }
   }
 
-  .post-image {
-    @include transition(opacity 0.3s ease);
-    display: block;
-    width: 100%;
-    object-fit: contain;
-  }
-
-  .big-image {
-    object-fit: contain;
-    margin-top: 10px !important;
-  }
 
   .movie-details {
-    padding: 1.5rem;
+    // padding: .7rem;
   }
 
   .movie-title {
@@ -169,49 +175,6 @@
     margin: 1.125rem 0 0 0;
     padding: 1.125rem 0 0 0;
     border-top: 0.0625rem solid $border;
-  }
-
-  @media (max-width: 40rem) {
-    #container {
-      width: 18rem;
-      height: 27.25rem;
-    }
-
-    .movie-card {
-      flex-wrap: wrap;
-    }
-  }
-
-  @supports (display: grid) {
-    body {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-gap: 0.625rem;
-      grid-template-areas: ". main main ." ". main main .";
-    }
-
-    #container {
-      grid-area: main;
-      align-self: center;
-      justify-self: center;
-    }
-
-    .post-image {
-      height: 100%;
-    }
-
-    .movie-card {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      grid-template-rows: 1fr;
-    }
-
-    @media (max-width: 40rem) {
-      .movie-card {
-        grid-template-columns: auto;
-        grid-template-rows: 12rem 1fr;
-      }
-    }
   }
 
 </style>

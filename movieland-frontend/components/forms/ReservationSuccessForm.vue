@@ -24,7 +24,7 @@
         return {
           goto: {
             flat: false,
-            color: 'green',
+            color: 'success',
             text: 'To my Reservation',
             handle: () => {
               this.$router.push('/users/me/reservations/' + this.reservation.resId)

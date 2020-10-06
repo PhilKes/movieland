@@ -10,6 +10,9 @@ export default (ctx, inject) => {
       id(id) {
         return axios.$get(`/movies/${id}`)
       },
+      trailer(id){
+        return axios.$get(`/movies/trailer/${id}`)
+      }
 
     },
     shows: {

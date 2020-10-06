@@ -4,18 +4,18 @@
       <v-skeleton-loader type="card" v-if="loading"/>
       <template v-else>
         <v-row no-gutters dense>
-          <v-col align-self="start">
-            <v-card-title>My Reservation</v-card-title>
-          </v-col>
-          <v-spacer/>
-          <v-col align-self="center">
-            <v-btn small outlined color="primary" link nuxt
-                   :to="`/users/me/reservations`">To my Reservations
-            </v-btn>
+          <v-col>
+            <back-button label="All Reservations" :url="`/users/me/reservations`"/>
           </v-col>
         </v-row>
+        <v-row justify="center">
+          <v-card-title>My Reservation</v-card-title>
+        </v-row>
+        <v-divider class="mb-4"/>
         <v-row>
-          <movie-card transparent :movie="resInfo.movie"/>
+          <v-col>
+            <movie-card transparent :movie="resInfo.movie"/>
+          </v-col>
         </v-row>
         <v-row>
           <v-col>
@@ -33,7 +33,12 @@
           </v-col>
           <v-spacer/>
           <v-col>
-            <img :src="resInfo.qrcodeURL" class="hover-pointer" @click="openQRCode"/>
+   <!--         <img :src="resInfo.qrcodeURL" class="hover-pointer" @click="openQRCode"/>-->
+            <span @click="openQRCode" >
+                <qrcode-vue :value="resInfo.reservation.resId+''" size="150"
+                            class="hover-pointer" level="H" />
+            </span>
+
           </v-col>
         </v-row>
 
@@ -46,10 +51,12 @@
 <script>
   import MovieCard from "../../../../../components/cards/MovieCard";
   import {QrCodeView} from "../../../../../.nuxt/components";
+  import BackButton from "../../../../../components/buttons/BackButton";
+  import QrcodeVue from 'qrcode.vue'
 
   export default {
     name: "MyReservation",
-    components: {MovieCard},
+    components: {BackButton, MovieCard, QrcodeVue},
     data() {
       return {
         resInfo: null,
@@ -63,7 +70,7 @@
     },
     methods: {
       openQRCode() {
-        this.$dialog.show(QrCodeView, {qrcodeURL: this.resInfo.qrcodeURL});
+        this.$dialog.show(QrCodeView, {qrcode: this.resInfo.reservation.resId+''});
       },
       showValidateInfo() {
         this.$dialog.confirm({

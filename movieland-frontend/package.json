@@ -14,10 +14,13 @@
     "@nuxtjs/proxy": "^2.0.1",
     "core-js": "^3.6.5",
     "nuxt": "^2.14.5",
+    "qrcode.vue": "^1.7.0",
     "vue": "^2.6.12",
+    "vue-youtube": "^1.4.0",
     "vuetify-dialog": "^2.0.11"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.1",
     "@nuxtjs/vuetify": "^1.11.2",
     "moment": "^2.29.0"
   }

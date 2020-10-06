@@ -65,6 +65,9 @@ export default {
     },
     theme: {
       dark: false,
+      icons: {
+        iconfont: 'fa',
+      },
       themes: {
         light: {
           primary: '#991b1b',
@@ -78,6 +81,28 @@ export default {
         }
       }
     }
+  },
+
+  vuetifyDialog: {
+    property: '$dialog',
+    confirm: {
+      actions: {
+      },
+      icon: false, // to disable icon just put false
+      width: 1200
+    },
+    warning: {
+      width: 1200
+    },
+    error: {
+      width: 1200
+
+    },
+    prompt: {
+      width: 1200
+
+    }
+    // ...
   },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)

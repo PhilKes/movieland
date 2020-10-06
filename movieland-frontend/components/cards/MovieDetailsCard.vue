@@ -1,5 +1,5 @@
 <template>
-  <v-skeleton-loader loading v-if="!movie" type="card"/>
+  <v-skeleton-loader v-if="loading" type="card"/>
   <v-card v-else>
     <v-container class="pa-0 ma-0">
       <v-row dense style="height:60vh!important;" justify="center" align-content="center" align="center">
@@ -19,7 +19,7 @@
             </v-row>
             <v-row dense justify="center" align="center">
               <v-col cols="11">
-                <shows-view :shows="shows" :mov-id="movie.movId"/>
+                <shows-view :loading="loading" :shows="shows" :mov-id="movie.movId"/>
               </v-col>
             </v-row>
             <v-row dense>
@@ -51,7 +51,8 @@
         director: String,
         description: String
       },
-      shows: Array
+      shows: Array,
+      loading:Boolean
     },
     data: () => ({})
   }

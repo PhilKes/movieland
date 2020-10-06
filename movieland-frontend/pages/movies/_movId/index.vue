@@ -1,18 +1,24 @@
 <template>
-  <movie-details-card :movie="movie" :shows="shows"/>
+  <v-container fluid>
+    <v-skeleton-loader type="card" v-if="loading"/>
+    <movie-card v-else :movie="movie" :shows="shows" no-link :show-view="true"/>
+
+  </v-container>
 </template>
 
 <script>
-  import MovieDetailsCard from "../../../components/cards/MovieDetailsCard";
+
+  import MovieCard from "../../../components/cards/MovieCard";
 
   export default {
     name: "MovieDetails",
     components: {
-      MovieDetailsCard
+      MovieCard
     },
     data: () => ({
       movie: null,
-      shows: []
+      shows: [],
+      loading: true
     }),
     async fetch() {
       console.log(this.$route.params.movId, this.$route.params.showId)
@@ -20,6 +26,7 @@
       this.shows = await this.$repos.shows.showsOfMovieWeek(this.$route.params.movId);
       this.shows.forEach(show => show.date = new Date(show.date));
       console.log(this.movie, this.shows)
+      setTimeout(() => this.loading = false, 0);
     }
   }
 </script>
