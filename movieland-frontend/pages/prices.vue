@@ -48,7 +48,8 @@
 
 <script>
   export default {
-    name: "Prices"
+    name: "Prices",
+    middleware: ['loggedIn']
   }
 </script>
 

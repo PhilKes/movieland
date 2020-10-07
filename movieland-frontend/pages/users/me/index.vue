@@ -37,7 +37,8 @@
   import BackButton from "../../../components/buttons/BackButton";
   export default {
     name: "UserMe",
-    components: {BackButton, NavigateButton}
+    components: {BackButton, NavigateButton},
+    middleware:['loggedIn']
   }
 </script>
 

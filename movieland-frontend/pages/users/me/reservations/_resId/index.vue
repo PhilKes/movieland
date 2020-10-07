@@ -57,6 +57,7 @@
   export default {
     name: "MyReservation",
     components: {BackButton, MovieCard, QrcodeVue},
+    middleware:['loggedIn'],
     data() {
       return {
         resInfo: null,

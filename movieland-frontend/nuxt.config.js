@@ -26,6 +26,7 @@ export default {
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
     '~/plugins/repos.js',
+    '~/plugins/eventBus.js',
     '~/plugins/filters.js'
   ],
 
@@ -86,8 +87,7 @@ export default {
   vuetifyDialog: {
     property: '$dialog',
     confirm: {
-      actions: {
-      },
+      actions: {},
       icon: false, // to disable icon just put false
       width: 1200
     },
@@ -116,7 +116,10 @@ export default {
           login: {url: '/auth/signin', method: 'post', propertyName: 'accessToken'},
           logout: {url: '/auth/signout', method: 'post'},
           user: {url: '/users/me', method: 'get', propertyName: ''},
-        }
+        },
+        tokenType: 'Bearer',
+        tokenRequired: true,
+        globalToken: true
       }
     }
   }

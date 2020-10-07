@@ -1,9 +1,9 @@
 <template>
   <v-app dark>
 
-    <v-app-bar color="primary" dark app >
+    <v-app-bar color="primary" dark app>
 
-      <v-app-bar-nav-icon  @click.stop="drawer = !drawer" class="ml-1 mr-5 hidden-md-and-up">
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="ml-1 mr-5 hidden-md-and-up">
         <v-icon large>fas fa-bars</v-icon>
       </v-app-bar-nav-icon>
       <img v-if="$vuetify.breakpoint.smAndUp" class="hover-pointer mr-6" @click="$router.push('/')"
@@ -20,7 +20,7 @@
       <v-spacer/>
       <v-toolbar-items>
         <template v-if="!$auth.loggedIn">
-          <v-btn text @click="showLoginDialog">
+          <v-btn text @click="$events.$emit('showLogin',null)">
             <v-icon class="mr-2">mdi-login</v-icon>
             <template>Login</template>
           </v-btn>
@@ -30,7 +30,7 @@
             <v-icon class="mr-2">mdi-account</v-icon>
             {{$auth.user.username}}
           </v-btn>
-          <v-btn text @click="$auth.logout()" >
+          <v-btn text @click="onLogout">
             <v-icon :class="{'mr-2':$vuetify.breakpoint.smAndUp}">mdi-logout</v-icon>
             <template v-if="$vuetify.breakpoint.smAndUp">Logout</template>
           </v-btn>
@@ -75,6 +75,8 @@
   import LoginForm from "../components/forms/LoginForm";
   import RegisterForm from "../components/forms/RegisterForm";
   import logo from "../static/img/movie_land_icon.png"
+  import jwt_decode from "jwt-decode";
+  import loggedIn from "../middleware/loggedIn";
 
   export default {
     data() {
@@ -103,13 +105,22 @@
         let loginInfo = await this.$dialog.showAndWait(LoginForm).then(resp => resp);
         if (!loginInfo)
           throw null;
-        if(loginInfo==='register'){
-          this.$root.$emit('showRegister',()=>this.showLoginDialog())
+        if (loginInfo === 'register') {
+          this.$events.$emit('showRegister', () => this.showLoginDialog())
           return;
         }
         return await this.$auth.loginWith('local', loginInfo).then(resp => {
           console.log("user", this.$auth.user)
+          console.log("token", jwt_decode(this.$auth.getToken('local')))
           return this.$auth.user;
+        }).catch(err=>{
+          this.showLoginDialog();
+          this.$dialog.confirm({
+            title:'Login failed',
+            text:'Your entered Username and Password do not match\n Please try again',
+            actions: ["Ok"],
+            width:300
+          })
         })
       },
       async showRegisterDialog() {
@@ -121,16 +132,24 @@
              console.log(resp)
              console.log("user",this.$auth.user)
            })*/
+      },
+      onLogout(){
+        this.$auth.logout()
+        this.$router.push('/')
       }
     },
-    mounted() {
-      this.$root.$on('showLogin', (onSuccessMethod) => {
+    created() {
+      this.$events.$on('showLogin', (onSuccess) => {
+        console.log("SHOW LOGIN")
         this.showLoginDialog().then(res => {
-          onSuccessMethod();
+          if (typeof onSuccess === 'string' || onSuccess instanceof String)
+            this.$router.push(onSuccess);
+          else
+            onSuccess();
         }).catch(res => {
         })
       });
-      this.$root.$on('showRegister', (onSuccessMethod) => {
+      this.$events.$on('showRegister', (onSuccessMethod) => {
         this.showRegisterDialog().then(res => {
           onSuccessMethod();
         }).catch(res => {
@@ -141,7 +160,7 @@
 </script>
 <style scoped lang="scss">
 
-  .sidebar-logo{
+  .sidebar-logo {
     background-color: rgba(180, 133, 133, 0.08);
   }
 </style>

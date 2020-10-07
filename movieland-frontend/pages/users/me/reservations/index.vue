@@ -1,6 +1,5 @@
 <template>
   <v-card>
-
     <v-skeleton-loader type="list" v-if="loading"/>
     <v-container v-else>
       <v-row no-gutters dense>
@@ -40,6 +39,7 @@
 <script>
   export default {
     name: "index",
+    middleware:['loggedIn'],
     data() {
       return {
         reservations: [],

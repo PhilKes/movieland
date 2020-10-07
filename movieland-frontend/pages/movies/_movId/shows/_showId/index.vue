@@ -47,7 +47,7 @@
       submitSelection(selection) {
         if (!this.$auth.loggedIn) {
           /** See layouts/default.vue for login */
-          this.$root.$emit('showLogin', () => this.makeReservation(selection)) //like this
+          this.$events.$emit('showLogin', () => this.makeReservation(selection)) //like this
           return;
         }
         this.makeReservation(selection)
