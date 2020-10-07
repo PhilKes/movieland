@@ -1,6 +1,7 @@
 // Ref: https://github.com/nuxt-community/vuetify-module#customvariables
 //
 // The variables you want to modify
+@import '~vuetify/src/styles/styles.sass';
 $font-size-root: 20px;
 $material-dark: (
   'background': --v-background-base

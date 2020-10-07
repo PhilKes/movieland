@@ -1,43 +1,50 @@
 <template>
   <v-app dark>
 
-    <v-app-bar color="primary" dark fixed app>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="ml-1 mr-5">
-       <v-icon large>fas fa-bars</v-icon>
+    <v-app-bar color="primary" dark app >
+
+      <v-app-bar-nav-icon  @click.stop="drawer = !drawer" class="ml-1 mr-5 hidden-md-and-up">
+        <v-icon large>fas fa-bars</v-icon>
       </v-app-bar-nav-icon>
-      <v-img class="hover-pointer" @click="$router.push('/')"
-        :src="logo" max-height="60" position="start" contain />
+      <img v-if="$vuetify.breakpoint.smAndUp" class="hover-pointer mr-6" @click="$router.push('/')"
+           :src="logo" style="height:56px"/>
+
+      <v-toolbar-items>
+        <template v-if="$vuetify.breakpoint.mdAndUp">
+          <v-btn text link nuxt v-for="(item, i) in routes" :key="i" :to="item.to">
+            <v-icon class="mr-2">{{ item.icon }}</v-icon>
+            <v-list-item-title v-text="item.title"/>
+          </v-btn>
+        </template>
+      </v-toolbar-items>
       <v-spacer/>
-      <template v-if="!$auth.loggedIn">
-        <v-btn text @click="showLoginDialog">
-          <v-icon class="mr-2">mdi-login</v-icon>
-          Login
-        </v-btn>
-        <v-btn text @click="showRegisterDialog">
-          <v-icon class="mr-2">mdi-account-plus</v-icon>
-          Register
-        </v-btn>
-      </template>
-      <template v-else>
-        <v-btn text link nuxt to="/users/me">
-          <v-icon class="mr-2">mdi-account</v-icon>
-          {{$auth.user.username}}
-        </v-btn>
-        <v-btn text @click="$auth.logout()" class="mr-5">
-          <v-icon class="mr-2">mdi-logout</v-icon>
-          Logout
-        </v-btn>
-      </template>
+      <v-toolbar-items>
+        <template v-if="!$auth.loggedIn">
+          <v-btn text @click="showLoginDialog">
+            <v-icon class="mr-2">mdi-login</v-icon>
+            <template>Login</template>
+          </v-btn>
+        </template>
+        <template v-else>
+          <v-btn text link nuxt to="/users/me">
+            <v-icon class="mr-2">mdi-account</v-icon>
+            {{$auth.user.username}}
+          </v-btn>
+          <v-btn text @click="$auth.logout()" >
+            <v-icon :class="{'mr-2':$vuetify.breakpoint.smAndUp}">mdi-logout</v-icon>
+            <template v-if="$vuetify.breakpoint.smAndUp">Logout</template>
+          </v-btn>
+        </template>
+      </v-toolbar-items>
+
+
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" app temporary color="primary" dark>
-
-      <v-row justify="center" no-gutters dense>
+      <v-row justify="center" no-gutters dense class="sidebar-logo">
         <v-col cols="6">
-          <v-img :src="logo" class="hover-pointer" @click="$router.push('/')" />
+          <v-img :src="logo" class="hover-pointer " @click="$router.push('/')"/>
         </v-col>
-
       </v-row>
-
       <v-divider/>
       <v-list>
         <v-list-item v-for="(item, i) in routes" :key="i" :to="item.to" router exact>
@@ -96,6 +103,10 @@
         let loginInfo = await this.$dialog.showAndWait(LoginForm).then(resp => resp);
         if (!loginInfo)
           throw null;
+        if(loginInfo==='register'){
+          this.$root.$emit('showRegister',()=>this.showLoginDialog())
+          return;
+        }
         return await this.$auth.loginWith('local', loginInfo).then(resp => {
           console.log("user", this.$auth.user)
           return this.$auth.user;
@@ -119,6 +130,18 @@
         }).catch(res => {
         })
       });
+      this.$root.$on('showRegister', (onSuccessMethod) => {
+        this.showRegisterDialog().then(res => {
+          onSuccessMethod();
+        }).catch(res => {
+        })
+      });
     }
   }
 </script>
+<style scoped lang="scss">
+
+  .sidebar-logo{
+    background-color: rgba(180, 133, 133, 0.08);
+  }
+</style>

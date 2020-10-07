@@ -1,17 +1,12 @@
 <template>
   <DialogCard title="Login" :actions="actions">
-    <v-text-field label="Username" icon="person" v-model="username"/>
-    <v-text-field label="Password" icon="lock" v-model="password"/>
+    <v-text-field outlined label="Username" icon="person" v-model="username"/>
+    <v-text-field type="password" outlined label="Password" icon="lock" v-model="password"/>
   </DialogCard>
 </template>
 <script>
   export default {
-    // overlay: 'default',
-    //   asyncData () {
-    //         return new Promise(resolve => {
-    //           setTimeout(resolve, 3000)
-    //         })
-    // },
+    name: 'LoginForm',
     data() {
       return {
         username: 'admin',
@@ -21,13 +16,22 @@
     computed: {
       actions() {
         return {
+          register: {
+            outlined:true,
+            color: 'dark',
+            text: 'Register',
+            handle(){
+               return "register";
+            }
+          },
           login: {
-            flat: true,
+            flat: false,
+            color: 'success',
             text: 'Login',
             handle: () => {
               return {data: {usernameOrEmail: this.username, password: this.password}}
             }
-          }
+          },
         }
       }
     }
