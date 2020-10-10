@@ -36,6 +36,11 @@
             icon: 'fas fa-film',
             title: 'Movies',
             to: '/admin/movies',
+          },
+          {
+            icon: 'fas fa-calendar-alt',
+            title: 'Shows',
+            to: '/admin/shows',
           }
         ]
       }

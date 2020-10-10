@@ -34,17 +34,21 @@ public class MovieShowService {
         return shows;
     }
 
-    public List<MovieShow> getShowsForMovieDate(Movie movie,String dateString){
+    public List<MovieShow> getShowsForMovieDate(Movie movie, String dateString) {
+        return getShowsForMovieDate((int) movie.getMovId(), dateString);
+    }
+
+    public List<MovieShow> getShowsForMovieDate(Integer movId, String dateString) {
         Date date=DateUtils.createDateFromDateString(dateString);
         Date[] betweenDates=getBetweenDates(date);
-        List<MovieShow> shows=movieShowRepository.findAllByMovIdAndDateBetweenOrderByDate(movie.getMovId(), betweenDates[0], betweenDates[1]);
+        List<MovieShow> shows=movieShowRepository.findAllByMovIdAndDateBetweenOrderByDate(movId, betweenDates[0], betweenDates[1]);
         for(MovieShow show : shows) {
             log.info("Show at: " + show.getDate());
         }
         return shows;
     }
 
-    public void postMovieShow(Long movieId,Date date) {
+    public void postMovieShow(Long movieId, Date date) {
         MovieShow show=new MovieShow();
         show.setMovId(movieId);
         show.setDate(date);
@@ -55,26 +59,30 @@ public class MovieShowService {
         movieShowRepository.save(show);
     }
 
-    public void deleteMovieShow(Long showid){
+    public void deleteMovieShow(Long showid) {
         log.info("Deleting: " + showid);
         movieShowRepository.deleteById(showid);
     }
-     public void deleteAllMovieShows(){
-         log.info("Deleting all Shows");
-         movieShowRepository.deleteAll();
-        }
 
-    public List<MovieShow> getShowsForDate(Date date) {
+    public void deleteAllMovieShows() {
+        log.info("Deleting all Shows");
+        movieShowRepository.deleteAll();
+    }
+
+    public List<MovieShow> getShowsForDate(Date date, boolean groupByMovId) {
         log.info("Getting MovieShows for: " + date);
         Date[] betweenDates=getBetweenDates(date);
-        List<MovieShow> shows=movieShowRepository.findAllByDateBetween(betweenDates[0],betweenDates[1]);
+        List<MovieShow> shows=groupByMovId==false ?
+                movieShowRepository.findAllByDateBetween(betweenDates[0], betweenDates[1])
+                : movieShowRepository.findAllByDateBetween(betweenDates[0], betweenDates[1]);
+
         return shows;
     }
 
     /**
      * Return dates from today 00:00 and 23:59
      */
-    private Date[] getBetweenDates(Date date){
+    private Date[] getBetweenDates(Date date) {
         Date dateStart=new Date(date.getTime());
         dateStart.setHours(0);
         dateStart.setMinutes(0);
@@ -83,7 +91,7 @@ public class MovieShowService {
         dateEnd.setHours(23);
         dateEnd.setMinutes(59);
         dateEnd.setSeconds(59);
-        return new Date[]{dateStart,dateEnd};
+        return new Date[]{dateStart, dateEnd};
     }
 
     public MovieShow saveShow(MovieShow show) {

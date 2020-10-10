@@ -259,7 +259,7 @@ public class StatisticsService {
         Random rand=new Random();
         List<Long> userIds=userController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
         while(countDate.getTime().before(until)) {
-            List<MovieShow> shows=movieShowService.getShowsForDate(countDate.getTime());
+            List<MovieShow> shows=movieShowService.getShowsForDate(countDate.getTime(),false);
             /** For each show generate reservations */
             for(MovieShow show : shows) {
                 List<ReservationWithSeats> reservations=new ArrayList<>();

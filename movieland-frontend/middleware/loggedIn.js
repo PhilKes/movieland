@@ -2,7 +2,6 @@ export default ({$events,$auth,from,route,redirect,app}) => {
   if(process.server){
     return
   }
-  console.log("route",from)
 
   if (!$auth.loggedIn) {
     $events.$emit('showLogin',route.path);

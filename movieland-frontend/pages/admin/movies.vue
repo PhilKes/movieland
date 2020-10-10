@@ -4,49 +4,49 @@
       <h4>Movies Dashboard</h4>
     </v-row>
     <v-row justify="center">
-      <v-data-table :loading="loading" :headers="headers" :items="movies" v-model="selected"
-                    item-key="movId" class="elevation-1" sort-desc sort-by="date"
-                    :search="search" :items-per-page="10" show-select
-      >
-        <template v-slot:top>
-          <v-toolbar
-            flat
-          >
-            <v-text-field
-              v-model="search"
-              label="Search TMDB Movies" hide-details append-icon="fas fa-search"
-            ></v-text-field>
-            <v-spacer/>
-            <v-btn color="error" @click="deleteSelected" class="mr-2" :disabled="selected.length < 1">
-              <v-icon>fas fa-trash</v-icon>
+      <v-col cols="12" md="10">
+        <v-data-table :loading="loading" :headers="headers" :items="movies" v-model="selected"
+                      item-key="movId" class="elevation-1" sort-desc sort-by="date"
+                      :search="search" :items-per-page="10" show-select
+        >
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-text-field
+                v-model="search"
+                label="Search TMDB Movies" hide-details append-icon="fas fa-search"
+              ></v-text-field>
+              <v-spacer/>
+              <v-btn color="error" @click="deleteSelected" class="mr-2" :disabled="selected.length < 1">
+                <v-icon>fas fa-trash</v-icon>
+              </v-btn>
+              <v-btn color="success" @click="addMovie">
+                <v-icon>fas fa-plus</v-icon>
+              </v-btn>
+            </v-toolbar>
+          </template>
+
+          <template v-slot:item.posterUrl="{ item }">
+            <v-img :src="item.posterUrl" max-width="80"/>
+          </template>
+
+          <template v-slot:item.date="{ item }">
+            {{item.date | formatDate}}
+          </template>
+
+          <template v-slot:item.actions="{ item }">
+           <!-- <v-btn icon @click="editMovie(item)" class="mr-2">
+              <v-icon>
+                mdi-pencil
+              </v-icon>
+            </v-btn>-->
+            <v-btn color="error" elevation="0" small fab @click="deleteMovie(item)">
+              <v-icon>
+                mdi-delete
+              </v-icon>
             </v-btn>
-            <v-btn color="success" @click="addMovie">
-              <v-icon>fas fa-plus</v-icon>
-            </v-btn>
-          </v-toolbar>
-        </template>
-
-        <template v-slot:item.posterUrl="{ item }">
-          <v-img :src="item.posterUrl" max-width="80"/>
-        </template>
-
-        <template v-slot:item.date="{ item }">
-          {{item.date | formatDate}}
-        </template>
-
-        <template v-slot:item.actions="{ item }">
-          <v-btn icon @click="editMovie(item)" class="mr-2">
-            <v-icon>
-              mdi-pencil
-            </v-icon>
-          </v-btn>
-          <v-btn icon @click="deleteMovie(item)">
-            <v-icon>
-              mdi-delete
-            </v-icon>
-          </v-btn>
-        </template>
-      </v-data-table>
+          </template>
+        </v-data-table>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -55,6 +55,7 @@
   import MovieDelete from "../../components/forms/movie/MovieDelete";
   import MovieAdd from "../../components/forms/movie/MovieAdd";
   import Utils from "../../service/Utils";
+  import MovieEdit from "../../components/forms/movie/MovieEdit";
 
   export default {
     name: "movies",
@@ -98,11 +99,22 @@
       this.loading = false
     },
     methods: {
-      editMovie(movie) {
-        console.log("edit movie")
+      async editMovie(movie) {
+        let editedMovie = await this.$dialog.showAndWait(MovieEdit, {movie})
+        if (editedMovie !== false) {
+          this.loading = true;
+          this.$repos.movies.update(editedMovie).then(updatedMovie => {
+            updatedMovie.idx=movie.idx;
+            this.movies[updatedMovie.idx]=updatedMovie;
+            //Utils.initIndex(this.movies)
+            this.$dialog.message.success('Movies succesfully updated!',
+              {position: 'bottom-left', timeout: 3000})
+            console.debug("Updated",editedMovie)
+            this.loading = false;
+          })
+        }
       },
       async deleteMovie(movie) {
-        console.log("delete movie")
         let del = await this.$dialog.showAndWait(MovieDelete, {title: movie.name})
         if (del === true) {
           this.loading = true;
@@ -114,7 +126,6 @@
             console.debug("Deleted",movie)
             this.loading = false;
           })
-
         }
       },
       async deleteSelected() {

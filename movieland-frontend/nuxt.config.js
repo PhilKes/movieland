@@ -66,6 +66,9 @@ export default {
     },
     theme: {
       dark: false,
+      options: {
+        customProperties: true,
+      },
       icons: {
         iconfont: 'fa',
       },

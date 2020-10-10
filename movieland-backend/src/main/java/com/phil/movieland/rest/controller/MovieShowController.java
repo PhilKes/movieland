@@ -1,5 +1,6 @@
 package com.phil.movieland.rest.controller;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.rest.service.MovieService;
@@ -8,6 +9,7 @@ import com.phil.movieland.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,10 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * REST Controller for MovieShows
@@ -43,9 +44,90 @@ public class MovieShowController {
         List<MovieShow> shows=null;
         Date date=DateUtils.createDateFromDateString(dateString);
         log.info("Query for " + date);
-        shows=movieShowService.getShowsForDate(date);
+        shows=movieShowService.getShowsForDate(date,false);
         return shows;
     }
+
+    @GetMapping("/infos")
+    public Collection<MovieShowInfo> getMoviesShowsInfo(
+            @RequestParam(value="date", required=true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) Date date) {
+        log.info("Query for " + date);
+        List<MovieShow> shows=movieShowService.getShowsForDate(date,false);
+        Map<Long,List<MovieShow>> showMap=shows.stream().collect(groupingBy(MovieShow::getMovId));
+        List<Movie> movies= movieService.queryMoviesByIds(new ArrayList<>(showMap.keySet()));
+        List<MovieShowInfo> showInfos=new ArrayList<>();
+        movies.forEach(movie->{
+            MovieShowInfo info= new MovieShowInfo()
+                    .setMovId(movie.getMovId())
+                    .setName(movie.getName())
+                    .setPosterUrl(movie.getPosterUrl())
+                    .setDate(movie.getDate())
+                    .setShows(showMap.get(movie.getMovId()));
+            showInfos.add(info);
+        });
+        return showInfos;
+    }
+    public class MovieShowInfo{
+        Long movId;
+        String name;
+        @DateTimeFormat(iso= DateTimeFormat.ISO.DATE_TIME)
+        Date date;
+        String posterUrl;
+
+        List<MovieShow> shows;
+
+        public MovieShowInfo() {
+        }
+
+        public Long getMovId() {
+            return movId;
+        }
+
+        public MovieShowInfo setMovId(Long movId) {
+            this.movId=movId;
+            return this;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public MovieShowInfo setName(String name) {
+            this.name=name;
+            return this;
+
+        }
+
+        public Date getDate() {
+            return date;
+        }
+
+        public MovieShowInfo setDate(Date date) {
+            this.date=date;
+            return this;
+
+        }
+
+        public String getPosterUrl() {
+            return posterUrl;
+        }
+
+        public MovieShowInfo setPosterUrl(String posterUrl) {
+            this.posterUrl=posterUrl;
+            return this;
+
+        }
+
+        public List<MovieShow> getShows() {
+            return shows;
+        }
+
+        public MovieShowInfo setShows(List<MovieShow> shows) {
+            this.shows=shows;
+            return this;
+        }
+    }
+
 
     @GetMapping("/movies/{id}")
     public ResponseEntity<Collection<MovieShow>> getMovieShows(@PathVariable Long id,

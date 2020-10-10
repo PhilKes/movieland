@@ -2,7 +2,9 @@ package com.phil.movieland.data.repository;
 
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
+import com.phil.movieland.rest.controller.MovieShowController;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

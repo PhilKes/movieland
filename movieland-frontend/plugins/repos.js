@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export default (ctx, inject) => {
   const axios = (ctx.$axios)
 
@@ -38,6 +40,9 @@ export default (ctx, inject) => {
       },
       showsOfMovieWeek(movId) {
         return axios.$get(`/shows/movies/${movId}`)
+      },
+      showInfos(date){
+        return axios.$get(`/shows/infos`,{params:{date: moment(date).format("YYYY-MM-DD")}})
       }
     },
     seats: {
