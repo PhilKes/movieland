@@ -76,7 +76,7 @@ export default {
           secondary: '#150f82',
           info: '#76b6fd',
           warning: '#fd921f',
-          error: '#ff2929',
+          error: '#bb1919',
           success: colors.green.darken1,
           background: '#ffe9e9'
         }

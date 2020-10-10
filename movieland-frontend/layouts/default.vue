@@ -1,6 +1,5 @@
 <template>
   <v-app dark>
-
     <v-app-bar color="primary" style="z-index: 5!important;" dark app>
 
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="ml-1 mr-5 hidden-md-and-up">
@@ -47,7 +46,7 @@
       </v-row>
       <v-divider/>
       <v-list>
-        <v-list-item v-for="(item, i) in routes" :key="i" :to="item.to" router exact>
+        <v-list-item v-for="(item, i) in routes" :key="i" :to="item.to" router link nuxt>
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
