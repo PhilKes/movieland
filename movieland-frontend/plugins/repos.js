@@ -12,8 +12,15 @@ export default (ctx, inject) => {
       },
       trailer(id){
         return axios.$get(`/movies/trailer/${id}`)
+      },
+    },
+    tmdb:{
+      search(search){
+        return axios.$get(`/movies/tmdb`,{params:{name:search}})
+      },
+      topMovies(){
+        return axios.$get(`/movies/tmdb/top`)
       }
-
     },
     shows: {
       all() {

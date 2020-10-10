@@ -1,6 +1,7 @@
 <template>
   <v-app>
-    <v-navigation-drawer color="secondary" dark permanent fixed style="top:55px!important;" mini-variant
+    <v-navigation-drawer color="secondary" dark permanent fixed
+                         style="top:55px!important;z-index: 2!important;" mini-variant
                          expand-on-hover >
       <v-list>
         <v-list-item v-for="(item, i) in routes" :key="i" :to="item.to" router exact>
@@ -45,5 +46,7 @@
 <style scoped>
   .content{
     margin-left: 44px!important;
+    paddin-left:8px;
+    paddin-right:8px;
   }
 </style>

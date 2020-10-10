@@ -1,7 +1,7 @@
 <template>
   <v-app dark>
 
-    <v-app-bar color="primary" dark app>
+    <v-app-bar color="primary" style="z-index: 5!important;" dark app>
 
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="ml-1 mr-5 hidden-md-and-up">
         <v-icon large>fas fa-bars</v-icon>
@@ -146,7 +146,7 @@
           {
             icon: 'fas fa-tools',
             title: 'Admin',
-            to: '/admin',
+            to: '/admin/dashboard',
             roles: ['ROLE_ADMIN']
           }
         ];

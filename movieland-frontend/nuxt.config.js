@@ -100,8 +100,8 @@ export default {
     },
     prompt: {
       width: 1200
-
-    }
+    },
+    width:1200
     // ...
   },
 

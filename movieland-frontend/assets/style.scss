@@ -14,3 +14,23 @@
 .hover-pointer:hover {
   cursor: pointer;
 }
+
+.title-col{
+  width: 42vw;
+}
+
+.dialog-card{
+  .v-card__title{
+    font-size: 0.9em;
+  }
+  .v-card__text{
+    font-size: 0.8em!important;
+  }
+  .v-card__subtitle{
+    font-size: 0.7em!important;
+  }
+}
+
+.v-dialog{
+  overflow: hidden;
+}
