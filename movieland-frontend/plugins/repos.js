@@ -13,6 +13,12 @@ export default (ctx, inject) => {
       trailer(id){
         return axios.$get(`/movies/trailer/${id}`)
       },
+      add(movie) {
+        return axios.$post(`/movies`, movie)
+      },
+      remove(movId){
+        return axios.$delete(`/movies/${movId}`)
+      }
     },
     tmdb:{
       search(search){

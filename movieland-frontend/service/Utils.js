@@ -9,6 +9,9 @@ const Utils = {
   },
   getPureToken(token){
     return token.replace("Bearer ","");
+  },
+  initIndex(array){
+    array.forEach((item,idx)=>item.idx=idx)
   }
 }
 export default Utils;

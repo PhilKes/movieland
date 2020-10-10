@@ -8,7 +8,7 @@
                     :headers="headers"
                     :items="movies"
                     item-key="movie"
-                    class="elevation-1"
+                    class="elevation-1" sort-desc sort-by="date"
                     :search="search" :items-per-page="10"
       >
         <template v-slot:top>
@@ -52,6 +52,7 @@
 <script>
   import MovieDelete from "../../components/forms/movie/MovieDelete";
   import MovieAdd from "../../components/forms/movie/MovieAdd";
+  import Utils from "../../service/Utils";
 
   export default {
     name: "movies",
@@ -86,7 +87,7 @@
     },
     async fetch() {
       this.movies = await this.$repos.movies.all();
-      this.movies.forEach((movie,idx)=> movie.idx=idx);
+      this.movies.forEach((movie, idx) => {movie.idx = idx;movie.exists=true;});
       console.log("movies", this.movies)
       this.loading = false
     },
@@ -96,19 +97,38 @@
       },
       async deleteMovie(movie) {
         console.log("delete movie")
-        let del= await this.$dialog.showAndWait(MovieDelete,{title:movie.name})
-        if(del=== true){
-          this.movies.splice(movie.idx,1);
+        let del = await this.$dialog.showAndWait(MovieDelete, {title: movie.name})
+        if (del === true) {
+          this.loading=true;
+          this.$repos.movies.remove(movie.movId).then(resp=>{
+            this.movies.splice(movie.idx, 1);
+            Utils.initIndex(this.movies)
+            this.$dialog.message.success('Movies succesfully removed!',
+              {position:'bottom-left',timeout:3000})
+            this.loading=false;
+          })
+
         }
       },
       async addMovie() {
         console.log("add movie")
-        let newMovies= await this.$dialog.showAndWait(MovieAdd,
-          {width:'620',tmdbRepo:this.$repos.tmdb})
-        if(newMovies!== false){
+        let newMovies = await this.$dialog.showAndWait(MovieAdd,
+          {width: '620', tmdbRepo: this.$repos.tmdb,existingMovies: this.movies})
+        if (newMovies !== false) {
           console.log(newMovies)
-          //REST POST
-          newMovies.forEach(newMovie=>this.movies.push(newMovie));
+          this.loading = true;
+          let promises = [];
+          newMovies.forEach(newMovie => {
+            promises.push(this.$repos.movies.add(newMovie).then(addedMovie => {
+              this.movies.push(addedMovie)
+              return addedMovie
+            }));
+          });
+          Promise.all(promises).then(addedMovies => {
+            this.$dialog.message.success('Movies succesfully added!',
+              {position:'bottom-left',timeout:3000})
+            this.loading=false;
+          })
           //Scroll to new movie
         }
       }
