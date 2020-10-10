@@ -1,5 +1,6 @@
 // middleware/is-admin.js
 import jwt_decode from "jwt-decode";
+import Utils from "../service/Utils";
 
 export default ({$auth,$events, route, redirect,from}) => {
   if(process.server){

@@ -73,7 +73,7 @@ export default {
         light: {
           primary: '#991b1b',
           accent: colors.grey.darken3,
-          secondary: '#1f6abb',
+          secondary: '#150f82',
           info: '#76b6fd',
           warning: '#fd921f',
           error: '#ff2929',
