@@ -32,6 +32,7 @@
     async fetch() {
       this.movies = await this.$repos.movies.all();
       console.log("movies",this.movies)
+      this.loading = false
       setTimeout(() => this.loading = false, 0);
     }
   }

@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import moment from 'moment'
 import VueYoutube from 'vue-youtube'
+import AsyncComputed from 'vue-async-computed'
+
 Vue.filter('formatDateTime', value => {
   if (!value) return ''
   return moment(value).format('DD.MM.YYYY HH:mm [h]');
@@ -19,3 +21,4 @@ Vue.filter('formatTime', value => {
   return moment(value).format('HH:mm [h]');
 })
 Vue.use(VueYoutube)
+Vue.use(AsyncComputed);

@@ -22,6 +22,7 @@
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
     "@nuxtjs/vuetify": "^1.11.2",
-    "moment": "^2.29.0"
+    "moment": "^2.29.0",
+    "vue-async-computed": "^3.9.0"
   }
 }

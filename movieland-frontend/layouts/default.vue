@@ -77,6 +77,7 @@
   import logo from "../static/img/movie_land_icon.png"
   import jwt_decode from "jwt-decode";
   import loggedIn from "../middleware/loggedIn";
+  import Utils from "../service/Utils";
 
   export default {
     data() {
@@ -84,21 +85,13 @@
         clipped: false,
         drawer: false,
         fixed: false,
-        routes: [
-          {
-            icon: 'fas fa-film',
-            title: 'Movies',
-            to: '/movies'
-          },
-          {
-            icon: 'fas fa-dollar-sign',
-            title: 'Prices',
-            to: '/prices'
-          }
-        ],
         title: 'MovieLand',
+        routes:[],
         logo
       }
+    },
+    mounted() {
+      this.updateRoutes();
     },
     methods: {
       async showLoginDialog() {
@@ -113,13 +106,13 @@
           console.log("user", this.$auth.user)
           console.log("token", jwt_decode(this.$auth.getToken('local')))
           return this.$auth.user;
-        }).catch(err=>{
+        }).catch(err => {
           this.showLoginDialog();
           this.$dialog.confirm({
-            title:'Login failed',
-            text:'Your entered Username and Password do not match\n Please try again',
+            title: 'Login failed',
+            text: 'Your entered Username and Password do not match\n Please try again',
             actions: ["Ok"],
-            width:300
+            width: 300
           })
         })
       },
@@ -133,15 +126,47 @@
              console.log("user",this.$auth.user)
            })*/
       },
-      onLogout(){
-        this.$auth.logout()
+      async onLogout() {
+        await this.$auth.logout()
         this.$router.push('/')
+        this.updateRoutes();
+      },
+      async updateRoutes(){
+        let routes = [
+          {
+            icon: 'fas fa-film',
+            title: 'Movies',
+            to: '/movies'
+          },
+          {
+            icon: 'fas fa-dollar-sign',
+            title: 'Prices',
+            to: '/prices'
+          },
+          {
+            icon: 'fas fa-tools',
+            title: 'Admin',
+            to: '/admin',
+            roles: ['ROLE_ADMIN']
+          }
+        ];
+        let token = await this.$auth.getToken('local');
+        let userInfo = token === false ? {authorities: []} : jwt_decode(Utils.getPureToken(token));
+        routes= routes.filter(route => {
+          if (route.roles && route.roles.length > 0) {
+            return route.roles.some(role => userInfo.authorities.some(auth => auth.authority === role))
+          }
+          return true;
+        });
+        console.log("routes",routes)
+        this.routes=routes;
       }
     },
     created() {
       this.$events.$on('showLogin', (onSuccess) => {
         console.log("SHOW LOGIN")
         this.showLoginDialog().then(res => {
+          this.updateRoutes();
           if (typeof onSuccess === 'string' || onSuccess instanceof String)
             this.$router.push(onSuccess);
           else

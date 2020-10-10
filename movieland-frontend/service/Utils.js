@@ -6,6 +6,9 @@ const Utils = {
       r[moment(a.date).format("dd DD.MM")] = [...r[moment(a.date).format("dd DD.MM")] || [], a];
       return r;
     }, {});
+  },
+  getPureToken(token){
+    return token.replace("Bearer ","");
   }
 }
 export default Utils;
