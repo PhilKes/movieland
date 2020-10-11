@@ -19,9 +19,9 @@ INSERT INTO RESERVATION (SHOW_ID, USER_ID) VALUES ((SELECT SHOW_ID FROM MOVIE_SH
 
 */
 INSERT IGNORE INTO ROLE(id,name)
-VALUES (1,'USER');
+VALUES (1,'ROLE_USER');
 INSERT IGNORE INTO ROLE(id,name)
-VALUES (2,'ADMIN');
+VALUES (2,'ROLE_ADMIN');
 
 INSERT IGNORE INTO USER(id,name, username, email, password,created_at,updated_at)
 VALUES (1,'Phil Key', 'admin', 'admin@mail.com', 'admin123',curdate(),curdate());
@@ -29,12 +29,12 @@ INSERT IGNORE INTO USER(id,name, username, email, password,created_at,updated_at
 VALUES (2,'User1', 'user', 'user@mail.com', 'user123',curdate(),curdate());
 
 INSERT IGNORE INTO USER_ROLES (user_id, role_id)
-VALUES ((SELECT id FROM USER WHERE username = 'admin'), (SELECT id FROM ROLE WHERE name = 'ADMIN'));
+VALUES ((SELECT id FROM USER WHERE username = 'admin'), (SELECT id FROM ROLE WHERE name = 'ROLE_ADMIN'));
 INSERT IGNORE INTO USER_ROLES (user_id, role_id)
-VALUES ((SELECT id FROM USER WHERE username = 'admin'), (SELECT id FROM ROLE WHERE name = 'USER'));
+VALUES ((SELECT id FROM USER WHERE username = 'admin'), (SELECT id FROM ROLE WHERE name = 'ROLE_USER'));
 
 INSERT IGNORE INTO USER_ROLES (user_id, role_id)
-VALUES ((SELECT id FROM USER WHERE username = 'user'), (SELECT id FROM ROLE WHERE name = 'USER'));
+VALUES ((SELECT id FROM USER WHERE username = 'user'), (SELECT id FROM ROLE WHERE name = 'ROLE_USER'));
 
 
 
