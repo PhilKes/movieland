@@ -43,3 +43,17 @@
 .disabled-text {
   color:red!important;
 }
+.border-no-bottom{
+  border-bottom: none!important;
+}
+
+.btn-tiny{
+  width:20px!important;
+  height:20px!important;
+
+  .v-icon{
+      font-size:10px!important;
+      padding-right: 1px;
+  }
+
+}

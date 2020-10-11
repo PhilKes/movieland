@@ -57,7 +57,7 @@
 
           <template v-slot:item.shows="{ item }">
             <v-row justify="center">
-              <v-simple-table dense style="background-color: transparent" >
+              <v-simple-table dense style="background-color: transparent">
                 <template v-slot:default>
                   <!--    <thead>
                       <tr>
@@ -67,12 +67,16 @@
                       </tr>
                       </thead>-->
                   <tbody>
-                  <tr v-for="(show,idx) of item.shows" >
-                    <td style="border-bottom: none!important;">
-                      <v-row dense justify="start" align="start">
-                        <div class="show-item" @click="$router.push(`/movies/${item.movId}/shows/${show.showId}`)">
+                  <tr v-for="(show,idx) of item.shows">
+                    <td class="border-no-bottom">
+                      <v-row dense justify="center" align="center" align-content="center">
+                        <div class="show-item" v-on:click="$router.push(`/movies/${item.movId}/shows/${show.showId}`)">
                           <p>
                             {{show.date | formatTime}}
+                            <v-btn fab color="error" elevation="0" class="btn-tiny"
+                                   v-on:click.stop="deleteSingleShow(show)">
+                              <v-icon>fas fa-trash</v-icon>
+                            </v-btn>
                           </p>
                         </div>
                       </v-row>
@@ -102,7 +106,7 @@
     name: "AdminShows",
     data() {
       return {
-        dates: moment().format('YYYY-DD-MM'),
+        dates: moment().format('YYYY-MM-DD'),
         movieInfos: [],
         headers: [
           {
@@ -145,14 +149,40 @@
     methods: {
       async findShows() {
         this.loading = true;
-        console.log("date",this.dates)
+        console.log("date", this.dates)
         this.movieInfos = await this.$repos.shows.showInfos(this.dates);
         console.log("infos", this.movieInfos)
         this.loading = false;
       },
-      selectToday(){
-        this.dates=moment().format('YYYY-DD-MM');
+      selectToday() {
+        this.dates = moment().format('YYYY-MM-DD');
         this.findShows();
+      },
+      async deleteSingleShow(show) {
+        console.log("delte show", show)
+        let res = await this.$dialog.confirm({
+          text: "Do you really want to delete this show?",
+          title: "Delete Show",
+          width:'400px',
+          actions: {
+            cancel: {
+              color: 'secondary',
+              outlined:true,
+              text: 'Cancel',
+            },
+            ok: {
+              color: 'error',
+              text: 'Delete',
+            },
+          }
+        });
+        if(res==='ok'){
+          this.loading=true;
+          this.$repos.shows.remove(show.showId).then(resp=>{
+            this.findShows();
+            this.loading=false;
+          })
+        }
       }
     },
     computed: {

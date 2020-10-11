@@ -1,6 +1,6 @@
 
 INSERT IGNORE INTO MOVIE (MOVIE_ID,NAME, RELEASE_DATE,DESCRIPTION) VALUES (1,'Star Wars', '2019-12-16', 'A long time ago');
-INSERT IGNORE INTO MOVIE (MOVIE_ID,NAME, RELEASE_DATE,DESCRIPTION) VALUES (2,'Star Wars 2', '2021-12-16', 'ABSDFV dsfg');
+INSERT IGNORE INTO MOVIE (MOVIE_ID,NAME, RELEASE_DATE,DESCRIPTION) VALUES (2,'Star Wars Return of the Jedi', '2021-12-16', 'ABSDFV dsfg');
 INSERT IGNORE INTO MOVIE (MOVIE_ID,NAME, RELEASE_DATE,DESCRIPTION) VALUES (3,'Indiana Jones', '1982-10-12', 'Harrison Ford out in the jungle');
 INSERT IGNORE INTO MOVIE (MOVIE_ID,NAME, RELEASE_DATE,DESCRIPTION) VALUES (4,'Whiplash', '2014-10-05', 'A young drummer trying');
 INSERT IGNORE INTO MOVIE (MOVIE_ID,NAME, RELEASE_DATE,DESCRIPTION) VALUES (5,'Harry Potter', '2001-10-10', 'The boy who lived');
@@ -24,9 +24,10 @@ INSERT IGNORE INTO ROLE(id,name)
 VALUES (2,'ROLE_ADMIN');
 
 INSERT IGNORE INTO USER(id,name, username, email, password,created_at,updated_at)
-VALUES (1,'Phil Key', 'admin', 'admin@mail.com', 'admin123',curdate(),curdate());
+VALUES (1,'Phil Key', 'admin', 'admin@mail.com', '$2a$10$j76.2qh8PJvEeehtkC/0cekU8Z7MvzT2WaP95tacIRpK3a6AOjm0.',curdate(),curdate());
 INSERT IGNORE INTO USER(id,name, username, email, password,created_at,updated_at)
-VALUES (2,'User1', 'user', 'user@mail.com', 'user123',curdate(),curdate());
+VALUES (2,'User1', 'user', 'user@mail.com', '$2a$10$CclMO.EdyWx9apJM8OZvFOU7ZgVsNPYzmakhIzmU8wFEiJ.Bp9MWK',curdate(),curdate());
+
 
 INSERT IGNORE INTO USER_ROLES (user_id, role_id)
 VALUES ((SELECT id FROM USER WHERE username = 'admin'), (SELECT id FROM ROLE WHERE name = 'ROLE_ADMIN'));

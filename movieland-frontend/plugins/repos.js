@@ -34,7 +34,10 @@ export default (ctx, inject) => {
       all() {
         return axios.$get(`/shows`)
       },
+      remove(showId){
+        return axios.$delete(`/shows/${showId}`)
 
+      },
       id(id) {
         return axios.$get(`/shows/${id}`)
       },
