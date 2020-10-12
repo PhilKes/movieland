@@ -41,6 +41,11 @@
             icon: 'fas fa-calendar-alt',
             title: 'Shows',
             to: '/admin/shows',
+          },
+          {
+            icon: 'fas fa-calendar-alt',
+            title: 'Generate',
+            to: '/admin/generate',
           }
         ]
       }
