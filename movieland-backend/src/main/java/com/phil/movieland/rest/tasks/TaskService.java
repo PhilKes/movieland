@@ -47,7 +47,7 @@ public class TaskService {
         if(task==null) {
             return null;
         }
-        return new TaskProgress(task.getProgressMax(), task.getProgress(), taskId, null);
+        return new TaskProgress(task.getProgressMax(), task.getProgress(), taskId, task.getMessage());
     }
 
     public void removeTask(int taskId) {

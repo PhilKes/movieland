@@ -12,21 +12,26 @@
                 <v-menu transition="scale-transition" :close-on-content-click="true"
                         min-width="290px" class="mt-4">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-combobox hide-details v-model="showsForm.from" label="Start Date" prepend-icon="mdi-calendar"
+                    <v-combobox hide-details v-model="from" label="Start Date" prepend-icon="mdi-calendar"
                                 readonly v-bind="attrs" v-on="on"></v-combobox>
                   </template>
-                  <v-date-picker v-model="showsForm.from" no-title scrollable></v-date-picker>
+                  <v-date-picker v-model="from" no-title scrollable></v-date-picker>
                 </v-menu>
               </v-col>
               <v-col>
                 <v-menu transition="scale-transition" :close-on-content-click="true"
                         min-width="290px" class="mt-4">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-combobox hide-details v-model="showsForm.until" label="End Date" prepend-icon="mdi-calendar"
+                    <v-combobox hide-details v-model="until" label="End Date" prepend-icon="mdi-calendar"
                                 readonly v-bind="attrs" v-on="on"></v-combobox>
                   </template>
-                  <v-date-picker v-model="showsForm.until" no-title scrollable></v-date-picker>
+                  <v-date-picker v-model="until" no-title scrollable></v-date-picker>
                 </v-menu>
+              </v-col>
+              <v-col cols="auto" align-self="center" align="center">
+                <v-btn fab elevation="0" x-small color="primary" @click="deleteStats">
+                  <v-icon>fas fa-trash</v-icon>
+                </v-btn>
               </v-col>
             </v-row>
             <v-divider/>
@@ -74,15 +79,20 @@
             </v-row>
           </v-form>
           <v-card-actions>
-              <v-row>
-                <v-col>
-                  <v-btn v-if="!loading" color="success" :disabled="!reservationsEnabled && !showsEnabled || loading" @click="submitGenerate">
-                    Generate
-                  </v-btn>
-                  <v-progress-linear v-else color="primary" height="10" value="10" striped></v-progress-linear>
-                </v-col>
-              </v-row>
-            </v-card-actions>
+            <v-row>
+              <v-col>
+                <v-btn v-if="!loading" color="success" :disabled="!reservationsEnabled && !showsEnabled || loading"
+                       @click="submitGenerate">
+                  Generate
+                </v-btn>
+                <v-progress-linear v-else rounded :value="task.progress" :indeterminate="task.indeterminate" color="primary" height="20" >
+                  <template v-slot="{ value }">
+                    <strong :style="{'color':task.indeterminate? 'black':'white'}">{{ task.message }}</strong>
+                  </template>
+                </v-progress-linear>
+              </v-col>
+            </v-row>
+          </v-card-actions>
         </v-card>
 
       </v-col>
@@ -99,29 +109,112 @@
     name: "AdminGenerate",
     data() {
       return {
+        from: moment().format("YYYY-MM-DD"),
+        until: moment().format("YYYY-MM-DD"),
         showsEnabled: true,
         reservationsEnabled: true,
         showsForm: {
-          from: moment().format("YYYY-MM-DD"),
           moviePerDay: 3,
           showsPerMovie: 3,
-          until: moment().format("YYYY-MM-DD")
         },
         reservationsForm: {
-          from: moment().format("YYYY-MM-DD"),
           resPerShow: 3,
-          until: moment().format("YYYY-MM-DD")
         },
         loading: false,
+        task: {
+          indeterminate:false,
+          progress: 0,
+          message: null,
+        },
+        taskFinished: false,
+        taskQueue: []
+      }
+    },
+    watch: {
+      taskFinished: function (val) {
+        if (val === true) {
+          if(this.taskQueue.length >0){
+            this.taskQueue.pop()();
+          }
+        }
       }
     },
     methods: {
       submitGenerate() {
-        console.log("submit shows")
         this.loading = true;
+        this.task.progress=0;
+        if (this.showsEnabled) {
+          this.$repos.statistics.generateShows({
+            ...this.showsForm,
+            from: moment(this.from),
+            until: moment(this.until),
+          }).then(taskId => {
+            this.taskFinished = false;
+            this.taskId = taskId;
+            if (this.reservationsEnabled) {
+              this.taskQueue.push(this.submitReservationGenerate)
+            }
+            this.pollTaskProgress(taskId);
+          })
+        } else if (this.reservationsEnabled) {
+          this.submitReservationGenerate();
+        }
+      },
+      submitReservationGenerate() {
+        this.loading=true;
+        this.task.progress=0;
+        this.$repos.statistics.generateReservations({
+          ...this.reservationsForm,
+          from: moment(this.from),
+          until: moment(this.until),
+        }).then(taskId => {
+          this.taskFinished = false;
+          this.taskId = taskId;
+          this.pollTaskProgress(taskId);
+        });
+      },
+      async deleteStats(){
+        let res = await this.$dialog.confirm({
+          text: `<b>From:</b>${this.from}<br/><b>Until:</b> ${this.until}`,
+          title: "Delete Statistics",
+          width:'400px',
+          actions: {
+            cancel: {
+              color: 'secondary',
+              outlined:true,
+              text: 'Cancel',
+            },
+            ok: {
+              flat:true,
+              color: 'error',
+              text: 'Delete',
+            },
+          }
+        });
+        if(res==='ok'){
+          this.loading=true;
+          this.task.message="Deleting Statistics"
+          this.task.indeterminate=true;
+          this.$repos.statistics.deleteStats({from:this.from, until: this.until}).then(resp=>{
+            this.loading=false;
+            this.task.indeterminate=false;
+          });
+        }
+
+      },
+      pollTaskProgress(taskId) {
         setTimeout(() => {
-          this.loading = false
-        }, 2000)
+          this.$repos.tasks.progress(taskId).then(task => {
+            this.task.progress = (Number(task.progress) / Number(task.progressMax))*100;
+            this.task.message = task.message;
+            if (task.progress !== task.progressMax)
+              this.pollTaskProgress(taskId)
+            else {
+              this.loading = false;
+              this.taskFinished = true;
+            }
+          })
+        }, 200)
       }
     }
   }

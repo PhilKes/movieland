@@ -63,6 +63,22 @@ export default (ctx, inject) => {
       allUserReservations() {
         return axios.get(`/reservations/me/info`).then(resp => resp.data)
       }
+    },
+    statistics:{
+      generateShows(showRequest){
+        return axios.$post(`/statistics/shows`,showRequest);
+      },
+      generateReservations(reservationRequest){
+        return axios.$post(`/statistics/reservations`,reservationRequest);
+      },
+      deleteStats(deleteRequest){
+        return axios.$delete(`/statistics/statistics`,{params:deleteRequest});
+      }
+    },
+    tasks:{
+      progress(taskId){
+        return axios.$get(`/tasks/${taskId}`);
+      }
     }
   }
   //...

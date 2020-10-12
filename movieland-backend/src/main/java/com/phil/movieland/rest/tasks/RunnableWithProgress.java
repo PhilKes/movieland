@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class RunnableWithProgress implements Runnable {
     private AtomicInteger progress=new AtomicInteger(0);
     private AtomicInteger progressMax=new AtomicInteger(100);
+    private String message=null;
 
     public void incProgress(int inc) {
         progress.addAndGet(inc);
@@ -27,5 +28,13 @@ public abstract class RunnableWithProgress implements Runnable {
 
     public void setProgressMax(int progressMax) {
         this.progressMax.set(progressMax);
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message=message;
     }
 }

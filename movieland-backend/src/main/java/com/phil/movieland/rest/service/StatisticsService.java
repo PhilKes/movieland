@@ -56,6 +56,7 @@ public class StatisticsService {
         return new RunnableWithProgress() {
             @Override
             public void run() {
+                setMessage("Generating Shows");
                 setProgress(0);
                 long days=ChronoUnit.DAYS.between(from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
                         , until.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
@@ -119,6 +120,7 @@ public class StatisticsService {
         return new RunnableWithProgress() {
             @Override
             public void run() {
+                setMessage("Generating Reservations");
                 setProgress(0);
                 log.info("Start generation of reservations for: " + DateUtils.getDateStringFromDate(from) + " until: " + DateUtils.getDateStringFromDate(until));
                 //TODO List<MovieShow> shows=movieShowService.getShowsForDateBetween(from,until);

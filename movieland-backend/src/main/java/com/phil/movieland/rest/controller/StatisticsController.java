@@ -60,7 +60,7 @@ public class StatisticsController {
         }
         log.info("Task " + taskId + " posted for execution");
         return ResponseEntity.created(new URI("/api/task/" + taskId))
-                .body("Posted GenerateShows Task (taskId: " + taskId + ")");
+                .body(taskId);
     }
 
     /**
@@ -76,7 +76,7 @@ public class StatisticsController {
         int taskId;
         taskId=taskService.execute(statisticsService.generateReservationsBetweenTask(start, end, resRequest.getResPerShow()));
         return ResponseEntity.created(new URI("/api/task/" + taskId))
-                .body("Posted GenerateReservation Task (taskId: " + taskId + ")");
+                .body(taskId);
     }
 
   /*  @PostMapping("/shows")

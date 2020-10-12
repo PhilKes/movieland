@@ -43,7 +43,7 @@
             to: '/admin/shows',
           },
           {
-            icon: 'fas fa-calendar-alt',
+            icon: 'fas fa-database',
             title: 'Generate',
             to: '/admin/generate',
           }
