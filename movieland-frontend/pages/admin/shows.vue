@@ -89,7 +89,7 @@
           </template>
 
           <template v-slot:item.actions="{ item }">
-            <v-btn fab x-small color="error" class="mr-2" elevation="0">
+            <v-btn fab x-small color="error" class="mr-2" elevation="0" @click="deleteMovieShows(item)">
               <v-icon>fas fa-trash</v-icon>
             </v-btn>
           </template>
@@ -101,6 +101,7 @@
 
 <script>
   import moment from 'moment'
+  import DialogConfirm from "../../components/cards/DialogConfirm";
 
   export default {
     name: "AdminShows",
@@ -160,28 +161,34 @@
       },
       async deleteSingleShow(show) {
         console.log("delte show", show)
-        let res = await this.$dialog.confirm({
+        let res = await this.$dialog.showAndWait(DialogConfirm, {
           text: "Do you really want to delete this show?",
           title: "Delete Show",
-          width:'400px',
-          actions: {
-            cancel: {
-              color: 'secondary',
-              outlined:true,
-              text: 'Cancel',
-            },
-            ok: {
-              color: 'error',
-              text: 'Delete',
-            },
-          }
+          width: '400px',
+          submitText: 'Delete'
         });
-        if(res==='ok'){
-          this.loading=true;
-          this.$repos.shows.remove(show.showId).then(resp=>{
+        if (res === true) {
+          this.loading = true;
+          this.$repos.shows.remove(show.showId).then(resp => {
             this.findShows();
-            this.loading=false;
+            this.loading = false;
           })
+        }
+      },
+      async deleteMovieShows(movie) {
+        let showTexts= movie.shows.map(show=> moment(show.date).format("DD.MM HH:mm [h]")).join("<br/>")
+        let res = await this.$dialog.showAndWait(DialogConfirm, {
+          text:
+            `Do you really want to delete these shows ?<br/><b>Movie:</b><br/>${movie.name}<br/><b>Dates:</b><br/>${showTexts}`,
+          title: "Delete Shows",
+          width: '400px',
+          submitText: 'Delete',
+          cancel:true
+        });
+        if (res === true) {
+          this.loading=true;
+          await this.$repos.shows.removeList(movie.shows.map(show=>show.showId));
+          this.findShows();
         }
       }
     },

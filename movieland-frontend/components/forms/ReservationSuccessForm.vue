@@ -1,37 +1,24 @@
 <template>
-  <DialogCard title="Reservation Success!" :actions="actions">
+  <v-card class="dialog-card">
+    <v-card-title>Reservation Success</v-card-title>
     <v-card-text>
-      Movie: {{showDetails.movieTitle}}<br/>
-      Date: {{showDetails.date | formatDateTime}}<br/>
-      Total Sum: {{reservation.totalSum}} $
+      <b>Movie:</b> {{showDetails.movieTitle}}<br/>
+      <b>Date:</b> {{showDetails.date | formatDateTime}}<br/>
+      <b>Total Sum:</b> {{reservation.totalSum}} $
     </v-card-text>
-  </DialogCard>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="success" elevation="0" @click="$router.push('/users/me/reservations/' +reservation.resId);$emit('submit',true)">
+        To my Reservation
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 <script>
   export default {
     props: {
       reservation: Object,
       showDetails: Object
-    },
-    data() {
-      return {
-        username: 'admin',
-        password: 'admin123'
-      }
-    },
-    computed: {
-      actions() {
-        return {
-          goto: {
-            flat: false,
-            color: 'success',
-            text: 'To my Reservation',
-            handle: () => {
-              this.$router.push('/users/me/reservations/' + this.reservation.resId)
-            }
-          }
-        }
-      }
     }
   }
 </script>

@@ -1,7 +1,10 @@
 <template>
   <DialogCard title="Login" :actions="actions">
     <v-text-field outlined label="Username" icon="person" v-model="username"/>
-    <v-text-field type="password" outlined label="Password" icon="lock" v-model="password"/>
+    <v-text-field type="password" outlined label="Password"
+                  icon="lock" v-model="password"
+                  @keyup.enter.native="submitLogin"
+    />
   </DialogCard>
 </template>
 <script>
@@ -13,15 +16,21 @@
         password: 'admin123'
       }
     },
+    methods: {
+      submitLogin() {
+        this.$emit('submit', {data: {usernameOrEmail: this.username, password: this.password}}
+        )
+      }
+    },
     computed: {
       actions() {
         return {
           register: {
-            outlined:true,
+            outlined: true,
             color: 'dark',
             text: 'Register',
-            handle(){
-               return "register";
+            handle() {
+              return "register";
             }
           },
           login: {

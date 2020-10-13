@@ -1,4 +1,5 @@
 import moment from "moment";
+const qs = require('qs');
 
 export default (ctx, inject) => {
   const axios = (ctx.$axios)
@@ -37,6 +38,15 @@ export default (ctx, inject) => {
       remove(showId){
         return axios.$delete(`/shows/${showId}`)
 
+      },
+      removeList(showIds){
+        return axios.$delete('/shows', {
+          params: {
+            showIds
+          },
+          paramsSerializer: params => qs.stringify(params, {arrayFormat: 'repeat'})
+
+        })
       },
       id(id) {
         return axios.$get(`/shows/${id}`)

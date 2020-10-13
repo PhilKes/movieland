@@ -29,7 +29,7 @@
                 </v-menu>
               </v-col>
               <v-col cols="auto" align-self="center" align="center">
-                <v-btn fab elevation="0" x-small color="primary" @click="deleteStats">
+                <v-btn fab elevation="0" x-small color="primary" @click="deleteStats" :disabled="loading">
                   <v-icon>fas fa-trash</v-icon>
                 </v-btn>
               </v-col>
@@ -104,6 +104,7 @@
 
 <script>
   import moment from 'moment';
+  import DialogConfirm from "../../components/cards/DialogConfirm";
 
   export default {
     name: "AdminGenerate",
@@ -174,24 +175,13 @@
         });
       },
       async deleteStats(){
-        let res = await this.$dialog.confirm({
-          text: `<b>From:</b>${this.from}<br/><b>Until:</b> ${this.until}`,
+        let res = await this.$dialog.showAndWait(DialogConfirm,{
+          text: ` <b>From:</b>${this.from}<br/><b>Until:</b> ${this.until}`,
           title: "Delete Statistics",
-          width:'400px',
-          actions: {
-            cancel: {
-              color: 'secondary',
-              outlined:true,
-              text: 'Cancel',
-            },
-            ok: {
-              flat:true,
-              color: 'error',
-              text: 'Delete',
-            },
-          }
+          submitText: 'Delete',
+          width:'400px'
         });
-        if(res==='ok'){
+        if(res===true){
           this.loading=true;
           this.task.message="Deleting Statistics"
           this.task.indeterminate=true;

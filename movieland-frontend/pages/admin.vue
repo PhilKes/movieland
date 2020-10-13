@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer color="secondary" dark permanent fixed
+    <v-navigation-drawer color="secondary" dark permanent fixed width="200px"
                          style="top:55px!important;z-index: 2!important;" mini-variant
                          expand-on-hover >
       <v-list>

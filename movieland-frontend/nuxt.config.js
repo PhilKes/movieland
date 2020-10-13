@@ -77,7 +77,7 @@ export default {
           primary: '#991b1b',
           accent: colors.grey.darken3,
           secondary: '#150f82',
-          info: '#76b6fd',
+          info: '#2f83de',
           warning: '#fd921f',
           error: '#bb1919',
           success: colors.green.darken1,

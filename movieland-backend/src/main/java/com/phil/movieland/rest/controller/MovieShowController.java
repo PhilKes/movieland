@@ -44,7 +44,7 @@ public class MovieShowController {
         List<MovieShow> shows=null;
         Date date=DateUtils.createDateFromDateString(dateString);
         log.info("Query for " + date);
-        shows=movieShowService.getShowsForDate(date,false);
+        shows=movieShowService.getShowsForDate(date, false);
         return shows;
     }
 
@@ -52,12 +52,12 @@ public class MovieShowController {
     public Collection<MovieShowInfo> getMoviesShowsInfo(
             @RequestParam(value="date", required=true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) Date date) {
         log.info("Query for " + date);
-        List<MovieShow> shows=movieShowService.getShowsForDate(date,false);
-        Map<Long,List<MovieShow>> showMap=shows.stream().collect(groupingBy(MovieShow::getMovId));
-        List<Movie> movies= movieService.queryMoviesByIds(new ArrayList<>(showMap.keySet()));
+        List<MovieShow> shows=movieShowService.getShowsForDate(date, false);
+        Map<Long, List<MovieShow>> showMap=shows.stream().collect(groupingBy(MovieShow::getMovId));
+        List<Movie> movies=movieService.queryMoviesByIds(new ArrayList<>(showMap.keySet()));
         List<MovieShowInfo> showInfos=new ArrayList<>();
-        movies.forEach(movie->{
-            MovieShowInfo info= new MovieShowInfo()
+        movies.forEach(movie -> {
+            MovieShowInfo info=new MovieShowInfo()
                     .setMovId(movie.getMovId())
                     .setName(movie.getName())
                     .setPosterUrl(movie.getPosterUrl())
@@ -67,10 +67,11 @@ public class MovieShowController {
         });
         return showInfos;
     }
-    public class MovieShowInfo{
+
+    public class MovieShowInfo {
         Long movId;
         String name;
-        @DateTimeFormat(iso= DateTimeFormat.ISO.DATE_TIME)
+        @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
         Date date;
         String posterUrl;
 
@@ -183,8 +184,12 @@ public class MovieShowController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping
-    public ResponseEntity<?> deleteShows() {
-        movieShowService.deleteAllMovieShows();
+    public ResponseEntity<?> deleteShows(@RequestParam(value="showIds", required=false) List<Long> showIds) {
+        if(showIds==null) {
+            movieShowService.deleteAllMovieShows();
+        }else{
+            movieShowService.deleteShowsByIds(showIds);
+        }
         return ResponseEntity.ok().build();
     }
 }

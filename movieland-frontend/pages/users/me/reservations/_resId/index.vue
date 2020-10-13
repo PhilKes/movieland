@@ -50,7 +50,7 @@
 
 <script>
   import MovieCard from "../../../../../components/cards/MovieCard";
-  import {QrCodeView} from "../../../../../.nuxt/components";
+  import {DialogConfirm, QrCodeView} from "../../../../../.nuxt/components";
   import BackButton from "../../../../../components/buttons/BackButton";
   import QrcodeVue from 'qrcode.vue'
 
@@ -66,7 +66,6 @@
     },
     async fetch() {
       this.resInfo = await this.$repos.reservations.userReservation(this.$route.params.resId)
-      console.log("res", this.resInfo)
       this.loading = false;
     },
     methods: {
@@ -74,10 +73,11 @@
         this.$dialog.show(QrCodeView, {qrcode: this.resInfo.reservation.resId+''});
       },
       showValidateInfo() {
-        this.$dialog.confirm({
+        this.$dialog.show(DialogConfirm,{
           text: "To validate your Reservation, please go to the service desk and show your reservation' s QRCode",
           title: "Validation Info",
-          actions: ["Ok"]
+          cancel:false,
+          submitColor:'info'
         });
       }
     }

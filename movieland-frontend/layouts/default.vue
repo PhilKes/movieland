@@ -77,6 +77,7 @@
   import jwt_decode from "jwt-decode";
   import loggedIn from "../middleware/loggedIn";
   import Utils from "../service/Utils";
+  import DialogConfirm from "../components/cards/DialogConfirm";
 
   export default {
     data() {
@@ -107,10 +108,11 @@
           return this.$auth.user;
         }).catch(err => {
           this.showLoginDialog();
-          this.$dialog.confirm({
+          this.$dialog.showAndWait(DialogConfirm,{
             title: 'Login failed',
-            text: 'Your entered Username and Password do not match\n Please try again',
-            actions: ["Ok"],
+            text: 'Your entered Username and Password do not match<br/>Please try again',
+            submitText:'Ok',
+            cancel:false,
             width: 300
           })
         })
