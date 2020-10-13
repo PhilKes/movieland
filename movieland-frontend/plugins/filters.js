@@ -20,5 +20,10 @@ Vue.filter('formatTime', value => {
   if (!value) return ''
   return moment(value).format('HH:mm [h]');
 })
+
+Vue.filter('formatDollar', value => {
+  if (!value) return ''
+  return Number(value).toFixed(2)+' $';
+})
 Vue.use(VueYoutube)
 Vue.use(AsyncComputed);

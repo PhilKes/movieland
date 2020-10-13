@@ -1,4 +1,5 @@
 import moment from "moment";
+
 const qs = require('qs');
 
 export default (ctx, inject) => {
@@ -13,21 +14,21 @@ export default (ctx, inject) => {
       id(id) {
         return axios.$get(`/movies/${id}`)
       },
-      trailer(id){
+      trailer(id) {
         return axios.$get(`/movies/trailer/${id}`)
       },
       add(movie) {
         return axios.$post(`/movies`, movie)
       },
-      remove(movId){
+      remove(movId) {
         return axios.$delete(`/movies/${movId}`)
       }
     },
-    tmdb:{
-      search(search){
-        return axios.$get(`/movies/tmdb`,{params:{name:search}})
+    tmdb: {
+      search(search) {
+        return axios.$get(`/movies/tmdb`, {params: {name: search}})
       },
-      topMovies(){
+      topMovies() {
         return axios.$get(`/movies/tmdb/top`)
       }
     },
@@ -35,11 +36,11 @@ export default (ctx, inject) => {
       all() {
         return axios.$get(`/shows`)
       },
-      remove(showId){
+      remove(showId) {
         return axios.$delete(`/shows/${showId}`)
 
       },
-      removeList(showIds){
+      removeList(showIds) {
         return axios.$delete('/shows', {
           params: {
             showIds
@@ -54,8 +55,8 @@ export default (ctx, inject) => {
       showsOfMovieWeek(movId) {
         return axios.$get(`/shows/movies/${movId}`)
       },
-      showInfos(date){
-        return axios.$get(`/shows/infos`,{params:{date: moment(date).format("YYYY-MM-DD")}})
+      showInfos(date) {
+        return axios.$get(`/shows/infos`, {params: {date: moment(date).format("YYYY-MM-DD")}})
       }
     },
     seats: {
@@ -74,19 +75,27 @@ export default (ctx, inject) => {
         return axios.get(`/reservations/me/info`).then(resp => resp.data)
       }
     },
-    statistics:{
-      generateShows(showRequest){
-        return axios.$post(`/statistics/shows`,showRequest);
+    statistics: {
+      generateShows(showRequest) {
+        return axios.$post(`/statistics/shows`, showRequest);
       },
-      generateReservations(reservationRequest){
-        return axios.$post(`/statistics/reservations`,reservationRequest);
+      generateReservations(reservationRequest) {
+        return axios.$post(`/statistics/reservations`, reservationRequest);
       },
-      deleteStats(deleteRequest){
-        return axios.$delete(`/statistics/statistics`,{params:deleteRequest});
+      deleteStats(deleteRequest) {
+        return axios.$delete(`/statistics/statistics`, {params: deleteRequest});
+      },
+      getSummary(from, until) {
+        return axios.$get(`/statistics/summary`, {
+          params: {
+            from: moment(from).format("YYYY-MM-DD"),
+            until: moment(until).format("YYYY-MM-DD")
+          }
+        })
       }
     },
-    tasks:{
-      progress(taskId){
+    tasks: {
+      progress(taskId) {
         return axios.$get(`/tasks/${taskId}`);
       }
     }
