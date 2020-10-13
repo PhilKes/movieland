@@ -140,13 +140,14 @@
             }));
           })
           Promise.all(promises).then(removedIdxs => {
-            removedIdxs.forEach(removeIdx =>
-              this.movies.splice(this.movies.indexOf(movie => movie.idx === removeIdx), 1)
+            removedIdxs.forEach(removeIdx =>{
+              this.movies.splice(this.movies.findIndex(movie => movie.idx === removeIdx), 1)
+            }
             );
             Utils.initIndex(this.movies);
             this.$dialog.message.success('Movies succesfully removed!',
               {position: 'bottom-left', timeout: 3000})
-            console.debug("Deleted",this.selected)
+            this.selected=[];
             this.loading = false;
           })
         }

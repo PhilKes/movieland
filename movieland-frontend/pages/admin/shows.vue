@@ -34,13 +34,15 @@
                   >
                   </v-date-picker>
                 </v-menu>
-                <v-btn @click="findShows" color="success" class="mr-2">
-                  <v-icon>fas fa-search</v-icon>
-                </v-btn>
-                <v-btn @click="selectToday" color="primary">
+                <v-btn @click="selectToday" color="primary" tile>
                   Today
                 </v-btn>
-
+                <v-btn @click="findShows" color="success" class="mr-2 rounded-tr rounded-br" tile>
+                  <v-icon>fas fa-search</v-icon>
+                </v-btn>
+                <v-btn @click="deleteSelectedMovies" color="error" :disabled="selected.length <1 || loading">
+                  <v-icon>fas fa-trash</v-icon>
+                </v-btn>
               </v-toolbar>
             </template>
 
@@ -57,7 +59,7 @@
 
           <template v-slot:item.shows="{ item }">
             <v-row justify="center">
-              <v-simple-table dense style="background-color: transparent">
+              <v-simple-table dense style="background-color: transparent" v-model="selected">
                 <template v-slot:default>
                   <!--    <thead>
                       <tr>
@@ -176,22 +178,42 @@
         }
       },
       async deleteMovieShows(movie) {
-        let showTexts= movie.shows.map(show=> moment(show.date).format("DD.MM HH:mm [h]")).join("<br/>")
+        let showTexts = movie.shows.map(show => moment(show.date).format("DD.MM HH:mm [h]")).join("<br/>")
         let res = await this.$dialog.showAndWait(DialogConfirm, {
           text:
             `Do you really want to delete these shows ?<br/><b>Movie:</b><br/>${movie.name}<br/><b>Dates:</b><br/>${showTexts}`,
           title: "Delete Shows",
           width: '400px',
           submitText: 'Delete',
-          cancel:true
+          cancel: true
         });
         if (res === true) {
-          this.loading=true;
-          await this.$repos.shows.removeList(movie.shows.map(show=>show.showId));
+          this.loading = true;
+          await this.$repos.shows.removeList(movie.shows.map(show => show.showId));
           this.findShows();
         }
-      }
+      },
+      async deleteSelectedMovies(){
+        let movNames= this.selected.map(movieInfo=>movieInfo.name).join("<br/>");
+        let res = await this.$dialog.showAndWait(DialogConfirm, {
+          text:
+            `Do you really want to delete all Shows for<br/><b>Dates:</b><br/>${this.dates}<br/><b>Movies:</b><br/>${movNames}<br/>`,
+          title: "Delete Shows",
+          width: '400px',
+          submitText: 'Delete',
+          cancel: true
+        });
+        if (res === true) {
+          let shows=[];
+          this.selected.forEach(movieInfo => movieInfo.shows.forEach(show=>shows.push(show.showId)))
+          this.loading = true;
+          await this.$repos.shows.removeList(shows);
+          this.selected=[];
+          this.findShows();
+        }
+      },
     },
+
     computed: {
       dateRangeText() {
         return this.dates

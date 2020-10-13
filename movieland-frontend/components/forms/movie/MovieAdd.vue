@@ -4,7 +4,7 @@
     <v-container>
       <v-row justify="center">
       </v-row>
-      <v-row justify="center" >
+      <v-row justify="center">
         <v-data-table
           v-model="selected" show-select
           :loading="loading"
@@ -92,7 +92,12 @@
     methods: {
       async searchTmdb() {
         this.loading = true
-        this.movies = await this.tmdbRepo.search(this.search);
+        try {
+          this.movies = await this.tmdbRepo.search(this.search);
+        } catch (e) {
+          this.$dialog.message.success('TMDB Searched returned an error',
+            {position: 'bottom-left', timeout: 3000,color:'error'})
+        }
         this.initMovieRows();
         this.loading = false
       },
@@ -106,7 +111,7 @@
 
         this.movies.forEach((movie, idx) => {
           movie.movId = idx;
-          movie.selectable=true;
+          movie.selectable = true;
           if (this.existingMovies.some(existingMovie => existingMovie.name === movie.name)) {
             console.log("duplicate", movie.name)
             movie.selectable = false;
