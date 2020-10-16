@@ -106,7 +106,7 @@
           this.$repos.movies.update(editedMovie).then(updatedMovie => {
             updatedMovie.idx=movie.idx;
             this.movies[updatedMovie.idx]=updatedMovie;
-            //Utils.initIndex(this.movies)
+            //Utils.initIndex(this.existingMovies)
             this.$dialog.message.success('Movies succesfully updated!',
               {position: 'bottom-left', timeout: 3000})
             console.debug("Updated",editedMovie)

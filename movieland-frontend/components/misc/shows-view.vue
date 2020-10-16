@@ -2,7 +2,7 @@
   <!--    <v-list>
         <v-list-item v-for="show of shows">
           <v-list-item-action>
-            <a :href="`/movies/${movId}/shows/${show.showId}`">
+            <a :href="`/existingMovies/${movId}/shows/${show.showId}`">
               {{show.date | formatDateTime}}
             </a>
           </v-list-item-action>
