@@ -20,12 +20,14 @@
     "vue": "^2.6.12",
     "vue-apexcharts": "^1.6.0",
     "vue-youtube": "^1.4.0",
+    "vuetify-datetime-picker": "^2.1.1",
     "vuetify-dialog": "^2.0.11"
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
     "@nuxtjs/vuetify": "^1.11.2",
     "moment": "^2.29.0",
-    "vue-async-computed": "^3.9.0"
+    "vue-async-computed": "^3.9.0",
+    "vue-ctk-date-time-picker": "^2.5.0"
   }
 }

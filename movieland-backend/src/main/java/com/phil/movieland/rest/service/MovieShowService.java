@@ -75,8 +75,8 @@ public class MovieShowService {
         log.info("Getting MovieShows for: " + date);
         Date[] betweenDates=getBetweenDates(date);
         List<MovieShow> shows=groupByMovId==false ?
-                movieShowRepository.findAllByDateBetween(betweenDates[0], betweenDates[1])
-                : movieShowRepository.findAllByDateBetween(betweenDates[0], betweenDates[1]);
+                movieShowRepository.findAllByDateBetweenOrderByDate(betweenDates[0], betweenDates[1])
+                : movieShowRepository.findAllByDateBetweenOrderByDate(betweenDates[0], betweenDates[1]);
 
         return shows;
     }
@@ -120,7 +120,7 @@ public class MovieShowService {
         in7Days.set(Calendar.SECOND, 59);
         in7Days.add(Calendar.DATE, 7);
         log.info("Looking for shows between: " + date + " and " + in7Days.getTime());
-        return movieShowRepository.findAllByDateBetween(date, in7Days.getTime());
+        return movieShowRepository.findAllByDateBetweenOrderByDate(date, in7Days.getTime());
     }
 
     public List<MovieShow> getMovieShowsForWeekOf(Movie movie, Date date) {
@@ -141,7 +141,7 @@ public class MovieShowService {
     }
 
     public List<MovieShow> getShowsForBetween(Date from, Date until) {
-        return movieShowRepository.findAllByDateBetween(from, until);
+        return movieShowRepository.findAllByDateBetweenOrderByDate(from, until);
     }
 
     public long deleteShowsByIds(List<Long> showIds) {

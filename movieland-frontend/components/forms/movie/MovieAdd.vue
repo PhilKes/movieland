@@ -5,8 +5,8 @@
       <v-row justify="center">
       </v-row>
       <v-row justify="center">
-       <tmdb-search-table :existing-movies="existingMovies" ref="searchTable"
-                          :tmdb-repo="tmdbRepo" />
+       <movies-table :existing-movies="existingMovies" ref="searchTable"
+                          :repos="repos" />
       </v-row>
     </v-container>
     <v-card-actions>
@@ -18,12 +18,12 @@
 </template>
 
 <script>
-  import TmdbSearchTable from "../../tables/tmdb-search-table";
+  import MoviesTable from "../../tables/MoviesTable";
   export default {
     name: "MovieAdd",
-    components: {TmdbSearchTable},
+    components: {MoviesTable},
     props: {
-      tmdbRepo: Object,
+      repos: Object,
       existingMovies: Array
     },
     data() {

@@ -36,9 +36,11 @@ export default (ctx, inject) => {
       all() {
         return axios.$get(`/shows`)
       },
+      add(show){
+        return axios.$post('/shows',show)
+      },
       remove(showId) {
         return axios.$delete(`/shows/${showId}`)
-
       },
       removeList(showIds) {
         return axios.$delete('/shows', {

@@ -43,6 +43,9 @@
                 <v-btn @click="deleteSelectedMovies" color="error" :disabled="selected.length <1 || loading">
                   <v-icon>fas fa-trash</v-icon>
                 </v-btn>
+                <v-btn @click="addShow" color="success">
+                  <v-icon>fas fa-plus</v-icon>
+                </v-btn>
               </v-toolbar>
             </template>
 
@@ -104,6 +107,8 @@
 <script>
   import moment from 'moment'
   import DialogConfirm from "../../components/cards/DialogConfirm";
+  import MovieAdd from "../../components/forms/movie/MovieAdd";
+  import ShowAdd from "../../components/forms/shows/ShowAdd";
 
   export default {
     name: "AdminShows",
@@ -152,9 +157,7 @@
     methods: {
       async findShows() {
         this.loading = true;
-        console.log("date", this.dates)
         this.movieInfos = await this.$repos.shows.showInfos(this.dates);
-        console.log("infos", this.movieInfos)
         this.loading = false;
       },
       selectToday() {
@@ -162,7 +165,6 @@
         this.findShows();
       },
       async deleteSingleShow(show) {
-        console.log("delte show", show)
         let res = await this.$dialog.showAndWait(DialogConfirm, {
           text: "Do you really want to delete this show?",
           title: "Delete Show",
@@ -212,6 +214,24 @@
           this.findShows();
         }
       },
+      async addShow() {
+        let allMovies = await this.$repos.movies.all();
+        let newShows = await this.$dialog.showAndWait(ShowAdd,
+          {width: '800px', repos: this.$repos,movies:allMovies})
+        if (newShows && newShows !== false) {
+          this.loading = true;
+          let promises = [];
+          newShows.forEach(show => {
+            promises.push(this.$repos.shows.add(show));
+          });
+          Promise.all(promises).then(addedShows => {
+            this.$dialog.message.success('Show succesfully added!',
+              {position: 'bottom-left', timeout: 3000})
+            console.debug("Added",addedShows)
+            this.findShows();
+          })
+        }
+      }
     },
 
     computed: {

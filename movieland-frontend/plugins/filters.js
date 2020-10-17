@@ -2,6 +2,8 @@ import Vue from 'vue'
 import moment from 'moment'
 import VueYoutube from 'vue-youtube'
 import AsyncComputed from 'vue-async-computed'
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 
 Vue.filter('formatDateTime', value => {
   if (!value) return ''
@@ -27,3 +29,5 @@ Vue.filter('formatDollar', value => {
 })
 Vue.use(VueYoutube)
 Vue.use(AsyncComputed);
+
+Vue.component('VueCtkDateTimePicker', VueCtkDateTimePicker);
