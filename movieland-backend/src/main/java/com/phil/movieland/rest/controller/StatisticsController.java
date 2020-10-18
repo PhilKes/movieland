@@ -5,6 +5,7 @@ import com.phil.movieland.rest.request.GenerateReservationRequest;
 import com.phil.movieland.rest.request.GenerateShowRequest;
 import com.phil.movieland.rest.service.StatisticsService;
 import com.phil.movieland.rest.tasks.TaskService;
+import com.phil.movieland.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @RestController
@@ -109,12 +107,12 @@ public class StatisticsController {
 
     @GetMapping("/income")
     public Double getIncomeBetween(
-            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @DateTimeFormat(pattern="yyyy-MM-dd")
             @RequestParam(value="from") Date from
-            ,@DateTimeFormat(pattern = "yyyy-MM-dd")
+            , @DateTimeFormat(pattern="yyyy-MM-dd")
             @RequestParam(value="until") Date until) throws URISyntaxException {
-        Date start=getDateFormDayStartOrEnd(from,true);
-        Date end= getDateFormDayStartOrEnd(until,false);
+        Date start=getDateFormDayStartOrEnd(from, true);
+        Date end=getDateFormDayStartOrEnd(until, false);
         if(start.after(end)) {
             return 0.0;
         }
@@ -139,12 +137,12 @@ public class StatisticsController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/summary")
     public StatisticsService.Statistics getSummaryBetween(
-            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @DateTimeFormat(pattern="yyyy-MM-dd")
             @RequestParam(value="from") Date from
             , @DateTimeFormat(pattern="yyyy-MM-dd")
             @RequestParam(value="until") Date until) {
-        Date start=getDateFormDayStartOrEnd(from,true);
-        Date end= getDateFormDayStartOrEnd(until,false);
+        Date start=getDateFormDayStartOrEnd(from, true);
+        Date end=getDateFormDayStartOrEnd(until, false);
         if(start.after(end)) {
             return new StatisticsService.Statistics();
         }
@@ -166,6 +164,23 @@ public class StatisticsController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/movie/{movId}")
+    public ResponseEntity<?> getMovieStats(@DateTimeFormat(pattern="yyyy-MM-dd")
+                                           @RequestParam(value="from",required=false) Date from,
+                                           @DateTimeFormat(pattern="yyyy-MM-dd")
+                                           @RequestParam(value="until",required=false) Date until,
+                                           @RequestParam Boolean aggregated,
+                                           @PathVariable Integer movId) {
+        if(from == null ||until==null) {
+            until=new Date();
+            Calendar lastWeek=Calendar.getInstance();
+            lastWeek.setTime(until);
+            lastWeek.add(Calendar.DATE, -7);
+            from=lastWeek.getTime();
+        }
+        return ResponseEntity.ok(statisticsService.calculateMovieStats(movId,from,until,aggregated));
+    }
+
     @PostConstruct
     public void init() {
         log.info("Generating initial 7 Day summary");
@@ -173,12 +188,11 @@ public class StatisticsController {
         Calendar lastWeek=Calendar.getInstance();
         lastWeek.setTime(today);
         lastWeek.add(Calendar.DATE, -7);
-        getSummaryBetween(lastWeek.getTime(), today);
-
+        //getSummaryBetween(lastWeek.getTime(), today);
     }
 
 
-    public Date getDateFormDayStartOrEnd(Date date, boolean startEnd){
+    public Date getDateFormDayStartOrEnd(Date date, boolean startEnd) {
         Calendar calendar=Calendar.getInstance();
         calendar.setTime(date);
         if(startEnd) {
@@ -187,7 +201,8 @@ public class StatisticsController {
             calendar.set(Calendar.SECOND, 0);
             calendar.set(Calendar.MILLISECOND, 0);
             calendar.set(Calendar.HOUR_OF_DAY, 0);
-        }else {
+        }
+        else {
             calendar.set(Calendar.HOUR_OF_DAY, 23);
             calendar.set(Calendar.MINUTE, 59);
             calendar.set(Calendar.SECOND, 59);

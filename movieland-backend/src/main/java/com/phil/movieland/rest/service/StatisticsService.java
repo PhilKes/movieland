@@ -261,7 +261,7 @@ public class StatisticsService {
         Random rand=new Random();
         List<Long> userIds=userController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
         while(countDate.getTime().before(until)) {
-            List<MovieShow> shows=movieShowService.getShowsForDate(countDate.getTime(),false);
+            List<MovieShow> shows=movieShowService.getShowsForDate(countDate.getTime(), false);
             /** For each show generate reservations */
             for(MovieShow show : shows) {
                 List<ReservationWithSeats> reservations=new ArrayList<>();
@@ -397,7 +397,7 @@ public class StatisticsService {
 
             Calendar showDay=Calendar.getInstance();
             showDay.setTime(show.getDate());
-            showDay.set(Calendar.HOUR_OF_DAY,1);
+            showDay.set(Calendar.HOUR_OF_DAY, 1);
             /*showDay.set(Calendar.MINUTE,0);
             showDay.set(Calendar.SECOND,0);*/
             //showDay.set(Calendar.MILLISECOND,0);
@@ -407,7 +407,8 @@ public class StatisticsService {
             /** Update daily stats*/
             if(!dailyStats.containsKey(DateUtils.getDateStringFromDate(date))) {
                 dailyStats.put(DateUtils.getDateStringFromDate(date), daySeats);
-            }else{
+            }
+            else {
                 dailyStats.put(DateUtils.getDateStringFromDate(date), dailyStats.get(DateUtils.getDateStringFromDate(date)) + daySeats);
             }
             double seatsIncome=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
@@ -415,8 +416,9 @@ public class StatisticsService {
             long movId=show.getMovId();
             /** Update Movie income stats*/
             if(!movieGrossing.containsKey(movId)) {
-                movieGrossing.put(movId, new MovieStats(movId,movies.get(movId).getPosterUrl(),seatsIncome,seats.size()));
-            }else{
+                movieGrossing.put(movId, new MovieStats(movId, movies.get(movId).getPosterUrl(), seatsIncome, seats.size()));
+            }
+            else {
                 movieGrossing.get(movId).addGrossing(seatsIncome);
                 movieGrossing.get(movId).addVisitors(seats.size());
             }
@@ -435,8 +437,9 @@ public class StatisticsService {
         return statistics;
     }
 
+
     public List<IntermediateStatistic> getIntermediates(Date from, Date until) {
-        return seatRepository.findDailyStatisticsBetweenDate(from,until);
+        return seatRepository.findDailyStatisticsBetweenDate(from, until);
     }
 
     private HashMap<Long, Movie> getMoviesFromShows(List<MovieShow> shows) {
@@ -447,6 +450,39 @@ public class StatisticsService {
         return movies;
     }
 
+    public Map<String, MovieStats> calculateMovieStats(Integer movId, Date from, Date until, Boolean aggregated) {
+        log.info("Calculating statistics for: " + from + " until: " + until);
+
+        Calendar countDate=Calendar.getInstance();
+        countDate.setTime(from);
+        countDate.set(Calendar.HOUR_OF_DAY, 1);
+
+        TreeMap<String, MovieStats> dailyStats=new TreeMap<>();
+
+        while(countDate.getTime().before(until)) {
+            List<MovieShow> shows=movieShowService.getShowsForMovieDate(movId, DateUtils.getDateStringFromDate(countDate.getTime()));
+            MovieStats movieStats=new MovieStats();
+            for(MovieShow show : shows) {
+                List<Seat> seats=seatRepository.findSeatsOfShow(show.getShowId());
+               /* Calendar showDay=Calendar.getInstance();
+                showDay.setTime(show.getDate());
+                showDay.set(Calendar.HOUR_OF_DAY,1);
+                Date date=showDay.getTime();*/
+                int daySeats=seats.size();
+                movieStats.setVisitors(movieStats.getVisitors()+daySeats);
+                double seatsIncome=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
+                movieStats.setGrossing(movieStats.getGrossing() + seatsIncome);
+                //amtWatchedMins+=movies.get(movId).getLength();
+            }
+
+            dailyStats.put(DateUtils.getDateStringFromDate(countDate.getTime()), movieStats);
+            countDate.add(Calendar.DATE, 1);
+        }
+
+        log.info("Finished calculating statistics for: " + from + " until: " + until);
+        return dailyStats;
+    }
+
     public static class Statistics {
         private long amtShows, amtMovies, amtSeats;
         private long amtWatchedMins;
@@ -454,7 +490,6 @@ public class StatisticsService {
         private HashMap<String, Integer> dailyStats;
         private Map<Seat.Seat_Type, Integer> seatsDistribution;
         private LinkedHashMap<Long, MovieStats> movieStats;
-
 
         public Statistics() {
             seatsDistribution=new HashMap<>();
@@ -465,11 +500,11 @@ public class StatisticsService {
 
         //TODO SHOW in REACT
         //TODO USE Highest & LowestGrossing to determine bounds for Chart
-        public MovieStats getHighestGrossingMovie(){
+        public MovieStats getHighestGrossingMovie() {
             return movieStats.values().stream().max(Comparator.comparing(MovieStats::getGrossing)).orElse(new MovieStats());
         }
 
-        public MovieStats getLowestGrossingMovie(){
+        public MovieStats getLowestGrossingMovie() {
             return movieStats.values().stream().min(Comparator.comparing(MovieStats::getGrossing)).orElse(new MovieStats());
         }
 
@@ -497,14 +532,18 @@ public class StatisticsService {
             return movieStats;
         }
 
-        /** Sorts and sets moveStats Map*/
+        /**
+         * Sorts and sets moveStats Map
+         */
         public void setMovieStats(LinkedHashMap<Long, MovieStats> movieStats) {
-            LinkedHashMap<Long, MovieStats> sorted =  movieStats.entrySet().stream()
-                    .sorted((e1,e2)->Double.compare(e1.getValue().getGrossing(),e2.getValue().getGrossing())*-1)
+            LinkedHashMap<Long, MovieStats> sorted=movieStats.entrySet().stream()
+                    .sorted((e1, e2) -> Double.compare(e1.getValue().getGrossing(), e2.getValue().getGrossing()) * -1)
                     .collect(toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue,
-                            (a, b) -> { throw new AssertionError();},
+                            (a, b) -> {
+                                throw new AssertionError();
+                            },
                             LinkedHashMap::new
                     ));
             this.movieStats=sorted;
@@ -684,8 +723,8 @@ public class StatisticsService {
     public static class MovieStats {
         private long movId=-1;
         private String posterPath;
-        private Double grossing;
-        private Integer visitors;
+        private Double grossing=0.0;
+        private Integer visitors=0;
 
         public MovieStats() {
         }
