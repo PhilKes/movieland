@@ -94,6 +94,9 @@ export default (ctx, inject) => {
             until: moment(until).format("YYYY-MM-DD")
           }
         })
+      },
+      getMovieStatsWeek(movId){
+        return axios.$get(`/statistics/movie/${movId}`,{params:{aggregated:false}})
       }
     },
     tasks: {

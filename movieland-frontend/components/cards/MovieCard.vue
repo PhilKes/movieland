@@ -6,10 +6,10 @@
      'pa-0':true,'m-0':true}"
                  three-line :to="noLink? null : '/movies/'+movie.movId">
       <v-list-item-avatar rounded="0"
-                          height="370" :width="240"
+                          :height="small===true? 180: 370" :width="small===true? 120: 240"
                           max-height="370" max-width="240"
                           horizontal :class="{'ma-0':true, 'pa-0':true, 'mr-4':true, 'card-avatar':noLink===true}">
-        <v-img class="card-img rounded-l-lg" :src="movie.posterUrl" style="height:100%!important;"/>
+        <v-img :class="{'card-img':true, 'rounded-l-lg':!small}" :src="movie.posterUrl" style="height:100%!important;"/>
       </v-list-item-avatar>
       <v-list-item-content class="movie-details">
         <v-list-item-title class="movie-title">{{movie.name}}</v-list-item-title>
@@ -23,7 +23,7 @@
               Directed by {{movie.director}}
             </v-col>
             <v-spacer/>
-            <v-col>
+            <v-col v-if="noLink!==true">
               <v-btn icon v-on:click.prevent="openTrailer(movie.movId)">
                 <v-icon>fas fa-video</v-icon>
               </v-btn>
@@ -55,6 +55,7 @@
         director: String,
         description: String,
       },
+      small:Boolean,
       shows: Array,
       showView: Boolean,
       noLink: Boolean,

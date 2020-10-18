@@ -37,8 +37,11 @@
     <template v-slot:item.name="{ item }">
       <template class="disabled-text">
         {{item.name}}
+        <v-btn v-if="showDetails===true" color="info" icon elevation="0" small @click="showDetailsDialog(item)">
+          <v-icon>fas fa-info-circle</v-icon>
+        </v-btn>
       </template>
-      <v-chip v-if="!item.selectable" disabled>Already Exists</v-chip>
+      <v-chip v-if="noTmdb!==true && !item.selectable" disabled>Already Exists</v-chip>
     </template>
 
     <template v-slot:item.posterUrl="{ item }">
@@ -51,9 +54,7 @@
 
     <template v-slot:item.actions="{ item }">
       <v-btn v-if="canDelete===true" color="error" elevation="0" small fab @click="$emit('delete',[item])">
-        <v-icon>
-          mdi-delete
-        </v-icon>
+        <v-icon>mdi-delete</v-icon>
       </v-btn>
     </template>
 
@@ -61,6 +62,9 @@
 </template>
 
 <script>
+  import LoginForm from "../forms/LoginForm";
+  import MovieDetails from "../forms/movie/MovieDetails";
+
   export default {
     name: "MoviesTable",
     props: {
@@ -70,7 +74,8 @@
       canDelete: Boolean,
       canAdd: Boolean,
       large: Boolean,
-      singleSelect: Boolean
+      singleSelect: Boolean,
+      showDetails:Boolean
     },
     data() {
       const headers = [
@@ -89,7 +94,7 @@
           text: 'Date',
         }
       ];
-      if (this.canDelete === true) {
+      if (this.canDelete === true || this.showDetails===true) {
         headers.push({text: 'Actions', value: 'actions', sortable: false});
       }
       return {
@@ -141,6 +146,12 @@
             movie.selectable = false;
           }
         })
+      },
+      async showDetailsDialog(movie){
+        this.loading=true;
+        let stats= await this.$repos.statistics.getMovieStatsWeek(movie.movId);
+        this.loading=false;
+        this.$dialog.show(MovieDetails,{movie,stats,width:'600px'});
       }
     }
   }

@@ -5,7 +5,7 @@
     </v-row>
     <v-row justify="center">
       <v-col cols="12" md="10">
-        <movies-table :existing-movies="movies" no-tmdb large can-delete can-add
+        <movies-table :existing-movies="movies" no-tmdb large can-delete can-add show-details
                       :repos="$repos" @delete="deleteSelected" @add="addMovie"/>
       </v-col>
     </v-row>
