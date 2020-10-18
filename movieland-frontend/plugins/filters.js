@@ -4,6 +4,7 @@ import VueYoutube from 'vue-youtube'
 import AsyncComputed from 'vue-async-computed'
 import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
+import Utils from "../service/Utils";
 
 Vue.filter('formatDateTime', value => {
   if (!value) return ''
@@ -26,6 +27,11 @@ Vue.filter('formatTime', value => {
 Vue.filter('formatDollar', value => {
   if (!value) return ''
   return Number(value).toFixed(2)+' $';
+})
+
+Vue.filter('capitalize', value => {
+  if (!value) return ''
+  return Utils.capitalize(value)
 })
 Vue.use(VueYoutube)
 Vue.use(AsyncComputed);

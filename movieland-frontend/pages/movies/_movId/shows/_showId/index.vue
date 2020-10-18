@@ -12,7 +12,6 @@
                    :booking="booking"/>
       </v-col>
       <v-spacer/>
-
     </v-row>
   </v-container>
 

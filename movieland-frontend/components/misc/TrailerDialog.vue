@@ -1,7 +1,5 @@
 <template>
-<DialogCard>
   <youtube :video-id="videoId" ref="youtube" :player-vars="{autoplay: 1}" ></youtube>
-</DialogCard>
 </template>
 
 

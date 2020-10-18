@@ -65,7 +65,7 @@
       async openTrailer(movId){
         let trailerUrl= await this.$repos.movies.trailer(movId);
         console.log(trailerUrl)
-        let trailerDialog = await this.$dialog.showAndWait(TrailerDialog,{trailerUrl})
+        let trailerDialog = await this.$dialog.showAndWait(TrailerDialog,{trailerUrl,width:'630'})
           .then(resp => resp);
         console.log("trailer",trailerDialog)
       }
