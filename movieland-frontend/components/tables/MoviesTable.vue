@@ -20,15 +20,15 @@
                       hide-details
                       :append-icon="noTmdb!==true? null:'fas fa-search'"
         ></v-text-field>
-        <v-btn v-if="noTmdb!==true" color="success" @click="searchTmdb" :disabled="search.length<1">
+        <v-btn v-if="noTmdb!==true" color="success" @click="searchTmdb" :disabled="search.length<1 || loading">
           <v-icon>fas fa-search</v-icon>
         </v-btn>
         <v-spacer/>
         <v-btn v-if="canDelete===true" color="error" @click="$emit('delete',selected)" class="mr-2"
-               :disabled="selected.length < 1">
+               :disabled="selected.length < 1 ||loading">
           <v-icon>fas fa-trash</v-icon>
         </v-btn>
-        <v-btn v-if="canAdd===true" color="success" @click="$emit('add')">
+        <v-btn v-if="canAdd===true" color="success" @click="$emit('add')" :disabled="loading">
           <v-icon>fas fa-plus</v-icon>
         </v-btn>
       </v-toolbar>
@@ -37,8 +37,9 @@
     <template v-slot:item.name="{ item }">
       <template class="disabled-text">
         {{item.name}}
-        <v-btn v-if="showDetails===true" color="info" icon elevation="0" small @click="showDetailsDialog(item)">
-          <v-icon>fas fa-info-circle</v-icon>
+        <v-btn v-if="showDetails===true" color="info" icon elevation="0" small @click="showDetailsDialog(item)" :disabled="loading">
+          <v-icon v-if="!loading">fas fa-info-circle</v-icon>
+          <v-progress-circular v-else indeterminate size="20"/>
         </v-btn>
       </template>
       <v-chip v-if="noTmdb!==true && !item.selectable" disabled>Already Exists</v-chip>
@@ -53,7 +54,8 @@
     </template>
 
     <template v-slot:item.actions="{ item }">
-      <v-btn v-if="canDelete===true" color="error" elevation="0" small fab @click="$emit('delete',[item])">
+      <v-btn v-if="canDelete===true" color="error" elevation="0" :disabled="loading"
+             small fab @click="$emit('delete',[item])">
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </template>

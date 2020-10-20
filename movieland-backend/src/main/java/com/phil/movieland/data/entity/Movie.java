@@ -112,9 +112,9 @@ public class Movie {
         //TODO pipe description
 
         this.description=tmdbMovie.getOverview();
-        if(description.length()>120) {
+       /* if(description.length()>120) {
             description=description.substring(0, 120) + "...";
-        }
+        }*/
         if(tmdbMovie.getReleaseDate()!=null && !tmdbMovie.getReleaseDate().isEmpty()) {
             this.date=DateUtils.createDateFromDateString(tmdbMovie.getReleaseDate());
         }
