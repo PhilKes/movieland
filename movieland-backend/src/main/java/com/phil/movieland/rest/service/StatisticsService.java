@@ -7,6 +7,7 @@ import com.phil.movieland.data.repository.SeatRepository;
 import com.phil.movieland.rest.controller.UserController;
 import com.phil.movieland.rest.tasks.RunnableWithProgress;
 import com.phil.movieland.utils.DateUtils;
+import org.hibernate.stat.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,14 +46,14 @@ public class StatisticsService {
         this.userController=userController;
     }
 
-    public RunnableWithProgress generateShowsBetweenTask(Date from, Date until) {
-        return generateShowsBetweenTask(from, until, 10, 4);
+    public RunnableWithProgress generateShowsBetweenTask(Date from, Date until,List<Long> movIds) {
+        return generateShowsBetweenTask(from, until, 10, 4,movIds);
     }
 
     /**
      * Return Runnable for Show Generation Task
      */
-    public RunnableWithProgress generateShowsBetweenTask(Date from, Date until, int moviesPerDay, int showsPerMovie) {
+    public RunnableWithProgress generateShowsBetweenTask(Date from, Date until, int moviesPerDay, int showsPerMovie, List<Long> movIds) {
         return new RunnableWithProgress() {
             @Override
             public void run() {
@@ -67,13 +68,18 @@ public class StatisticsService {
                 /** Generate shows for each day until Date until is reached*/
                 Random rand=new Random();
                 /** Get random Movies*/
-                List<Movie> movies=movieService.getAllMovies().stream()
-                        .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
-                            Collections.shuffle(collected);
-                            return collected.stream();
-                        }))
-                        .limit(moviesPerDay)
-                        .collect(Collectors.toList());
+                List<Movie> movies= null;
+                if(movIds== null || movIds.size() == 0) {
+                    movies=movieService.getAllMovies().stream()
+                            .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
+                                Collections.shuffle(collected);
+                                return collected.stream();
+                            }))
+                            .limit(moviesPerDay)
+                            .collect(Collectors.toList());
+                }else{
+                    movies=movieService.queryMoviesByIds(movIds);
+                }
 
                 while(countDate.getTime().before(until)) {
                     /** For each movie generate shows every day */
@@ -116,7 +122,7 @@ public class StatisticsService {
     /**
      * Return Runnable for Reseravtion Generation Task
      */
-    public RunnableWithProgress generateReservationsBetweenTask(Date from, Date until, int resPerShow) {
+    public RunnableWithProgress generateReservationsBetweenTask(Date from, Date until, int resPerShow,List<Long> movIds) {
         return new RunnableWithProgress() {
             @Override
             public void run() {
@@ -129,7 +135,11 @@ public class StatisticsService {
                 Random rand=new Random();
                 List<Long> userIds=userController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
                 // while(countDate.getTime().before(until)) {
-                List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
+                List<MovieShow> shows=null;
+                if(movIds== null ||movIds.size()==0)
+                    shows=movieShowService.getShowsForBetween(from, until);
+                else
+                    shows=movieShowService.getShowsForMovIdListAndBetweenDates(movIds,from,until);
                 setProgressMax(shows.size());
                 /** For each show generate reservations */
                 for(MovieShow show : shows) {

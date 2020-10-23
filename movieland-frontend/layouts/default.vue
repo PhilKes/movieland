@@ -86,7 +86,7 @@
         drawer: false,
         fixed: false,
         title: 'MovieLand',
-        routes:[],
+        routes: [],
         logo
       }
     },
@@ -104,35 +104,34 @@
         }
         return await this.$auth.loginWith('local', loginInfo).then(resp => {
           console.log("user", this.$auth.user)
-          console.log("token", jwt_decode(this.$auth.getToken('local')))
           return this.$auth.user;
         }).catch(err => {
           this.showLoginDialog();
-          this.$dialog.showAndWait(DialogConfirm,{
+          this.$dialog.showAndWait(DialogConfirm, {
             title: 'Login failed',
             text: 'Your entered Username and Password do not match<br/>Please try again',
-            submitText:'Ok',
-            cancel:false,
+            submitText: 'Ok',
+            cancel: false,
             width: 300
           })
         })
       },
       async showRegisterDialog() {
         let registerInfo = await this.$dialog.showAndWait(RegisterForm).then(resp => resp);
-        this.$axios.post('/auth/signup', registerInfo).then(resp => {
-
-        });
-        /*   await this.$auth.loginWith('local',loginInfo).then(resp=> {
-             console.log(resp)
-             console.log("user",this.$auth.user)
-           })*/
+        if(!registerInfo)
+          return false;
+        return this.$axios.post('/auth/signup', registerInfo).then(resp => {
+          return resp;
+        }).catch(err => {
+          throw err.response.data;
+        })
       },
       async onLogout() {
         await this.$auth.logout()
         this.$router.push('/')
         this.updateRoutes();
       },
-      async updateRoutes(){
+      async updateRoutes() {
         let routes = [
           {
             icon: 'fas fa-film',
@@ -153,19 +152,18 @@
         ];
         let token = await this.$auth.getToken('local');
         let userInfo = token === false ? {authorities: []} : jwt_decode(Utils.getPureToken(token));
-        routes= routes.filter(route => {
+        routes = routes.filter(route => {
           if (route.roles && route.roles.length > 0) {
             return route.roles.some(role => userInfo.authorities.some(auth => auth.authority === role))
           }
           return true;
         });
-        console.log("routes",routes)
-        this.routes=routes;
+        console.log("routes", routes)
+        this.routes = routes;
       }
     },
     created() {
       this.$events.$on('showLogin', (onSuccess) => {
-        console.log("SHOW LOGIN")
         this.showLoginDialog().then(res => {
           this.updateRoutes();
           if (typeof onSuccess === 'string' || onSuccess instanceof String)
@@ -177,8 +175,18 @@
       });
       this.$events.$on('showRegister', (onSuccessMethod) => {
         this.showRegisterDialog().then(res => {
-          onSuccessMethod();
-        }).catch(res => {
+          console.log("register", res)
+          if (res !== false)
+            onSuccessMethod();
+        }).catch(err => {
+          this.$events.$emit('showRegister', () => this.showLoginDialog());
+          this.$dialog.showAndWait(DialogConfirm, {
+            title: 'Register failed',
+            text: `${err.message}<br/>Please try again`,
+            submitText: 'Ok',
+            cancel: false,
+            width: 300
+          })
         })
       });
     }

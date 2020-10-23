@@ -77,12 +77,12 @@ public class TaskController {
 
     @PostConstruct
     public void init() {
-        log.info("Generating initial 7 Day summary");
+        /*log.info("Generating initial 7 Day summary");
         Date today=new Date();
         Calendar lastWeek=Calendar.getInstance();
         lastWeek.setTime(today);
         lastWeek.add(Calendar.DATE, -7);
-        getSummaryBetween(lastWeek.getTime(), today);
+        getSummaryBetween(lastWeek.getTime(), today);*/
 
     }
 

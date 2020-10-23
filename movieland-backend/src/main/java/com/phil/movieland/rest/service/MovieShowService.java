@@ -144,6 +144,10 @@ public class MovieShowService {
         return movieShowRepository.findAllByDateBetweenOrderByDate(from, until);
     }
 
+    public List<MovieShow> getShowsForMovIdListAndBetweenDates(List<Long> movIds,Date from, Date until) {
+        return movieShowRepository.findAllByMovIdInAndDateBetweenOrderByDate(movIds,from, until);
+    }
+
     public long deleteShowsByIds(List<Long> showIds) {
         return movieShowRepository.deleteAllByShowIdIn(showIds);
     }

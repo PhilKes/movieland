@@ -17,6 +17,9 @@ public interface MovieShowRepository extends CrudRepository<MovieShow,Long> {
     List<MovieShow> findAllByMovId(long movid);
 
     List<MovieShow> findAllByMovIdAndDateBetweenOrderByDate(long movid, Date dateStart, Date dateEnd);
+
+    List<MovieShow> findAllByMovIdInAndDateBetweenOrderByDate(List<Long> movIds, Date dateStart, Date dateEnd);
+
     List<MovieShow> findAllByDateBetweenOrderByDate(Date dateStart,Date dateEnd);
 
     Long deleteAllByShowIdIn(List<Long> showIds);

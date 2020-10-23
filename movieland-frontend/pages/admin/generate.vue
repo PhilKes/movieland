@@ -28,6 +28,12 @@
                   <v-date-picker v-model="until" no-title scrollable></v-date-picker>
                 </v-menu>
               </v-col>
+              <v-col>
+                <v-btn-toggle v-model="selMode" color="info darken-2">
+                  <v-btn color="info">All</v-btn>
+                  <v-btn color="info" @click="openSelectMovies">Select</v-btn>
+                </v-btn-toggle>
+              </v-col>
               <v-col cols="auto" align-self="center" align="center">
                 <v-btn fab elevation="0" x-small color="primary" @click="deleteStats" :disabled="loading">
                   <v-icon>fas fa-trash</v-icon>
@@ -45,7 +51,8 @@
                   <v-container>
                     <v-row justify="center">
                       <v-col>
-                        <v-text-field v-model.number="showsForm.moviePerDay" type="number" label="Movies per Day"
+                        <v-text-field :disabled="selMode===1" v-model.number="showsForm.moviePerDay" type="number"
+                                      label="Movies per Day"
                                       prepend-icon="fas fa-film"></v-text-field>
                       </v-col>
                       <v-col>
@@ -85,7 +92,8 @@
                        @click="submitGenerate">
                   Generate
                 </v-btn>
-                <v-progress-linear v-else rounded :value="task.progress" :indeterminate="task.indeterminate" color="primary" height="20" >
+                <v-progress-linear v-else rounded :value="task.progress" :indeterminate="task.indeterminate"
+                                   color="primary" height="20">
                   <template v-slot="{ value }">
                     <strong :style="{'color':task.indeterminate? 'black':'white'}">{{ task.message }}</strong>
                   </template>
@@ -105,6 +113,7 @@
 <script>
   import moment from 'moment';
   import DialogConfirm from "../../components/cards/DialogConfirm";
+  import MovieSelect from "../../components/forms/movie/MovieSelect";
 
   export default {
     name: "AdminGenerate",
@@ -123,18 +132,20 @@
         },
         loading: false,
         task: {
-          indeterminate:false,
+          indeterminate: false,
           progress: 0,
           message: null,
         },
         taskFinished: false,
-        taskQueue: []
+        taskQueue: [],
+        selMode: 0,
+        selectedMovies:[]
       }
     },
     watch: {
       taskFinished: function (val) {
         if (val === true) {
-          if(this.taskQueue.length >0){
+          if (this.taskQueue.length > 0) {
             this.taskQueue.pop()();
           }
         }
@@ -143,12 +154,13 @@
     methods: {
       submitGenerate() {
         this.loading = true;
-        this.task.progress=0;
+        this.task.progress = 0;
         if (this.showsEnabled) {
           this.$repos.statistics.generateShows({
             ...this.showsForm,
             from: moment(this.from),
             until: moment(this.until),
+            movIds: this.selMode===1? this.selectedMovies.map(movie=>movie.movId) : null
           }).then(taskId => {
             this.taskFinished = false;
             this.taskId = taskId;
@@ -162,51 +174,65 @@
         }
       },
       submitReservationGenerate() {
-        this.loading=true;
-        this.task.progress=0;
+        this.loading = true;
+        this.task.progress = 0;
         this.$repos.statistics.generateReservations({
           ...this.reservationsForm,
           from: moment(this.from),
           until: moment(this.until),
+          movIds: this.selMode===1? this.selectedMovies.map(movie=>movie.movId) : null
         }).then(taskId => {
           this.taskFinished = false;
           this.taskId = taskId;
           this.pollTaskProgress(taskId);
         });
       },
-      async deleteStats(){
-        let res = await this.$dialog.showAndWait(DialogConfirm,{
+      async deleteStats() {
+        let res = await this.$dialog.showAndWait(DialogConfirm, {
           text: ` <b>From:</b>${this.from}<br/><b>Until:</b> ${this.until}`,
           title: "Delete Statistics",
           submitText: 'Delete',
-          width:'400px'
+          width: '400px'
         });
-        if(res===true){
-          this.loading=true;
-          this.task.message="Deleting Statistics"
-          this.task.indeterminate=true;
-          this.$repos.statistics.deleteStats({from:this.from, until: this.until}).then(resp=>{
-            this.loading=false;
-            this.task.indeterminate=false;
+        if (res === true) {
+          this.loading = true;
+          this.task.message = "Deleting Statistics"
+          this.task.indeterminate = true;
+          this.$repos.statistics.deleteStats({from: this.from, until: this.until}).then(resp => {
+            this.loading = false;
+            this.task.indeterminate = false;
           });
         }
-
       },
-      pollTaskProgress(taskId) {
-        setTimeout(() => {
-          this.$repos.tasks.progress(taskId).then(task => {
-            this.task.progress = (Number(task.progress) / Number(task.progressMax))*100;
-            this.task.message = task.message;
-            if (task.progress !== task.progressMax)
-              this.pollTaskProgress(taskId)
-            else {
-              this.loading = false;
-              this.taskFinished = true;
-            }
-          })
-        }, 200)
-      }
+      async openSelectMovies() {
+        this.loading=true;
+        let movies= await this.$repos.movies.all();
+        this.loading=false;
+        let res = await this.$dialog.showAndWait(MovieSelect, {
+          existingMovies:movies,
+          repos:this.$repos,
+          width: '400px'
+        });
+        if (res !== false ) {
+          console.log("selected movies:",res)
+          this.selectedMovies=res;
+        }
+    },
+    pollTaskProgress(taskId) {
+      setTimeout(() => {
+        this.$repos.tasks.progress(taskId).then(task => {
+          this.task.progress = (Number(task.progress) / Number(task.progressMax)) * 100;
+          this.task.message = task.message;
+          if (task.progress !== task.progressMax)
+            this.pollTaskProgress(taskId)
+          else {
+            this.loading = false;
+            this.taskFinished = true;
+          }
+        })
+      }, 200)
     }
+  }
   }
 </script>
 

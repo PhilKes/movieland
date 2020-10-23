@@ -49,13 +49,16 @@ public class StatisticsController {
             return ResponseEntity.badRequest().body("From Date must be earlier than until Date!");
         }
         int taskId;
-        if(generateRequest.getMoviesPerDay()==null || generateRequest.getShowsPerMovie()==null) {
-            taskId=taskService.execute(statisticsService.generateShowsBetweenTask(start, end));
+        if(generateRequest.getShowsPerMovie()==null) {
+            generateRequest.setShowsPerMovie(4);
         }
-        else {
-            taskId=taskService.execute(statisticsService.generateShowsBetweenTask(
-                    start, end, generateRequest.getMoviesPerDay(), generateRequest.getShowsPerMovie()));
+        if(generateRequest.getMoviesPerDay()==null) {
+            generateRequest.setMoviesPerDay(4);
         }
+
+        taskId=taskService.execute(statisticsService.generateShowsBetweenTask(
+                start, end, generateRequest.getMoviesPerDay(), generateRequest.getShowsPerMovie(), generateRequest.getMovIds()));
+
         log.info("Task " + taskId + " posted for execution");
         return ResponseEntity.created(new URI("/api/task/" + taskId))
                 .body(taskId);
@@ -72,7 +75,7 @@ public class StatisticsController {
             return ResponseEntity.badRequest().body("From Date must be earlier than until Date!");
         }
         int taskId;
-        taskId=taskService.execute(statisticsService.generateReservationsBetweenTask(start, end, resRequest.getResPerShow()));
+        taskId=taskService.execute(statisticsService.generateReservationsBetweenTask(start, end, resRequest.getResPerShow(), resRequest.getMovIds()));
         return ResponseEntity.created(new URI("/api/task/" + taskId))
                 .body(taskId);
     }
@@ -166,30 +169,30 @@ public class StatisticsController {
 
     @GetMapping("/movie/{movId}")
     public ResponseEntity<?> getMovieStats(@DateTimeFormat(pattern="yyyy-MM-dd")
-                                           @RequestParam(value="from",required=false) Date from,
+                                           @RequestParam(value="from", required=false) Date from,
                                            @DateTimeFormat(pattern="yyyy-MM-dd")
-                                           @RequestParam(value="until",required=false) Date until,
+                                           @RequestParam(value="until", required=false) Date until,
                                            @RequestParam Boolean aggregated,
                                            @PathVariable Integer movId) {
-        if(from == null ||until==null) {
+        if(from==null || until==null) {
             until=new Date();
             Calendar lastWeek=Calendar.getInstance();
             lastWeek.setTime(until);
             lastWeek.add(Calendar.DATE, -7);
             from=lastWeek.getTime();
         }
-        return ResponseEntity.ok(statisticsService.calculateMovieStats(movId,from,until,aggregated));
+        return ResponseEntity.ok(statisticsService.calculateMovieStats(movId, from, until, aggregated));
     }
 
-    @PostConstruct
+   /* @PostConstruct
     public void init() {
         log.info("Generating initial 7 Day summary");
         Date today=new Date();
         Calendar lastWeek=Calendar.getInstance();
         lastWeek.setTime(today);
         lastWeek.add(Calendar.DATE, -7);
-        //getSummaryBetween(lastWeek.getTime(), today);
-    }
+        getSummaryBetween(lastWeek.getTime(), today);
+    }*/
 
 
     public Date getDateFormDayStartOrEnd(Date date, boolean startEnd) {
