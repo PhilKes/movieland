@@ -111,6 +111,13 @@ export default (ctx, inject) => {
       register(registerRequest){
         return axios.$post('/auth/signup', registerRequest)
       },
+      remove(id){
+        return axios.$delete(`/users/${id}`)
+      },
+      update(user){
+        console.log("update",user)
+        return axios.put(`/users/${user.id}`,user)
+      }
     }
   }
   //...

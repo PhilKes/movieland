@@ -73,10 +73,10 @@ public class AuthenticationController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        /*if(userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if(userRepository.existsByEmail(signUpRequest.getEmail())) {
             return new ResponseEntity(new ApiResponse(false, "Email Address already in use!"),
                     HttpStatus.BAD_REQUEST);
-        }*/
+        }
 
         // Creating user's account
         User user=new User(signUpRequest.getName(), signUpRequest.getUsername(),

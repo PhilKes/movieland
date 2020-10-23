@@ -14,9 +14,9 @@ import java.util.Set;
         @UniqueConstraint(columnNames={
                 "username"
         }),
-        @UniqueConstraint(columnNames={
+       /* @UniqueConstraint(columnNames={
                 "email"
-        })
+        })*/
 })
 public class User extends DateAudit {
     @Id
@@ -31,7 +31,7 @@ public class User extends DateAudit {
     @Size(max=15)
     private String username;
 
-    @NaturalId
+    //@NaturalId
     @NotBlank
     @Size(max=40)
     @Email
