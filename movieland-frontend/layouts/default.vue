@@ -120,9 +120,8 @@
         let registerInfo = await this.$dialog.showAndWait(RegisterForm).then(resp => resp);
         if(!registerInfo)
           return false;
-        return this.$axios.post('/auth/signup', registerInfo).then(resp => {
-          return resp;
-        }).catch(err => {
+        return this.$repos.users.register(registerInfo)
+          .catch(err => {
           throw err.response.data;
         })
       },

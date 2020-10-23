@@ -130,4 +130,11 @@ public class UserController {
         return userProfile;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        userRepository.deleteById(id);
+        return ResponseEntity.ok("User (id:"+id+") deleted");
+    }
+
 }

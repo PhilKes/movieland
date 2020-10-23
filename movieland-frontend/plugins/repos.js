@@ -107,7 +107,10 @@ export default (ctx, inject) => {
     users:{
       all(){
         return axios.$get(`/users/all`)
-      }
+      },
+      register(registerRequest){
+        return axios.$post('/auth/signup', registerRequest)
+      },
     }
   }
   //...
