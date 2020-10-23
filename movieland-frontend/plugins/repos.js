@@ -103,6 +103,11 @@ export default (ctx, inject) => {
       progress(taskId) {
         return axios.$get(`/tasks/${taskId}`);
       }
+    },
+    users:{
+      all(){
+        return axios.$get(`/users/all`)
+      }
     }
   }
   //...

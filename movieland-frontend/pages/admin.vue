@@ -46,6 +46,11 @@
             icon: 'fas fa-database',
             title: 'Generate',
             to: '/admin/generate',
+          },
+          {
+            icon: 'fas fa-user',
+            title: 'Users',
+            to: '/admin/users',
           }
         ]
       }
