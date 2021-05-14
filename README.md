@@ -27,7 +27,7 @@ Full Docker Support with **Docker-compose**:
    **Note**: Change "proxy" address in "package.json" of React-frontend to "**app-server**:8080" if used with docker-compose 
 * Starts and initializes **MySQL** Schema exposed only to Spring backend
 * Starts **Spring** REST API exposed to Port 8080
-* Starts **React** Frontend exposed to Port 80
+* Starts **Vue** Frontend exposed to Port 80
 
 ## Attribution
 All Movie Posters, Descriptions, Meta Data is provided by the free TMDB API
