@@ -14,16 +14,17 @@
           </v-col>
         </v-row>
         <v-row>
-            Selected Seats:
+            Selected:
+            {{selection.length}} Seats
         </v-row>
-        <v-row v-for="(type,idx) of ticketTypes" :key="type.value" dense no-gutters>
+       <!-- <v-row v-for="(type,idx) of ticketTypes" :key="type.value" dense no-gutters>
           <v-col cols="3">
             {{type.value | capitalize}}
           </v-col>
           <v-col cols="2">
             <v-text-field type="number" v-model="type.amount" @input="onTicketInput(idx,$event)"  />
           </v-col>
-        </v-row>
+        </v-row>-->
       </v-container>
     </v-card-text>
     <v-card-actions>

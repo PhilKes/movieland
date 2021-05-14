@@ -3,7 +3,7 @@
     <v-row justify="center">
       <h4>Manage Users</h4>
     </v-row>
-    <v-row v-if="!loading">
+    <v-row v-if="!loading" justify="center">
       <v-data-table
         v-model="selected" show-select
         :loading="loading"
