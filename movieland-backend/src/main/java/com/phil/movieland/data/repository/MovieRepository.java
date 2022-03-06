@@ -22,4 +22,6 @@ public interface MovieRepository extends PagingAndSortingRepository<Movie, Long>
 
     List<Movie> findAllByMovIdIn(List<Long> movIds);
     Optional<Movie> findFirstByTmdbId(Long tmdbId);
+
+    List<Movie> findAll();
 }

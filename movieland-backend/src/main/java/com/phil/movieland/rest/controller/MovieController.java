@@ -26,13 +26,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/movies")
 public class MovieController {
     private final MovieService movieService;
-    private final MovieShowService movieShowService;
     private Logger log=LoggerFactory.getLogger(MovieController.class);
 
     @Autowired
-    public MovieController(MovieService movieService,MovieShowService movieShowService) {
+    public MovieController(MovieService movieService) {
         this.movieService=movieService;
-        this.movieShowService=movieShowService;
     }
 
     @GetMapping

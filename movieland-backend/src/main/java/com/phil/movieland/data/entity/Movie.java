@@ -21,6 +21,7 @@ public class Movie {
     private String name;
 
     @Column(name="RELEASE_DATE")
+    @Temporal(TemporalType.DATE)
     private Date date;
 
     @Column(name="DESCRIPTION")
@@ -86,10 +87,6 @@ public class Movie {
 
     public Long getTmdbId() {
         return tmdbId;
-    }
-
-    public void setTmdbId(long tmdbId) {
-        this.tmdbId=tmdbId;
     }
 
     public String getPosterUrl() {
