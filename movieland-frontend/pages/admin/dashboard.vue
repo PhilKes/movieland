@@ -4,41 +4,41 @@
       <h4>Admin Dashboard</h4>
     </v-row>
     <v-row justify="center">
-      <v-col cols="12" lg="10">
+      <v-col cols="12" lg="9">
         <v-row>
-          <v-col cols="6" xl="3">
+          <v-col cols="12" sm="6">
             <stat-card color="success" icon="fas fa-dollar-sign"
                        title="Net Earnings" subtitle="Last 7 Days" :loading="loading"
             >
               {{stats.income | formatDollar}}
             </stat-card>
           </v-col>
-          <v-col cols="6" xl="3">
+          <v-col cols="12" sm="6">
             <stat-card color="secondary" icon="fas fa-calendar-alt"
                        title="Shows" subtitle="Last 7 Days"
                        :value="stats.amtShows" :loading="loading"
             />
           </v-col>
-          <v-col cols="6" xl="3">
+          <v-col cols="12" sm="6">
             <stat-card color="primary" icon="fas fa-film"
                        title="Movies" subtitle="Last 7 Days"
                        :value="stats.amtMovies" :loading="loading"
             />
           </v-col>
-          <v-col cols="6" xl="3">
+          <v-col cols="12" sm="6" >
             <stat-card color="orange darken-2" icon="fas fa-user"
                        title="Sold Tickets" subtitle="Last 7 Days"
                        :value="stats.amtSeats" :loading="loading"
             />
           </v-col>
-          <v-col cols="6" xl="6">
+          <v-col cols="12" sm="6">
             <stat-card :img="stats.highestGrossingMovie.posterPath"
                        title="Highest Grossing" subtitle="Last 7 Days" :loading="loading">
               {{stats.highestGrossingMovie.grossing | formatDollar}}
             </stat-card>
           </v-col>
           <v-spacer/>
-          <v-col cols="6" xl="6">
+          <v-col cols="12" sm="6" >
             <stat-card :img="stats.lowestGrossingMovie.posterPath"
                        title="Lowest Grossing" subtitle="Last 7 Days" :loading="loading">
               {{stats.lowestGrossingMovie.grossing | formatDollar}}

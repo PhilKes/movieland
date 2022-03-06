@@ -109,12 +109,11 @@ public class Movie {
         this.tmdbId=(long) tmdbMovie.getId();
         this.posterUrl=TmdbApiService.POSTER_BASE_URL + tmdbMovie.getPosterPath();
         this.length=(long) tmdbMovie.getRuntime();
-        //TODO pipe description
 
         this.description=tmdbMovie.getOverview();
-       /* if(description.length()>120) {
-            description=description.substring(0, 120) + "...";
-        }*/
+        if(description.length()>255) {
+            description=description.substring(0, 252) + "...";
+        }
         if(tmdbMovie.getReleaseDate()!=null && !tmdbMovie.getReleaseDate().isEmpty()) {
             this.date=DateUtils.createDateFromDateString(tmdbMovie.getReleaseDate());
         }

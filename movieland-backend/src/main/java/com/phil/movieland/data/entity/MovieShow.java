@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
@@ -16,6 +17,7 @@ public class MovieShow {
     private long showId;
 
     @Column(name="MOVIE_ID")
+    @NotNull
     private long movId;
 
     @Column(name="RELEASE_DATE")

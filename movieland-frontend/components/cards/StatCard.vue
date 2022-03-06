@@ -7,10 +7,10 @@
         <v-icon v-else-if="icon" color="white" x-large>{{icon}}</v-icon>
       </v-list-item-avatar>
       <v-list-item-content>
-        <v-list-item-title class="mb-4 text-center" style="font-size: 0.8em">
+        <v-list-item-title class="mb-2 text-center" style="font-size: 0.8em">
           {{title}}
         </v-list-item-title>
-        <v-list-item-title class="mb-2 text-center stat-card-main">
+        <v-list-item-title class="mb-2 pa-1 text-center stat-card-main">
          {{value}}
           <slot></slot>
         </v-list-item-title>
