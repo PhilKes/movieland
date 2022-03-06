@@ -9,7 +9,7 @@ services:
     # Configuration for building the docker posterUrl for the backend service
     build:
       context: movieland-backend # Use an posterUrl built from the specified dockerfile in the `polling-app-server` directory.
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     ports:
       - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
     restart: on-failure
@@ -19,24 +19,19 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
-    networks:
-      - backend
-      - frontend
 
   # Frontend Service
   app-client:
     build:
       context: movieland-frontend # Use an posterUrl built from the specified dockerfile in the `polling-app-client` directory.
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       args:
         REACT_APP_API_BASE_URL: http://127.0.0.1:8080/api
     ports:
       - "80:3000" # Map the exposed port 80 on the container to port 9090 on the host machine
-    restart: always
     depends_on:
       - app-server
-    networks:
-      - frontend
+    network_mode: host
 
 
   # Database Service (Mysql)
@@ -44,7 +39,6 @@ services:
     image: mysql:5.7.29
     ports:
       - "3306:3306"
-    restart: always
     environment:
       MYSQL_DATABASE: movieland_db
       MYSQL_USER: movielandadmin
@@ -53,16 +47,7 @@ services:
     volumes:
       - db-data:/var/lib/mysql
       - ./database:/database
-    command: mysqld --init-file="/database/schema-and-data.sql"
-            
-    networks:
-      - backend
-
 # Volumes
 volumes:
   db-data:
 
-# Networks to be created to facilitate communication between containers
-networks:
-    backend:
-    frontend:

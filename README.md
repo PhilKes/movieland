@@ -2,11 +2,11 @@
 
 <p align="center"><img src="/doc/admin.gif" width="400px" >   <img src="/doc/reservation.gif" width="400px"></p>
 
-## Frameworks
+## Techstack
 * **Vue-Nuxt** Frontend 
 * **Spring Boot** Backend
 * **MySQL** Database
-* **Docker** Container
+* **Docker-Compose** Containerization
 
 ## Features
 * Spring **REST** API
@@ -24,10 +24,9 @@ Full Docker Support with **Docker-compose**:
 
     docker-compose up --build
     
-   **Note**: Change "proxy" address in "package.json" of React-frontend to "**app-server**:8080" if used with docker-compose 
-* Starts and initializes **MySQL** Schema exposed only to Spring backend
+   * Starts and initializes **MySQL** Schema exposed only to Spring backend
 * Starts **Spring** REST API exposed to Port 8080
-* Starts **Vue** Frontend exposed to Port 80
+* Starts **Vue** Frontend exposed to Port 3000
 
 ## Attribution
 All Movie Posters, Descriptions, Meta Data is provided by the free TMDB API

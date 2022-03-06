@@ -1,0 +1,17 @@
+version: '3.3'
+
+# Define services
+services:
+# Database Service (Mysql)
+  db:
+    image: mysql:5.7.29
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_DATABASE: movieland_db
+      MYSQL_USER: movielandadmin
+      MYSQL_PASSWORD: movielandadmin
+      MYSQL_ROOT_PASSWORD: movielandadmin
+    volumes:
+      - ./:/database
