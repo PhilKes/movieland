@@ -1,10 +1,13 @@
-# Docker Compose for entire Full Stack Application running on localhost with Containers pulled from dockerhub/philkes
+# Docker Compose for entire Full Stack Application running on localhost with locally built Docker Containers
 
 version: '3.3'
 services:
   # App backend service
   app-server:
-    image: philkes/movie-land-backend:latest
+    # Configuration for building the docker posterUrl for the backend service
+    build:
+      context: movieland-backend # Use an posterUrl built from the specified dockerfile in the `polling-app-server` directory.
+      dockerfile: docker/Dockerfile
     ports:
       - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
     restart: on-failure
@@ -17,7 +20,9 @@ services:
     network_mode: host
   # Frontend Service
   app-client:
-    image: philkes/movie-land-frontend:latest
+    build:
+      context: movieland-frontend # Use an posterUrl built from the specified dockerfile in the `polling-app-client` directory.
+      dockerfile: movieland-frontend/Dockerfile
     ports:
       - "80:3000" # Map the exposed port 80 on the container to port 9090 on the host machine
     depends_on:

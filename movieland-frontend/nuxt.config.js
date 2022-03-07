@@ -13,7 +13,7 @@ export default {
       {hid: 'description', name: 'description', content: ''}
     ],
     link: [
-      {rel: 'icon', type: 'posterUrl/x-icon', href: '/favicon.ico'}
+      {rel: 'icon', type: 'posterUrl/x-icon', href: '/img/movie_land_icon.ico'}
     ]
   },
 
