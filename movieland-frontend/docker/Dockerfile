@@ -23,4 +23,4 @@ ENV NUXT_HOST=127.0.0.1
 ENV NUXT_PORT=3000
 
 # start the app
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "dev" ]
