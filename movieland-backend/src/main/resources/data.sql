@@ -32,31 +32,21 @@ insert ignore into movie (movie_id,name, release_date,description) values (4,'Wh
 insert ignore into movie (movie_id,name, release_date,description) values (5,'Harry Potter', '2001-10-10', 'The boy who lived');
 
 
---Insert dummy MovieShows for all Movies
-
-set @showId = 0;
-set @resId = 0;
-set @seatId = 0;
-
+set @maxSeatType= 4;
 --Shows for yesterday
-INSERT ignore INTO movie_show (show_id,movie_id, release_date) SELECT (select @showId := @showId + 1), movie_id, @dateYesterday FROM movie;
-INSERT ignore INTO reservation (reservation_id, show_id, user_id,validated, method,total_sum) SELECT (select @resId := @resId + 1), s.show_id, u.id, true, 0, 7  FROM movie_show s, user u where s.release_date = @dateYesterday and u.username ='user';
-INSERT ignore INTO seat (seat_id, seat_nr, reservation_id,type) SELECT (select @seatId := @seatId + 1), 1,r.reservation_id, 2  FROM reservation r, movie_show s where r.show_id = s.show_id and s.release_date = @dateYesterday;
+insert ignore INTO movie_show (movie_id, release_date) select  movie_id, @dateYesterday FROM movie;
+INSERT ignore INTO reservation ( show_id, user_id,validated, method,total_sum) select  s.show_id, u.id, true, 0, 7  from movie_show s, user u where s.release_date = @dateYesterday and u.username ='user';
+insert ignore INTO seat ( seat_nr, reservation_id,type) select 1,r.reservation_id, floor((RAND() * @maxSeatType))  from reservation r, movie_show s where r.show_id = s.show_id and s.release_date = @dateYesterday;
 
 --Shows for today
-INSERT ignore INTO movie_show (show_id,movie_id, release_date) SELECT (select @showId := @showId + 1),movie_id, @dateToday FROM movie;
-INSERT ignore INTO reservation (reservation_id, show_id, user_id,validated, method,total_sum) SELECT (select @resId := @resId + 1),s.show_id, u.id, true, 0, 7  FROM movie_show s, user u where s.release_date = @dateToday and u.username ='user';
-INSERT ignore INTO seat (seat_id, seat_nr, reservation_id,type) SELECT (select @seatId := @seatId + 1), 1,r.reservation_id, 2  FROM reservation r, movie_show s where r.show_id = s.show_id and s.release_date = @dateToday;
-
---insert ignore into reservation (show_id, user_id) values ((select show_id from movie_show where release_date = @dateToday), (select id from user where username = 'admin'));
---insert ignore into reservation (show_id, user_id) values ((select show_id from movie_show where release_date = @dateToday), (select id from user where username = 'admin'));
---insert ignore into reservation (show_id, user_id) values ((select show_id from movie_show where release_date = @dateToday), (select id from user where username = 'user'));
---insert ignore into reservation (show_id, user_id) values ((select show_id from movie_show where release_date = @dateToday), (select id from user where username = 'user'));
+insert ignore INTO movie_show (movie_id, release_date) select movie_id, @dateToday FROM movie;
+INSERT ignore INTO reservation (show_id, user_id,validated, method,total_sum) select s.show_id, u.id, true, 0, 7  from movie_show s, user u where s.release_date = @dateToday and u.username ='user';
+insert ignore INTO seat (seat_nr, reservation_id,type) select 1,r.reservation_id, floor((RAND() * @maxSeatType))  from reservation r, movie_show s where r.show_id = s.show_id and s.release_date = @dateToday;
 
 --Shows for tomorrow
-INSERT ignore INTO movie_show (show_id,movie_id, release_date) SELECT (select @showId := @showId + 1),movie_id, @dateTomorrow FROM movie;
-INSERT ignore INTO reservation (reservation_id, show_id, user_id,validated, method,total_sum) SELECT (select @resId := @resId + 1), s.show_id, u.id, true, 0, 7  FROM movie_show s, user u where s.release_date = @dateTomorrow and u.username ='user';
-INSERT ignore INTO seat (seat_id, seat_nr, reservation_id,type) SELECT (select @seatId := @seatId + 1), 1,r.reservation_id, 2  FROM reservation r, movie_show s where r.show_id = s.show_id and s.release_date = @dateTomorrow;
+insert ignore INTO movie_show (movie_id, release_date) select movie_id, @dateTomorrow FROM movie;
+INSERT ignore INTO reservation (show_id, user_id,validated, method,total_sum) select s.show_id, u.id, true, 0, 7  from movie_show s, user u where s.release_date = @dateTomorrow and u.username ='user';
+insert ignore INTO seat (seat_nr, reservation_id,type) select  1,r.reservation_id, floor((RAND() * @maxSeatType))  from reservation r, movie_show s where r.show_id = s.show_id and s.release_date = @dateTomorrow;
 
 
 
