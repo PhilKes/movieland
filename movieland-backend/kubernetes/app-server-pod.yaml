@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: app-server
+  name: app-server
+spec:
+  containers:
+    - env:
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: movielandadmin
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:mysql://localhost:3306/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
+        - name: SPRING_DATASOURCE_USERNAME
+          value: movielandadmin
+      image: philkes/movie-land-backend:master
+      name: app-server
+      ports:
+        - containerPort: 8080
+      resources: {}
+  restartPolicy: OnFailure
+status: {}
