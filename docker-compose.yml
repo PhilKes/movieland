@@ -22,6 +22,8 @@ services:
       - "80:3000" # Map the exposed port 80 on the container to port 9090 on the host machine
     depends_on:
       - app-server
+    environment: # Pass environment variables to the service
+      REST_API_URL: http://localhost:8080/api
     network_mode: host
 
 

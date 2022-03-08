@@ -48,14 +48,14 @@ export default {
 
   proxy: {
     '/api': {
-      target: 'http://localhost:8080/api',
+      target: process.env.REST_API_URL || 'http://localhost:8080/api',
       pathRewrite: {
         '^/api': '/'
       }
     }
   },
 
-  axios: {baseURL: 'http://localhost:8080/api'},
+  axios: {baseURL: process.env.REST_API_URL || 'http://localhost:8080/api'},
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)
   vuetify: {
