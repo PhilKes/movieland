@@ -45,27 +45,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-  deploy:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - deployfile: ./database/kubernetes/db-claim1-persistentvolumeclaim.yaml
-          - deployfile: ./database/kubernetes/db-data-persistentvolumeclaim.yaml
-          - deployfile: ./database/kubernetes/db-service.yaml
-          - deployfile: ./database/kubernetes/db-deployment.yaml
-          - deployfile: ./movieland-backend/kubernetes/app-server-pod.yaml
-          - deployfile: ./movieland-backend/kubernetes/app-server-service.yaml
-          - deployfile: ./movieland-frontend/kubernetes/app-client-service.yaml
-          - deployfile: ./movieland-frontend/kubernetes/app-client-deployment.yaml
-     
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Trigger deploy
-        uses: Consensys/kubernetes-action@master
-        env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-        with:
-          args: apply -f ${{ matrix.deployfile }}
