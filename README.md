@@ -2,7 +2,7 @@
 
 <p align="center"><img src="/doc/admin.gif" width="400px" >   <img src="/doc/reservation.gif" width="400px"></p>
 
-This is a showcase project for **Full Stack Web Application** for a cinema operator use-case scenario.
+This is a showcase project for a **Full Stack Web Application** for a cinema operator use-case scenario.
 
 ## Backend - Spring Boot <img src="./doc/spring.png" width="26">
 * JPA/Hibernate to interact with the database
