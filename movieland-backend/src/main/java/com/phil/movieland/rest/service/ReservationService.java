@@ -6,6 +6,7 @@ import com.phil.movieland.data.entity.Reservation;
 import com.phil.movieland.data.entity.Seat;
 import com.phil.movieland.data.repository.ReservationRepository;
 import com.phil.movieland.data.repository.SeatRepository;
+import com.phil.movieland.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,35 +22,36 @@ public class ReservationService {
     private final SeatRepository seatRepository;
     private final ReservationRepository reservationRepository;
 
-    private Logger log=LoggerFactory.getLogger(ReservationService.class);
+    private Logger log = LoggerFactory.getLogger(ReservationService.class);
 
     @Autowired
     public ReservationService(SeatRepository seatRepository, ReservationRepository reservationRepository) {
-        this.seatRepository=seatRepository;
-        this.reservationRepository=reservationRepository;
+        this.seatRepository = seatRepository;
+        this.reservationRepository = reservationRepository;
     }
 
 
     public Reservation updateReservation(Reservation reservation) {
         return reservationRepository.save(reservation);
     }
+
     public Reservation saveReservation(Reservation reservation, List<Seat> seats) {
         /** Check if seats are already taken*/
         //TOD Use seatRepository.findAllOfShow
-        List<Reservation> reservations=reservationRepository.findAllByShowId(reservation.getShowId());
-        for(Reservation res : reservations) {
-            List<Seat> seatList=seatRepository.findAllByResId(res.getResId());
-            for(Seat reserved : seatList) {
-                if(seats.stream().anyMatch(selected -> reserved.getNumber()==selected.getNumber())) {
+        List<Reservation> reservations = reservationRepository.findAllByShowId(reservation.getShowId());
+        for (Reservation res : reservations) {
+            List<Seat> seatList = seatRepository.findAllByResId(res.getResId());
+            for (Seat reserved : seatList) {
+                if (seats.stream().anyMatch(selected -> reserved.getNumber() == selected.getNumber())) {
                     return null;
                 }
             }
         }
         /**Calculate total Sum */
-        double totalSum=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
+        double totalSum = seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
         reservation.setTotalSum(totalSum);
 
-        Reservation result=reservationRepository.save(reservation);
+        Reservation result = reservationRepository.save(reservation);
         /** Store Seats */
         seats.stream().forEach(seat -> {
             seat.setResId(result.getResId());
@@ -59,42 +61,50 @@ public class ReservationService {
     }
 
     public List<Reservation> getAllReservations() {
+        log.info("Querying all Reservations");
         return reservationRepository.findAll();
 
     }
 
     public List<Reservation> getAllReservationsOfShow(long showId) {
+        log.info("Querying all Reservations of MovieShow '{}'", showId);
         return reservationRepository.findAllByShowId(showId);
     }
 
     public List<Seat> getAllSeatsOfReservation(Long resId) {
+        log.info("Querying all Seats of Reservation '{}'", resId);
         return seatRepository.findAllByResId(resId);
     }
 
     public List<Seat> getAllSeatsOfShow(Long showId) {
+        log.info("Querying all Seats of Show '{}'", showId);
         return seatRepository.findSeatsOfShow(showId);
     }
 
     public Optional<Reservation> getReservationById(Long resId) {
+        log.info("Querying Reservation by id='{}'", resId);
         return reservationRepository.findById(resId);
     }
 
 
     public void deleteAll() {
-        List<Reservation> reservations=reservationRepository.findAll();
+        log.info("Deleting all Reservations");
+        List<Reservation> reservations = reservationRepository.findAll();
         reservations.forEach(reservation -> seatRepository.deleteAllByResId(reservation.getResId()));
         reservationRepository.deleteAll();
     }
 
     public List<Reservation> getAllReservationsOfUser(Long userId, boolean futureReservations) {
-        if(futureReservations) {
+        log.info("Querying all Reservations of User userId='{}'", userId);
+        if (futureReservations) {
             return reservationRepository.findFutureAllByUserId(userId, new Date());
         }
         return reservationRepository.findAllByUserId(userId);
     }
 
     public void saveReservationsWithSeats(List<StatisticsService.ReservationWithSeats> reservations) {
-        reservations.stream().forEach(res -> saveReservation(res.getReservation(), res.getSeats()));
+        log.info("Saving Reservations List");
+        reservations.forEach(res -> saveReservation(res.getReservation(), res.getSeats()));
     }
 
     /**
@@ -112,9 +122,10 @@ public class ReservationService {
             }
         }
         return true;*/
-        for(Seat seat : seatList) {
-            if(!seatRepository.findSeatDuplicates(seat.getNumber(), showId).isEmpty()) {
-                log.info("Seat taken(" + seat.getNumber() + ",show: " + showId + ")");
+        log.info("Check if Seats '{}' are available for MovieShow '{}'", Utils.joinToStringList(seatList), showId);
+        for (Seat seat : seatList) {
+            if (!seatRepository.findSeatDuplicates(seat.getNumber(), showId).isEmpty()) {
+                log.info("Seat ({} for MovieShow: '{}') is already taken", seat.getNumber(), showId);
                 return false;
             }
         }
@@ -125,10 +136,12 @@ public class ReservationService {
      * Returns amount of deleted reservations
      */
     public long deleteReservationsOfShows(List<Long> showIds) {
+        log.info("Deleting all Reservations of MovieShows showIds='{}'", Utils.joinToStringList(showIds));
         return reservationRepository.deleteAllByShowIdIn(showIds);
     }
 
     public Optional<Reservation> getReservationInfoOfUser(Long userId, Long resId) {
+        log.info("Querying Reservation Info of User userId='{}', resId='{}'", userId, resId);
         return reservationRepository.findByResIdAndUserId(resId, userId);
     }
 
@@ -143,7 +156,7 @@ public class ReservationService {
         }
 
         public void setReservation(Reservation reservation) {
-            this.reservation=reservation;
+            this.reservation = reservation;
         }
 
         public MovieShow getMovieShow() {
@@ -151,7 +164,7 @@ public class ReservationService {
         }
 
         public void setMovieShow(MovieShow movieShow) {
-            this.movieShow=movieShow;
+            this.movieShow = movieShow;
         }
 
         public Movie getMovie() {
@@ -159,7 +172,7 @@ public class ReservationService {
         }
 
         public void setMovie(Movie movie) {
-            this.movie=movie;
+            this.movie = movie;
         }
 
         public String getQRCodeURL() {
@@ -167,7 +180,7 @@ public class ReservationService {
         }
 
         public void setQRCodeURL(String QRCodeURL) {
-            this.QRCodeURL=QRCodeURL;
+            this.QRCodeURL = QRCodeURL;
         }
     }
 }

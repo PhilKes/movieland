@@ -10,7 +10,6 @@ services:
       dockerfile: docker/Dockerfile
     ports:
       - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
-    restart: on-failure
     depends_on:
       - db # This service depends on mysql. Start that first.
     environment: # Pass environment variables to the service

@@ -30,12 +30,12 @@ public class StatisticsController {
     private final StatisticsService statisticsService;
     private final TaskService taskService;
 
-    private Logger log=LoggerFactory.getLogger(StatisticsController.class);
+    private Logger log = LoggerFactory.getLogger(StatisticsController.class);
 
     @Autowired
     public StatisticsController(StatisticsService statisticsService, TaskService taskService) {
-        this.statisticsService=statisticsService;
-        this.taskService=taskService;
+        this.statisticsService = statisticsService;
+        this.taskService = taskService;
     }
 
     /**
@@ -43,23 +43,22 @@ public class StatisticsController {
      */
     @PostMapping("/shows")
     public ResponseEntity<?> generateShows(@RequestBody GenerateShowRequest generateRequest) throws URISyntaxException {
-        Date start=getDateFormDayStartOrEnd(generateRequest.getFrom(), true);
-        Date end=getDateFormDayStartOrEnd(generateRequest.getUntil(), false);
-        if(start.after(end)) {
+        Date start = getDateFormDayStartOrEnd(generateRequest.getFrom(), true);
+        Date end = getDateFormDayStartOrEnd(generateRequest.getUntil(), false);
+        if (start.after(end)) {
             return ResponseEntity.badRequest().body("From Date must be earlier than until Date!");
         }
         int taskId;
-        if(generateRequest.getShowsPerMovie()==null) {
+        if (generateRequest.getShowsPerMovie() == null) {
             generateRequest.setShowsPerMovie(4);
         }
-        if(generateRequest.getMoviesPerDay()==null) {
+        if (generateRequest.getMoviesPerDay() == null) {
             generateRequest.setMoviesPerDay(4);
         }
-
-        taskId=taskService.execute(statisticsService.generateShowsBetweenTask(
+        log.info("Creating Task 'GenerateShows'");
+        taskId = taskService.execute(statisticsService.generateShowsBetweenTask(
                 start, end, generateRequest.getMoviesPerDay(), generateRequest.getShowsPerMovie(), generateRequest.getMovIds()));
-
-        log.info("Task " + taskId + " posted for execution");
+        log.info("Task '{}' was posted for execution", taskId);
         return ResponseEntity.created(new URI("/api/task/" + taskId))
                 .body(taskId);
     }
@@ -69,13 +68,15 @@ public class StatisticsController {
      */
     @PostMapping("/reservations")
     public ResponseEntity<?> generateReservations(@RequestBody GenerateReservationRequest resRequest) throws URISyntaxException {
-        Date start=getDateFormDayStartOrEnd(resRequest.getFrom(), true);
-        Date end=getDateFormDayStartOrEnd(resRequest.getUntil(), false);
-        if(start.after(end)) {
+        Date start = getDateFormDayStartOrEnd(resRequest.getFrom(), true);
+        Date end = getDateFormDayStartOrEnd(resRequest.getUntil(), false);
+        if (start.after(end)) {
             return ResponseEntity.badRequest().body("From Date must be earlier than until Date!");
         }
         int taskId;
-        taskId=taskService.execute(statisticsService.generateReservationsBetweenTask(start, end, resRequest.getResPerShow(), resRequest.getMovIds()));
+        log.info("Creating Task 'GenerateReservations'");
+        taskId = taskService.execute(statisticsService.generateReservationsBetweenTask(start, end, resRequest.getResPerShow(), resRequest.getMovIds()));
+        log.info("Task '{}' was posted for execution", taskId);
         return ResponseEntity.created(new URI("/api/task/" + taskId))
                 .body(taskId);
     }
@@ -110,13 +111,13 @@ public class StatisticsController {
 
     @GetMapping("/income")
     public Double getIncomeBetween(
-            @DateTimeFormat(pattern="yyyy-MM-dd")
-            @RequestParam(value="from") Date from
-            , @DateTimeFormat(pattern="yyyy-MM-dd")
-            @RequestParam(value="until") Date until) throws URISyntaxException {
-        Date start=getDateFormDayStartOrEnd(from, true);
-        Date end=getDateFormDayStartOrEnd(until, false);
-        if(start.after(end)) {
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(value = "from") Date from
+            , @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(value = "until") Date until) throws URISyntaxException {
+        Date start = getDateFormDayStartOrEnd(from, true);
+        Date end = getDateFormDayStartOrEnd(until, false);
+        if (start.after(end)) {
             return 0.0;
         }
         return statisticsService.calculateIncomeBetween(start, end);
@@ -124,62 +125,62 @@ public class StatisticsController {
 
     @GetMapping("/inter")
     public List<IntermediateStatistic> getIntermediates(
-            @DateTimeFormat(pattern="yyyy-MM-dd")
-            @RequestParam(value="from") Date from
-            , @DateTimeFormat(pattern="yyyy-MM-dd")
-            @RequestParam(value="until") Date until) throws URISyntaxException {
-        Date start=getDateFormDayStartOrEnd(from, true);
-        Date end=getDateFormDayStartOrEnd(until, false);
-        if(start.after(end)) {
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(value = "from") Date from
+            , @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(value = "until") Date until) throws URISyntaxException {
+        Date start = getDateFormDayStartOrEnd(from, true);
+        Date end = getDateFormDayStartOrEnd(until, false);
+        if (start.after(end)) {
             return new ArrayList<>();
         }
-        List<IntermediateStatistic> inter=statisticsService.getIntermediates(start, end);
+        List<IntermediateStatistic> inter = statisticsService.getIntermediates(start, end);
         return inter;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/summary")
     public StatisticsService.Statistics getSummaryBetween(
-            @DateTimeFormat(pattern="yyyy-MM-dd")
-            @RequestParam(value="from") Date from
-            , @DateTimeFormat(pattern="yyyy-MM-dd")
-            @RequestParam(value="until") Date until) {
-        Date start=getDateFormDayStartOrEnd(from, true);
-        Date end=getDateFormDayStartOrEnd(until, false);
-        if(start.after(end)) {
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(value = "from") Date from
+            , @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(value = "until") Date until) {
+        Date start = getDateFormDayStartOrEnd(from, true);
+        Date end = getDateFormDayStartOrEnd(until, false);
+        if (start.after(end)) {
             return new StatisticsService.Statistics();
         }
-        StatisticsService.Statistics stats=statisticsService.calculateStatistics(start, end);
+        StatisticsService.Statistics stats = statisticsService.calculateStatistics(start, end);
         return stats;
     }
 
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/statistics")
     public ResponseEntity<?> deleteStatistics(
-            @DateTimeFormat(pattern="yyyy-MM-dd")
-            @RequestParam(value="from") Date from,
-            @DateTimeFormat(pattern="yyyy-MM-dd")
-            @RequestParam(value="until") Date until) {
-        Date start=getDateFormDayStartOrEnd(from, true);
-        Date end=getDateFormDayStartOrEnd(until, false);
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(value = "from") Date from,
+            @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @RequestParam(value = "until") Date until) {
+        Date start = getDateFormDayStartOrEnd(from, true);
+        Date end = getDateFormDayStartOrEnd(until, false);
         statisticsService.deleteStatisticsBetween(start, end);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/movie/{movId}")
-    public ResponseEntity<?> getMovieStats(@DateTimeFormat(pattern="yyyy-MM-dd")
-                                           @RequestParam(value="from", required=false) Date from,
-                                           @DateTimeFormat(pattern="yyyy-MM-dd")
-                                           @RequestParam(value="until", required=false) Date until,
+    public ResponseEntity<?> getMovieStats(@DateTimeFormat(pattern = "yyyy-MM-dd")
+                                           @RequestParam(value = "from", required = false) Date from,
+                                           @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                           @RequestParam(value = "until", required = false) Date until,
                                            @RequestParam Boolean aggregated,
                                            @PathVariable Integer movId) {
-        if(from==null || until==null) {
-            until=new Date();
-            Calendar lastWeek=Calendar.getInstance();
+        if (from == null || until == null) {
+            until = new Date();
+            Calendar lastWeek = Calendar.getInstance();
             lastWeek.setTime(until);
             lastWeek.add(Calendar.DATE, -7);
-            from=lastWeek.getTime();
+            from = lastWeek.getTime();
         }
         return ResponseEntity.ok(statisticsService.calculateMovieStats(movId, from, until, aggregated));
     }
@@ -196,16 +197,15 @@ public class StatisticsController {
 
 
     public Date getDateFormDayStartOrEnd(Date date, boolean startEnd) {
-        Calendar calendar=Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        if(startEnd) {
+        if (startEnd) {
             calendar.set(Calendar.HOUR, 0);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
             calendar.set(Calendar.MILLISECOND, 0);
             calendar.set(Calendar.HOUR_OF_DAY, 0);
-        }
-        else {
+        } else {
             calendar.set(Calendar.HOUR_OF_DAY, 23);
             calendar.set(Calendar.MINUTE, 59);
             calendar.set(Calendar.SECOND, 59);

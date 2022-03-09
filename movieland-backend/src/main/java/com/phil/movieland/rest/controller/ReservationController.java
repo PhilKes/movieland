@@ -44,8 +44,7 @@ public class ReservationController {
     @PreAuthorize("hasRole('CASHIER')")
     @GetMapping
     public List<?> getReservations() {
-        List<Reservation> userReservations=reservationService.getAllReservations();
-        return userReservations;
+        return reservationService.getAllReservations();
     }
 
     //TODO Do not expose other reservation to user

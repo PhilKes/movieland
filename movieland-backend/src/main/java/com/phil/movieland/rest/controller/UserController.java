@@ -27,46 +27,49 @@ public class UserController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    private static final Logger log=LoggerFactory.getLogger(UserController.class);
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
-    public UserSummary getCurrentUser(@CurrentUser UserPrincipal currentUser) {
-        UserSummary userSummary=new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
+    public UserSummary getCurrentUser(@CurrentUser UserPrincipal currUser) {
+        UserSummary userSummary = new UserSummary(currUser.getId(), currUser.getUsername(), currUser.getName());
+        log.info("Querying current User '{}'", currUser.getUsername());
         return userSummary;
     }
 
     @PreAuthorize("hasRole('USER')")
     @PutMapping("/me")
     ResponseEntity<?> updateUserMe(@CurrentUser UserPrincipal currUser, @RequestBody User user) {
-        User beforeUser=fillUserUpdate(currUser.getId(), user);
-        User result=userRepository.save(beforeUser);
+        User beforeUser = fillUserUpdate(currUser.getId(), user);
+        log.info("Updating current User '{}'", currUser.getUsername());
+        userRepository.save(beforeUser);
         return ResponseEntity.ok().body("User updated");
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     ResponseEntity<?> updateUser(@PathVariable long id, @RequestBody User user) {
-        User beforeUser=fillUserUpdate(id, user);
-        if(user.getRoles()!=null) {
+        User beforeUser = fillUserUpdate(id, user);
+        if (user.getRoles() != null) {
             beforeUser.setRoles(user.getRoles());
         }
-        User result=userRepository.save(beforeUser);
+        log.info("Updating User '{}'", user.getUsername());
+        userRepository.save(beforeUser);
         return ResponseEntity.ok().body("User updated");
     }
 
     private User fillUserUpdate(@PathVariable long id, @RequestBody User user) {
-        User beforeUser=userRepository.findById(id).orElse(new User());
-        if(user.getPassword()!=null) {
+        User beforeUser = userRepository.findById(id).orElse(new User());
+        if (user.getPassword() != null) {
             beforeUser.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        if(user.getName()!=null) {
+        if (user.getName() != null) {
             beforeUser.setName(user.getName());
         }
-        if(user.getUsername()!=null) {
+        if (user.getUsername() != null) {
             beforeUser.setUsername(user.getUsername());
         }
-        if(user.getEmail()!=null) {
+        if (user.getEmail() != null) {
             beforeUser.setEmail(user.getEmail());
         }
         return beforeUser;
@@ -75,6 +78,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public List<User> getAllUsers() {
+        log.info("Querying all Users");
         return userRepository.findAll();
 
     }
@@ -89,22 +93,26 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admins")
     public List<User> getUsersOfRoleAdmins() {
-        Role role=roleRepository.findByName(ROLE_ADMIN).get();
+        log.info("Querying all Users with Role 'Admin'");
+        Role role = roleRepository.findByName(ROLE_ADMIN).get();
         return userRepository.findAllByRolesContaining(role);
     }
 
     public List<Long> getAllUserIds() {
+        log.info("Querying all User Ids");
         return userRepository.findAll().stream().map(User::getId).collect(Collectors.toList());
     }
 
     public List<User> getAllUserOfRole(Role.RoleName roleName) {
-        Role role=roleRepository.findByName(roleName).get();
+        log.info("Querying all Users with Role '{}'", roleName);
+        Role role = roleRepository.findByName(roleName).get();
         return userRepository.findAllByRolesContaining(role).stream()
-                .filter(user -> user.getRoles().size()==1)
+                .filter(user -> user.getRoles().size() == 1)
                 .collect(Collectors.toList());
     }
 
     public List<Long> getAllUserIdsOfRole(Role.RoleName roleName) {
+        log.info("Querying all User Ids by Role '{}'", roleName);
         return getAllUserOfRole(roleName).stream().map(User::getId).collect(Collectors.toList());
     }
 
@@ -123,18 +131,20 @@ public class UserController {
     */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{username}")
-    public UserProfile getUserProfile(@PathVariable(value="username") String username) {
-        User user=userRepository.findByUsername(username)
+    public UserProfile getUserProfile(@PathVariable(value = "username") String username) {
+        log.info("Querying UserProfile of User '{}'", username);
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        UserProfile userProfile=new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt());
+        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt());
         return userProfile;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        log.info("Deleting User of by id='{}'", id);
         userRepository.deleteById(id);
-        return ResponseEntity.ok("User (id:"+id+") deleted");
+        return ResponseEntity.ok("User (id:" + id + ") deleted");
     }
 
 }

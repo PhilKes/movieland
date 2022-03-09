@@ -31,23 +31,23 @@ public class StatisticsService {
     private final SeatRepository seatRepository;
     private final ReservationService reservationService;
 
-    private final static HashMap<String, Statistics> precalculatedSummaries=new HashMap<>();
+    private final static HashMap<String, Statistics> precalculatedSummaries = new HashMap<>();
 
-    private Logger log=LoggerFactory.getLogger(StatisticsService.class);
+    private Logger log = LoggerFactory.getLogger(StatisticsService.class);
 
     @Autowired
     public StatisticsService(SeatRepository seatRepository, ReservationService reservationService,
                              MovieShowService movieShowService, MovieService movieService,
                              UserController userController) {
-        this.seatRepository=seatRepository;
-        this.reservationService=reservationService;
-        this.movieShowService=movieShowService;
-        this.movieService=movieService;
-        this.userController=userController;
+        this.seatRepository = seatRepository;
+        this.reservationService = reservationService;
+        this.movieShowService = movieShowService;
+        this.movieService = movieService;
+        this.userController = userController;
     }
 
-    public RunnableWithProgress generateShowsBetweenTask(Date from, Date until,List<Long> movIds) {
-        return generateShowsBetweenTask(from, until, 10, 4,movIds);
+    public RunnableWithProgress generateShowsBetweenTask(Date from, Date until, List<Long> movIds) {
+        return generateShowsBetweenTask(from, until, 10, 4, movIds);
     }
 
     /**
@@ -59,47 +59,47 @@ public class StatisticsService {
             public void run() {
                 setMessage("Generating Shows");
                 setProgress(0);
-                long days=ChronoUnit.DAYS.between(from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+                long days = ChronoUnit.DAYS.between(from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
                         , until.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                 setProgressMax((int) days + 1);
 
-                Calendar countDate=Calendar.getInstance();
+                Calendar countDate = Calendar.getInstance();
                 countDate.setTime(from);
                 /** Generate shows for each day until Date until is reached*/
-                Random rand=new Random();
+                Random rand = new Random();
                 /** Get random Movies*/
-                List<Movie> movies= null;
-                if(movIds== null || movIds.size() == 0) {
-                    movies=movieService.getAllMovies().stream()
+                List<Movie> movies = null;
+                if (movIds == null || movIds.size() == 0) {
+                    movies = movieService.getAllMovies().stream()
                             .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
                                 Collections.shuffle(collected);
                                 return collected.stream();
                             }))
                             .limit(moviesPerDay)
                             .collect(Collectors.toList());
-                }else{
-                    movies=movieService.queryMoviesByIds(movIds);
+                } else {
+                    movies = movieService.queryMoviesByIds(movIds);
                 }
 
-                while(countDate.getTime().before(until)) {
+                while (countDate.getTime().before(until)) {
                     /** For each movie generate shows every day */
-                    for(Movie movie : movies) {
-                        List<MovieShow> movieShows=new ArrayList<>();
-                        List<Integer> hours=new ArrayList<>();
+                    for (Movie movie : movies) {
+                        List<MovieShow> movieShows = new ArrayList<>();
+                        List<Integer> hours = new ArrayList<>();
                         /** Between 2 - 5 shows every day per movie*/
                         //int amtShows=2 + rand.nextInt(3);
-                        int amtShows=showsPerMovie;
-                        for(int i=0; i<amtShows; i++) {
-                            Calendar showTime=Calendar.getInstance();
+                        int amtShows = showsPerMovie;
+                        for (int i = 0; i < amtShows; i++) {
+                            Calendar showTime = Calendar.getInstance();
                             showTime.setTime(countDate.getTime());
-                            MovieShow movieShow=new MovieShow();
+                            MovieShow movieShow = new MovieShow();
                             movieShow.setMovId(movie.getMovId());
-                            int hour=-1;
-                            while(true) {
+                            int hour = -1;
+                            while (true) {
                                 /** Between 11-23 h*/
-                                hour=11 + rand.nextInt(13);
-                                final int fhour=hour;
-                                if(hours.stream().noneMatch(h -> h==fhour)) {
+                                hour = 11 + rand.nextInt(13);
+                                final int fhour = hour;
+                                if (hours.stream().noneMatch(h -> h == fhour)) {
                                     break;
                                 }
                             }
@@ -122,7 +122,7 @@ public class StatisticsService {
     /**
      * Return Runnable for Reseravtion Generation Task
      */
-    public RunnableWithProgress generateReservationsBetweenTask(Date from, Date until, int resPerShow,List<Long> movIds) {
+    public RunnableWithProgress generateReservationsBetweenTask(Date from, Date until, int resPerShow, List<Long> movIds) {
         return new RunnableWithProgress() {
             @Override
             public void run() {
@@ -132,61 +132,58 @@ public class StatisticsService {
                 //TODO List<MovieShow> shows=movieShowService.getShowsForDateBetween(from,until);
                 // Iterate through all Shows, not the days -> change ProgressMax
                 /** Generate reservations for each show until Date until is reached*/
-                Random rand=new Random();
-                List<Long> userIds=userController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
+                Random rand = new Random();
+                List<Long> userIds = userController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
                 // while(countDate.getTime().before(until)) {
-                List<MovieShow> shows=null;
-                if(movIds== null ||movIds.size()==0)
-                    shows=movieShowService.getShowsForBetween(from, until);
+                List<MovieShow> shows = null;
+                if (movIds == null || movIds.size() == 0)
+                    shows = movieShowService.getShowsForBetween(from, until);
                 else
-                    shows=movieShowService.getShowsForMovIdListAndBetweenDates(movIds,from,until);
+                    shows = movieShowService.getShowsForMovIdListAndBetweenDates(movIds, from, until);
                 setProgressMax(shows.size());
                 /** For each show generate reservations */
-                for(MovieShow show : shows) {
-                    List<ReservationWithSeats> reservations=new ArrayList<>();
-                    List<Long> users=new ArrayList<>(userIds);
+                for (MovieShow show : shows) {
+                    List<ReservationWithSeats> reservations = new ArrayList<>();
+                    List<Long> users = new ArrayList<>(userIds);
                     /** Get All free seats*/
-                    List<Seat> showsTakenSeats=reservationService.getAllSeatsOfShow(show.getShowId());
-                    List<Integer> freeSeats=IntStream.range(0, 160).boxed().collect(Collectors.toList());
+                    List<Seat> showsTakenSeats = reservationService.getAllSeatsOfShow(show.getShowId());
+                    List<Integer> freeSeats = IntStream.range(0, 160).boxed().collect(Collectors.toList());
                     freeSeats.removeAll(showsTakenSeats.stream()
                             .map(Seat::getNumber).collect(Collectors.toList()));
                     /** Between 2 - 4 reservations per show*/
                     //int amtReservations=2 + rand.nextInt(2);
-                    int amtReservations=Math.min(resPerShow, userIds.size());
+                    int amtReservations = Math.min(resPerShow, userIds.size());
 
-                    for(int i=0; i<amtReservations; i++) {
-                        Reservation reservation=new Reservation();
+                    for (int i = 0; i < amtReservations; i++) {
+                        Reservation reservation = new Reservation();
                         reservation.setShowId(show.getShowId());
-                        Long user=-1L;
+                        Long user = -1L;
                         /** Determine user (never 2 Reservations of same user for same show)*/
-                        user=users.remove(rand.nextInt(users.size()));
+                        user = users.remove(rand.nextInt(users.size()));
 
                         reservation.setUserId(user);
-                        ReservationWithSeats reservationWithSeats=new ReservationWithSeats();
+                        ReservationWithSeats reservationWithSeats = new ReservationWithSeats();
                         reservationWithSeats.setReservation(reservation);
                         /** Determine Seats of reservation*/
-                        List<Seat> seatList=new ArrayList<>();
+                        List<Seat> seatList = new ArrayList<>();
                         // do {
                         //seatList.clear();
-                        int amtSeats=2 + rand.nextInt(4);
-                        if(amtSeats>freeSeats.size()) {
+                        int amtSeats = 2 + rand.nextInt(4);
+                        if (amtSeats > freeSeats.size()) {
                             break;
                         }
-                        for(int j=0; j<amtSeats; j++) {
-                            Seat seat=new Seat();
+                        for (int j = 0; j < amtSeats; j++) {
+                            Seat seat = new Seat();
                             seat.setResId(reservation.getResId());
                             seat.setNumber(freeSeats.remove(0));
-                            int type=rand.nextInt(11);
-                            if(type<=4) {
+                            int type = rand.nextInt(11);
+                            if (type <= 4) {
                                 seat.setType(Seat.Seat_Type.ADULT);
-                            }
-                            else if(type<=7) {
+                            } else if (type <= 7) {
                                 seat.setType(Seat.Seat_Type.STUDENT);
-                            }
-                            else if(type<=9) {
+                            } else if (type <= 9) {
                                 seat.setType(Seat.Seat_Type.CHILD);
-                            }
-                            else {
+                            } else {
                                 seat.setType(Seat.Seat_Type.DISABLED);
                             }
                             seatList.add(seat);
@@ -211,12 +208,12 @@ public class StatisticsService {
     }
 
     public void generateShowsBetween(Date from, Date until, int moviesPerDay, int showsPerMovie) {
-        Calendar countDate=Calendar.getInstance();
+        Calendar countDate = Calendar.getInstance();
         countDate.setTime(from);
         /** Generate shows for each day until Date until is reached*/
-        Random rand=new Random();
+        Random rand = new Random();
         /** Get random Movies*/
-        List<Movie> movies=movieService.getAllMovies().stream()
+        List<Movie> movies = movieService.getAllMovies().stream()
                 .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
                     Collections.shuffle(collected);
                     return collected.stream();
@@ -225,25 +222,25 @@ public class StatisticsService {
                 .collect(Collectors.toList());
         ;
 
-        while(countDate.getTime().before(until)) {
+        while (countDate.getTime().before(until)) {
             /** For each movie generate shows every day */
-            for(Movie movie : movies) {
-                List<MovieShow> movieShows=new ArrayList<>();
-                List<Integer> hours=new ArrayList<>();
+            for (Movie movie : movies) {
+                List<MovieShow> movieShows = new ArrayList<>();
+                List<Integer> hours = new ArrayList<>();
                 /** Between 2 - 5 shows every day per movie*/
                 //int amtShows=2 + rand.nextInt(3);
-                int amtShows=showsPerMovie;
-                for(int i=0; i<amtShows; i++) {
-                    Calendar showTime=Calendar.getInstance();
+                int amtShows = showsPerMovie;
+                for (int i = 0; i < amtShows; i++) {
+                    Calendar showTime = Calendar.getInstance();
                     showTime.setTime(countDate.getTime());
-                    MovieShow movieShow=new MovieShow();
+                    MovieShow movieShow = new MovieShow();
                     movieShow.setMovId(movie.getMovId());
-                    int hour=-1;
-                    while(true) {
+                    int hour = -1;
+                    while (true) {
                         /** Between 11-23 h*/
-                        hour=11 + rand.nextInt(13);
-                        final int fhour=hour;
-                        if(hours.stream().noneMatch(h -> h==fhour)) {
+                        hour = 11 + rand.nextInt(13);
+                        final int fhour = hour;
+                        if (hours.stream().noneMatch(h -> h == fhour)) {
                             break;
                         }
                     }
@@ -265,54 +262,54 @@ public class StatisticsService {
     }
 
     public void generateReservationsBetween(Date from, Date until, Integer resPerShow) {
-        Calendar countDate=Calendar.getInstance();
+        Calendar countDate = Calendar.getInstance();
         countDate.setTime(from);
         /** Generate reservations for each show until Date until is reached*/
-        Random rand=new Random();
-        List<Long> userIds=userController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
-        while(countDate.getTime().before(until)) {
-            List<MovieShow> shows=movieShowService.getShowsForDate(countDate.getTime(), false);
+        Random rand = new Random();
+        List<Long> userIds = userController.getAllUserIdsOfRole(Role.RoleName.ROLE_USER);
+        while (countDate.getTime().before(until)) {
+            List<MovieShow> shows = movieShowService.getShowsForDate(countDate.getTime(), false);
             /** For each show generate reservations */
-            for(MovieShow show : shows) {
-                List<ReservationWithSeats> reservations=new ArrayList<>();
-                List<Long> users=new ArrayList<>();
+            for (MovieShow show : shows) {
+                List<ReservationWithSeats> reservations = new ArrayList<>();
+                List<Long> users = new ArrayList<>();
                 /** Between 2 - 4 reservations per show*/
                 //int amtReservations=2 + rand.nextInt(2);
-                int amtReservations=resPerShow;
-                for(int i=0; i<amtReservations; i++) {
-                    Calendar showTime=Calendar.getInstance();
+                int amtReservations = resPerShow;
+                for (int i = 0; i < amtReservations; i++) {
+                    Calendar showTime = Calendar.getInstance();
                     showTime.setTime(countDate.getTime());
-                    Reservation reservation=new Reservation();
+                    Reservation reservation = new Reservation();
                     reservation.setShowId(show.getShowId());
-                    Long user=-1L;
-                    while(true) {
+                    Long user = -1L;
+                    while (true) {
                         /** Determine user (never 2 Reservations of same user for same show)*/
-                        user=userIds.get(rand.nextInt(userIds.size()));
-                        final long fuser=user;
-                        if(users.stream().noneMatch(u -> u==fuser)) {
+                        user = userIds.get(rand.nextInt(userIds.size()));
+                        final long fuser = user;
+                        if (users.stream().noneMatch(u -> u == fuser)) {
                             break;
                         }
                     }
                     users.add(user);
                     reservation.setUserId(user);
-                    ReservationWithSeats reservationWithSeats=new ReservationWithSeats();
+                    ReservationWithSeats reservationWithSeats = new ReservationWithSeats();
                     reservationWithSeats.setReservation(reservation);
                     /** Determine Seats of reservation*/
-                    List<Seat> seatList=new ArrayList<>();
+                    List<Seat> seatList = new ArrayList<>();
                     do {
                         seatList.clear();
-                        int amtSeats=2 + rand.nextInt(4);
-                        int startSeat=rand.nextInt(160) - amtSeats;
-                        if(startSeat<0) {
-                            startSeat=0;
+                        int amtSeats = 2 + rand.nextInt(4);
+                        int startSeat = rand.nextInt(160) - amtSeats;
+                        if (startSeat < 0) {
+                            startSeat = 0;
                         }
 
-                        for(int j=0; j<amtSeats; j++) {
-                            Seat seat=new Seat();
+                        for (int j = 0; j < amtSeats; j++) {
+                            Seat seat = new Seat();
                             seat.setResId(reservation.getResId());
                             seat.setNumber(startSeat + j);
-                            int type=rand.nextInt(4);
-                            switch(type) {
+                            int type = rand.nextInt(4);
+                            switch (type) {
                                 case 0:
                                     seat.setType(Seat.Seat_Type.CHILD);
                                     break;
@@ -331,7 +328,7 @@ public class StatisticsService {
                             }
                             seatList.add(seat);
                         }
-                    } while(!reservationService.areSeatsAvailable(show.getShowId(), seatList));
+                    } while (!reservationService.areSeatsAvailable(show.getShowId(), seatList));
                     reservationWithSeats.setSeats(seatList);
                     reservations.add(reservationWithSeats);
                 }
@@ -347,10 +344,10 @@ public class StatisticsService {
     //TODO speed up with sql
     public void deleteStatisticsBetween(Date from, Date until) {
         log.info("Deleting Statistics from: " + from + " until " + until);
-        List<Long> showIds=movieShowService.getShowsForBetween(from, until).stream().map(MovieShow::getShowId).collect(Collectors.toList());
-        long deletedRes=reservationService.deleteReservationsOfShows(showIds);
+        List<Long> showIds = movieShowService.getShowsForBetween(from, until).stream().map(MovieShow::getShowId).collect(Collectors.toList());
+        long deletedRes = reservationService.deleteReservationsOfShows(showIds);
         log.info("Deleted " + deletedRes + " Reservations");
-        long deletedShows=movieShowService.deleteShowsByIds(showIds);
+        long deletedShows = movieShowService.deleteShowsByIds(showIds);
         log.info("Deleted " + deletedShows + " Shows");
         precalculatedSummaries.clear();
 
@@ -360,12 +357,14 @@ public class StatisticsService {
      * Calculates income based on reservation from Date to Date until
      */
     public double calculateIncomeBetween(Date from, Date until) {
-        List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
-        double sum=0.0;
-        for(MovieShow show : shows) {
-            List<Seat> seats=seatRepository.findSeatsOfShow(show.getShowId());
-            sum+=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
+        log.info("Calculating income between '{}' and '{}'", from, until);
+        List<MovieShow> shows = movieShowService.getShowsForBetween(from, until);
+        double sum = 0.0;
+        for (MovieShow show : shows) {
+            List<Seat> seats = seatRepository.findSeatsOfShow(show.getShowId());
+            sum += seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
         }
+        log.info("Finished calculating income between '{}' and '{}': {}", from, until, sum);
         return sum;
     }
 
@@ -373,66 +372,64 @@ public class StatisticsService {
      * Calculates income based on reservation from Date to Date until
      */
     public Statistics calculateStatistics(Date from, Date until) {
-        String summaryKey=DateUtils.getDateRangeStringFromDate(from, until);
-        if(precalculatedSummaries.containsKey(summaryKey)) {
+        String summaryKey = DateUtils.getDateRangeStringFromDate(from, until);
+        if (precalculatedSummaries.containsKey(summaryKey)) {
             log.info("Already calculated statistics for: " + from + " until: " + until);
             return precalculatedSummaries.get(summaryKey);
         }
-        log.info("Calculating statistics for: " + from + " until: " + until);
-        Statistics statistics=new Statistics();
-        long amtShows=0, amtMovies=0, amtSeats=0, amtWatchedMins=0, income=0;
-        List<MovieShow> shows=movieShowService.getShowsForBetween(from, until);
-        HashMap<String, Integer> dailyStats=new HashMap<>();
-        Calendar countDate=Calendar.getInstance();
+        log.info("Calculating statistics between '{}' and '{}'", from, until);
+        Statistics statistics = new Statistics();
+        long amtShows = 0, amtMovies = 0, amtSeats = 0, amtWatchedMins = 0, income = 0;
+        List<MovieShow> shows = movieShowService.getShowsForBetween(from, until);
+        HashMap<String, Integer> dailyStats = new HashMap<>();
+        Calendar countDate = Calendar.getInstance();
         countDate.setTime(from);
         countDate.set(Calendar.HOUR_OF_DAY, 1);
-        while(countDate.getTime().before(until)) {
+        while (countDate.getTime().before(until)) {
             dailyStats.put(DateUtils.getDateStringFromDate(countDate.getTime()), 0);
             countDate.add(Calendar.DATE, 1);
         }
 
-        LinkedHashMap<Long, MovieStats> movieGrossing=new LinkedHashMap<>();
-        HashMap<Long, Movie> movies=getMoviesFromShows(shows);
-        amtShows=shows.size();
-        amtMovies=movies.size();
-        for(MovieShow show : shows) {
-            List<Seat> seats=seatRepository.findSeatsOfShow(show.getShowId());
+        LinkedHashMap<Long, MovieStats> movieGrossing = new LinkedHashMap<>();
+        HashMap<Long, Movie> movies = getMoviesFromShows(shows);
+        amtShows = shows.size();
+        amtMovies = movies.size();
+        for (MovieShow show : shows) {
+            List<Seat> seats = seatRepository.findSeatsOfShow(show.getShowId());
             /** Split seats into Seat Types*/
-            Map<Seat.Seat_Type, List<Seat>> seatsMap=seats.stream()
+            Map<Seat.Seat_Type, List<Seat>> seatsMap = seats.stream()
                     .collect(Collectors.groupingBy(s -> s.getType()));
             /** Add amount of seats to types Statistics*/
             seatsMap.entrySet().forEach(seatType ->
                     statistics.addSeatsDistribution(Map.entry(seatType.getKey(), seatType.getValue().size()))
             );
 
-            Calendar showDay=Calendar.getInstance();
+            Calendar showDay = Calendar.getInstance();
             showDay.setTime(show.getDate());
             showDay.set(Calendar.HOUR_OF_DAY, 1);
             /*showDay.set(Calendar.MINUTE,0);
             showDay.set(Calendar.SECOND,0);*/
             //showDay.set(Calendar.MILLISECOND,0);
-            Date date=showDay.getTime();
-            int daySeats=seats.size();
-            amtSeats+=daySeats;
+            Date date = showDay.getTime();
+            int daySeats = seats.size();
+            amtSeats += daySeats;
             /** Update daily stats*/
-            if(!dailyStats.containsKey(DateUtils.getDateStringFromDate(date))) {
+            if (!dailyStats.containsKey(DateUtils.getDateStringFromDate(date))) {
                 dailyStats.put(DateUtils.getDateStringFromDate(date), daySeats);
-            }
-            else {
+            } else {
                 dailyStats.put(DateUtils.getDateStringFromDate(date), dailyStats.get(DateUtils.getDateStringFromDate(date)) + daySeats);
             }
-            double seatsIncome=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
-            income+=seatsIncome;
-            long movId=show.getMovId();
+            double seatsIncome = seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
+            income += seatsIncome;
+            long movId = show.getMovId();
             /** Update Movie income stats*/
-            if(!movieGrossing.containsKey(movId)) {
+            if (!movieGrossing.containsKey(movId)) {
                 movieGrossing.put(movId, new MovieStats(movId, movies.get(movId).getPosterUrl(), seatsIncome, seats.size()));
-            }
-            else {
+            } else {
                 movieGrossing.get(movId).addGrossing(seatsIncome);
                 movieGrossing.get(movId).addVisitors(seats.size());
             }
-            amtWatchedMins+=movies.get(movId).getLength();
+            amtWatchedMins += movies.get(movId).getLength();
         }
 
         statistics.setAmtMovies(amtMovies);
@@ -443,7 +440,7 @@ public class StatisticsService {
         statistics.setDailyStats(dailyStats);
         statistics.setMovieStats(movieGrossing);
         precalculatedSummaries.put(summaryKey, statistics);
-        log.info("Finished calculating statistics for: " + from + " until: " + until);
+        log.info("Finished calculating statistics between '{}' and '{}'", from, until);
         return statistics;
     }
 
@@ -453,7 +450,7 @@ public class StatisticsService {
     }
 
     private HashMap<Long, Movie> getMoviesFromShows(List<MovieShow> shows) {
-        HashMap<Long, Movie> movies=new HashMap<>();
+        HashMap<Long, Movie> movies = new HashMap<>();
         shows.stream().mapToLong(show -> show.getMovId()).distinct().forEach(
                 mov -> movieService.queryMovie(mov).ifPresent(movie -> movies.put(movie.getMovId(), movie))
         );
@@ -461,26 +458,25 @@ public class StatisticsService {
     }
 
     public Map<String, MovieStats> calculateMovieStats(Integer movId, Date from, Date until, Boolean aggregated) {
-        log.info("Calculating statistics for: " + from + " until: " + until);
-
-        Calendar countDate=Calendar.getInstance();
+        log.info("Calculating MovieStats between '{}' and '{}'", from, until);
+        Calendar countDate = Calendar.getInstance();
         countDate.setTime(from);
         countDate.set(Calendar.HOUR_OF_DAY, 1);
 
-        TreeMap<String, MovieStats> dailyStats=new TreeMap<>();
+        TreeMap<String, MovieStats> dailyStats = new TreeMap<>();
 
-        while(countDate.getTime().before(until)) {
-            List<MovieShow> shows=movieShowService.getShowsForMovieDate(movId, DateUtils.getDateStringFromDate(countDate.getTime()));
-            MovieStats movieStats=new MovieStats();
-            for(MovieShow show : shows) {
-                List<Seat> seats=seatRepository.findSeatsOfShow(show.getShowId());
+        while (countDate.getTime().before(until)) {
+            List<MovieShow> shows = movieShowService.getShowsForMovieDate(movId, DateUtils.getDateStringFromDate(countDate.getTime()));
+            MovieStats movieStats = new MovieStats();
+            for (MovieShow show : shows) {
+                List<Seat> seats = seatRepository.findSeatsOfShow(show.getShowId());
                /* Calendar showDay=Calendar.getInstance();
                 showDay.setTime(show.getDate());
                 showDay.set(Calendar.HOUR_OF_DAY,1);
                 Date date=showDay.getTime();*/
-                int daySeats=seats.size();
-                movieStats.setVisitors(movieStats.getVisitors()+daySeats);
-                double seatsIncome=seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
+                int daySeats = seats.size();
+                movieStats.setVisitors(movieStats.getVisitors() + daySeats);
+                double seatsIncome = seats.stream().mapToDouble(seat -> Seat.getPrice(seat.getType())).sum();
                 movieStats.setGrossing(movieStats.getGrossing() + seatsIncome);
                 //amtWatchedMins+=movies.get(movId).getLength();
             }
@@ -488,8 +484,7 @@ public class StatisticsService {
             dailyStats.put(DateUtils.getDateStringFromDate(countDate.getTime()), movieStats);
             countDate.add(Calendar.DATE, 1);
         }
-
-        log.info("Finished calculating statistics for: " + from + " until: " + until);
+        log.info("Finished calculating MovieStats between '{}' and '{}'", from, until);
         return dailyStats;
     }
 
@@ -502,8 +497,8 @@ public class StatisticsService {
         private LinkedHashMap<Long, MovieStats> movieStats;
 
         public Statistics() {
-            seatsDistribution=new HashMap<>();
-            for(Seat.Seat_Type type : Seat.Seat_Type.values()) {
+            seatsDistribution = new HashMap<>();
+            for (Seat.Seat_Type type : Seat.Seat_Type.values()) {
                 seatsDistribution.put(type, 0);
             }
         }
@@ -523,7 +518,7 @@ public class StatisticsService {
         }
 
         public void setSeatsDistribution(Map<Seat.Seat_Type, Integer> seatsDistribution) {
-            this.seatsDistribution=seatsDistribution;
+            this.seatsDistribution = seatsDistribution;
         }
 
         public void addSeatsDistributions(Map<Seat.Seat_Type, Integer> seatsDistribution) {
@@ -546,7 +541,7 @@ public class StatisticsService {
          * Sorts and sets moveStats Map
          */
         public void setMovieStats(LinkedHashMap<Long, MovieStats> movieStats) {
-            LinkedHashMap<Long, MovieStats> sorted=movieStats.entrySet().stream()
+            LinkedHashMap<Long, MovieStats> sorted = movieStats.entrySet().stream()
                     .sorted((e1, e2) -> Double.compare(e1.getValue().getGrossing(), e2.getValue().getGrossing()) * -1)
                     .collect(toMap(
                             Map.Entry::getKey,
@@ -556,7 +551,7 @@ public class StatisticsService {
                             },
                             LinkedHashMap::new
                     ));
-            this.movieStats=sorted;
+            this.movieStats = sorted;
         }
 
        /* public List<Integer> getSortedDailyStats(){
@@ -569,7 +564,7 @@ public class StatisticsService {
         }
 
         public void setDailyStats(HashMap<String, Integer> dailyStats) {
-            this.dailyStats=dailyStats;
+            this.dailyStats = dailyStats;
         }
 
         public long getAmtShows() {
@@ -577,7 +572,7 @@ public class StatisticsService {
         }
 
         public void setAmtShows(long amtShows) {
-            this.amtShows=amtShows;
+            this.amtShows = amtShows;
         }
 
         public long getAmtMovies() {
@@ -585,7 +580,7 @@ public class StatisticsService {
         }
 
         public void setAmtMovies(long amtMovies) {
-            this.amtMovies=amtMovies;
+            this.amtMovies = amtMovies;
         }
 
         public long getAmtSeats() {
@@ -593,7 +588,7 @@ public class StatisticsService {
         }
 
         public void setAmtSeats(long amtSeats) {
-            this.amtSeats=amtSeats;
+            this.amtSeats = amtSeats;
         }
 
         public long getAmtWatchedMins() {
@@ -601,7 +596,7 @@ public class StatisticsService {
         }
 
         public void setAmtWatchedMins(long amtWatchedMins) {
-            this.amtWatchedMins=amtWatchedMins;
+            this.amtWatchedMins = amtWatchedMins;
         }
 
         public long getIncome() {
@@ -609,7 +604,7 @@ public class StatisticsService {
         }
 
         public void setIncome(long income) {
-            this.income=income;
+            this.income = income;
         }
     }
 
@@ -622,8 +617,8 @@ public class StatisticsService {
         private LinkedHashMap<Long, MovieStats> movieStats;
 
         public DayStatistic() {
-            seatsDistribution=new HashMap<>();
-            for(Seat.Seat_Type type : Seat.Seat_Type.values()) {
+            seatsDistribution = new HashMap<>();
+            for (Seat.Seat_Type type : Seat.Seat_Type.values()) {
                 seatsDistribution.put(type, 0);
             }
         }
@@ -647,7 +642,7 @@ public class StatisticsService {
         }
 
         public void setSeatsDistribution(Map<Seat.Seat_Type, Integer> seatsDistribution) {
-            this.seatsDistribution=seatsDistribution;
+            this.seatsDistribution = seatsDistribution;
         }
 
         public void addSeatsDistributions(Map<Seat.Seat_Type, Integer> seatsDistribution) {
@@ -670,7 +665,7 @@ public class StatisticsService {
          * Sorts and sets moveStats Map
          */
         public void setMovieStats(LinkedHashMap<Long, MovieStats> movieStats) {
-            LinkedHashMap<Long, MovieStats> sorted=movieStats.entrySet().stream()
+            LinkedHashMap<Long, MovieStats> sorted = movieStats.entrySet().stream()
                     .sorted((e1, e2) -> Double.compare(e1.getValue().getGrossing(), e2.getValue().getGrossing()) * -1)
                     .collect(toMap(
                             Map.Entry::getKey,
@@ -680,7 +675,7 @@ public class StatisticsService {
                             },
                             LinkedHashMap::new
                     ));
-            this.movieStats=sorted;
+            this.movieStats = sorted;
         }
 
        /* public List<Integer> getSortedDailyStats(){
@@ -693,7 +688,7 @@ public class StatisticsService {
         }
 
         public void setAmtShows(long amtShows) {
-            this.amtShows=amtShows;
+            this.amtShows = amtShows;
         }
 
         public long getAmtMovies() {
@@ -701,7 +696,7 @@ public class StatisticsService {
         }
 
         public void setAmtMovies(long amtMovies) {
-            this.amtMovies=amtMovies;
+            this.amtMovies = amtMovies;
         }
 
         public long getAmtSeats() {
@@ -709,7 +704,7 @@ public class StatisticsService {
         }
 
         public void setAmtSeats(long amtSeats) {
-            this.amtSeats=amtSeats;
+            this.amtSeats = amtSeats;
         }
 
         public long getAmtWatchedMins() {
@@ -717,7 +712,7 @@ public class StatisticsService {
         }
 
         public void setAmtWatchedMins(long amtWatchedMins) {
-            this.amtWatchedMins=amtWatchedMins;
+            this.amtWatchedMins = amtWatchedMins;
         }
 
         public long getIncome() {
@@ -725,25 +720,25 @@ public class StatisticsService {
         }
 
         public void setIncome(long income) {
-            this.income=income;
+            this.income = income;
         }
     }
 
 
     public static class MovieStats {
-        private long movId=-1;
+        private long movId = -1;
         private String posterPath;
-        private Double grossing=0.0;
-        private Integer visitors=0;
+        private Double grossing = 0.0;
+        private Integer visitors = 0;
 
         public MovieStats() {
         }
 
         public MovieStats(long movId, String posterPath, double grossing, int visitors) {
-            this.movId=movId;
-            this.posterPath=posterPath;
-            this.grossing=grossing;
-            this.visitors=visitors;
+            this.movId = movId;
+            this.posterPath = posterPath;
+            this.grossing = grossing;
+            this.visitors = visitors;
         }
 
         public Integer getVisitors() {
@@ -751,11 +746,11 @@ public class StatisticsService {
         }
 
         public void setVisitors(Integer visitors) {
-            this.visitors=visitors;
+            this.visitors = visitors;
         }
 
         public void addVisitors(Integer visitors) {
-            this.visitors+=visitors;
+            this.visitors += visitors;
         }
 
         public long getMovId() {
@@ -763,7 +758,7 @@ public class StatisticsService {
         }
 
         public void setMovId(long movId) {
-            this.movId=movId;
+            this.movId = movId;
         }
 
         public String getPosterPath() {
@@ -771,7 +766,7 @@ public class StatisticsService {
         }
 
         public void setPosterPath(String posterPath) {
-            this.posterPath=posterPath;
+            this.posterPath = posterPath;
         }
 
         public Double getGrossing() {
@@ -779,11 +774,11 @@ public class StatisticsService {
         }
 
         public void setGrossing(Double grossing) {
-            this.grossing=grossing;
+            this.grossing = grossing;
         }
 
         public void addGrossing(double grossing) {
-            this.grossing+=grossing;
+            this.grossing += grossing;
         }
 
 
@@ -798,7 +793,7 @@ public class StatisticsService {
         }
 
         public void setReservation(Reservation reservation) {
-            this.reservation=reservation;
+            this.reservation = reservation;
         }
 
         public List<Seat> getSeats() {
@@ -806,7 +801,7 @@ public class StatisticsService {
         }
 
         public void setSeats(List<Seat> seats) {
-            this.seats=seats;
+            this.seats = seats;
         }
     }
 }

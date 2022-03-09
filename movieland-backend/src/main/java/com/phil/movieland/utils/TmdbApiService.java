@@ -23,40 +23,41 @@ import java.util.Optional;
  * Service for Tmdb Api interface
  */
 @Service
-@PropertySource(value="classpath:/api.properties", ignoreResourceNotFound=true)
+@PropertySource(value = "classpath:/api.properties", ignoreResourceNotFound = true)
 public class TmdbApiService {
-    public static final String POSTER_BASE_URL="https://image.tmdb.org/t/p/w185/";
-    public static final String IMAGE_BASE_URL="https://image.tmdb.org/t/p/original";
+    public static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185/";
+    public static final String IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original";
 
     private final String API_KEY;
 
     private final TmdbApi tmdbApi;
     private final TmdbMovies tmdbMovies;
 
-    private Logger log=LoggerFactory.getLogger(TmdbApiService.class);
+    private Logger log = LoggerFactory.getLogger(TmdbApiService.class);
 
     /**
      * Additional backdrops stored in memory
      */
-    private static HashMap<Long, String> backdrops=new HashMap<>();
+    private static HashMap<Long, String> backdrops = new HashMap<>();
 
-    private static HashMap<Long, String> trailers=new HashMap<>();
+    private static HashMap<Long, String> trailers = new HashMap<>();
 
     /**
      * Create /resources/api.properties with TMDB API-Key
      */
     @Autowired
     public TmdbApiService(@Value("${tmdbApi.apikey}") String apiKey) {
-        API_KEY=apiKey;
-        tmdbApi=new TmdbApi(API_KEY);
-        tmdbMovies=tmdbApi.getMovies();
+        API_KEY = apiKey;
+        tmdbApi = new TmdbApi(API_KEY);
+        tmdbMovies = tmdbApi.getMovies();
     }
 
     public MovieDb getMovieFromTmdb(Movie movie) {
-        if(movie.getTmdbId()==null) {
-            MovieResultsPage resultsPage=tmdbApi.getSearch().searchMovie(movie.getName(), null, "en", false, 0);
-            List<MovieDb> results=resultsPage.getResults();
-            if(!results.isEmpty()) {
+        if (movie.getTmdbId() == null) {
+            log.debug("Search TMDB Api for '{}'", movie.getName());
+            MovieResultsPage resultsPage = tmdbApi.getSearch().searchMovie(movie.getName(), null, "en", false, 0);
+            List<MovieDb> results = resultsPage.getResults();
+            if (!results.isEmpty()) {
                 return results.get(0);
             }
         }
@@ -64,40 +65,44 @@ public class TmdbApiService {
     }
 
     public List<MovieDb> getMoviesFromTmdb(String name) {
-        MovieResultsPage resultsPage=tmdbApi.getSearch().searchMovie(name, null, "en", false, 0);
-        List<MovieDb> results=resultsPage.getResults();
-        return results;
+        log.debug("Search TMDB Api for '{}'", name);
+        MovieResultsPage resultsPage = tmdbApi.getSearch().searchMovie(name, null, "en", false, 0);
+        return resultsPage.getResults();
     }
 
     public List<MovieDb> getTop10Movies() {
-
+        log.debug("Fetching Top 10 Movies from TMDB Api");
         //return tmdbApi.getMovies().getTopRatedMovies("en",0).getResults().subList(0,10);
         return tmdbApi.getMovies().getNowPlayingMovies("en", 0, "US").getResults().subList(0, 10);
     }
 
-    public String getBackdrop(Long movId) {
-        if(backdrops.containsKey(movId)) {
-            return backdrops.get(movId);
+    public String getBackdrop(Long tmdbId) {
+        if (backdrops.containsKey(tmdbId)) {
+            log.debug("Loading Backdrop for Movie tmdbId='{}' from cache", tmdbId);
+            return backdrops.get(tmdbId);
         }
-        List<Artwork> images=tmdbMovies.getMovie(movId.intValue(), "en", TmdbMovies.MovieMethod.images).getImages();
-        if(images.isEmpty()) {
+        log.debug("Fetching Backdrop for Movie tmdbId='{}' from TMDB Api", tmdbId);
+        List<Artwork> images = tmdbMovies.getMovie(tmdbId.intValue(), "en", TmdbMovies.MovieMethod.images).getImages();
+        if (images.isEmpty()) {
             return null;
         }
-        Optional<Artwork> backdrop=images.stream().filter(img -> img.getArtworkType()==ArtworkType.BACKDROP).findFirst();
-        String path=IMAGE_BASE_URL + backdrop.orElse(images.get(0)).getFilePath();
-        log.info("Loaded: " + path + " from tmdb");
-        backdrops.put(movId, path);
+        Optional<Artwork> backdrop = images.stream().filter(img -> img.getArtworkType() == ArtworkType.BACKDROP).findFirst();
+        String path = IMAGE_BASE_URL + backdrop.orElse(images.get(0)).getFilePath();
+        log.debug("Loaded Backdrop for '{}' from path: '{}'", tmdbId, path);
+        backdrops.put(tmdbId, path);
         return path;
     }
 
     public String getTrailerURL(Long tmdbId) {
-        if(trailers.containsKey(tmdbId)) {
+        if (trailers.containsKey(tmdbId)) {
+            log.debug("Loading Trailer URL for Movie tmdbId='{}' from cache", tmdbId);
             return trailers.get(tmdbId);
         }
-        List<Video> videos=tmdbMovies.getMovie(tmdbId.intValue(), "en", TmdbMovies.MovieMethod.videos).getVideos();
-        if(!videos.isEmpty()) {
-            Video trailer=videos.get(0);
-            if(trailer.getSite().equals("YouTube")) {
+        log.debug("Fetching Trailer URL for Movie tmdbId='{}' from TMDB Api", tmdbId);
+        List<Video> videos = tmdbMovies.getMovie(tmdbId.intValue(), "en", TmdbMovies.MovieMethod.videos).getVideos();
+        if (!videos.isEmpty()) {
+            Video trailer = videos.get(0);
+            if (trailer.getSite().equals("YouTube")) {
                 //String url="https://youtube.com/watch?v="+trailer.getKey();
                 trailers.put(tmdbId, trailer.getKey());
                 return trailer.getKey();

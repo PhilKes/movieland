@@ -89,6 +89,8 @@ public class MovielandSpringConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/api/users/checkUsernameAvailability", "/api/users/checkEmailAvailability")
                 .permitAll()
+                .antMatchers("/actuator/**")
+                .permitAll()
                 .anyRequest()
                 .authenticated();
 

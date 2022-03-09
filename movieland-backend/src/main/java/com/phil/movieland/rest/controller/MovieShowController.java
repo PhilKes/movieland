@@ -43,7 +43,6 @@ public class MovieShowController {
             @RequestParam(value="date", required=true) String dateString) {
         List<MovieShow> shows=null;
         Date date=DateUtils.createDateFromDateString(dateString);
-        log.info("Query for " + date);
         shows=movieShowService.getShowsForDate(date, false);
         return shows;
     }
@@ -135,7 +134,6 @@ public class MovieShowController {
                                                                @RequestParam(value="date", required=false) String dateString) {
         List<MovieShow> shows=null;
         Date date=dateString==null ? new Date() : DateUtils.createDateFromDateString(dateString);
-        log.info("Query for " + date);
         Optional<Movie> movie=movieService.queryMovie(id);
         if(!movie.isPresent()) {
             return ResponseEntity.notFound().build();
@@ -162,7 +160,6 @@ public class MovieShowController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<MovieShow> postMovieShow(@RequestBody MovieShow show) throws URISyntaxException {
-        log.info("Post Show( MovId:" + show.getMovId() + " Date: " + show.getDate());
         MovieShow result=movieShowService.saveShow(show);
         return ResponseEntity.created(new URI("/api/show/" + result.getShowId()))
                 .body(result);
