@@ -77,5 +77,5 @@ jobs:
         with:
           email: ${{ secrets.HEROKU_EMAIL }} # your heroku email
           api_key: ${{ secrets.HEROKU_API_KEY }} # your  heroku api key
-          docker_compose_file: './docker-compose.yml' # set the path to the folder where the docker-compose file is located
-          heroku_apps: '[{"imagename":"philkes/movie-land-backend","appname":"movieland-backend","apptype":"web"},{"imagename":"philkes/movie-land-frontend","appname":"movieland-frontend","apptype":"web"},{"imagename":"mysql","appname":"movieland-db","apptype":"web"}]' # List of Docker Image name, Heroku app and Heroku app type
+          docker_compose_file: './docker-compose-local.yml' # set the path to the folder where the docker-compose file is located
+          heroku_apps: '[{"imagename":"movieland-backend","appname":"movieland-showcase","apptype":"web"},{"imagename":"movieland-frontend","appname":"movieland-showcase","apptype":"web"},{"imagename":"mysql","appname":"movieland-showcase","apptype":"web"}]' # List of Docker Image name, Heroku app and Heroku app type
