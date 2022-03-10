@@ -1,5 +1,5 @@
 #### Stage 1: Build the application
-FROM openjdk:12-oracle as build
+FROM openjdk:11-oracle as build
 
 # Set the current working directory inside the image
 WORKDIR /app
