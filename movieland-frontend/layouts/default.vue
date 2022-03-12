@@ -109,7 +109,7 @@
           this.showLoginDialog();
           this.$dialog.showAndWait(DialogConfirm, {
             title: 'Login failed',
-            text: 'Your entered Username and Password do not match<br/>Please try again',
+            text: 'Your entered invalid login credentials<br/>Please try again',
             submitText: 'Ok',
             cancel: false,
             width: 300

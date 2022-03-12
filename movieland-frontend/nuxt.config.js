@@ -1,12 +1,12 @@
 import colors from 'vuetify/es5/util/colors'
 
 export default {
+  // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
+  ssr: false,
   server: {
     host: '0.0.0.0',
     port: process.env.PORT || 3000 // default: 3000
   },
-  // Target (https://go.nuxtjs.dev/config-target)
-  target: 'static',
 
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
@@ -59,7 +59,9 @@ export default {
     }
   },
 
-  axios: {baseURL: process.env.REST_API_URL || 'http://localhost:8080/api'},
+  axios: {
+    baseURL: process.env.REST_API_URL || 'http://localhost:8080/api',
+  },
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)
   vuetify: {
