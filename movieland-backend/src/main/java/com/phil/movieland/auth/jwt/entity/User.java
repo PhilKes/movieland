@@ -1,7 +1,5 @@
 package com.phil.movieland.auth.jwt.entity;
 
-import org.hibernate.annotations.NaturalId;
-
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -10,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name="USER", uniqueConstraints={
+@Table(name="USER_ACCOUNT", uniqueConstraints={
         @UniqueConstraint(columnNames={
                 "username"
         }),
@@ -20,7 +18,7 @@ import java.util.Set;
 })
 public class User extends DateAudit {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
     @NotBlank

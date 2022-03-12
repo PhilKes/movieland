@@ -32,6 +32,14 @@ public class Reservation {
     @Column(name="CASHIER_ID")
     private Long cashierId;
 
+    public Reservation() {
+    }
+
+    public Reservation(long showId, long userId) {
+        this.showId = showId;
+        this.userId = userId;
+    }
+
     public long getResId() {
         return resId;
     }

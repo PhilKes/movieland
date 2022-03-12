@@ -31,19 +31,17 @@ services:
       PORT: 4000
     networks:
       - frontend
-  # Database Service (Mysql)
+  # Database Service (Postgresql)
   db:
-    image: mysql:5.7.29
+    image: 'postgres:13.1-alpine'
     ports:
-      - "3306:3306"
+      - "5432:5432"
     environment:
-      MYSQL_DATABASE: movieland_db
-      MYSQL_USER: movielandadmin
-      MYSQL_PASSWORD: movielandadmin
-      MYSQL_ROOT_PASSWORD: movielandadmin
+      - POSTGRES_USER=movielandadmin
+      - POSTGRES_PASSWORD=movielandadmin
+      - POSTGRES_DB=movieland_db
     volumes:
-      - db-data:/var/lib/mysql
-      - ./database:/database
+      - db-data:/var/lib/postgresql/data
     networks:
       - backend
 # Volumes

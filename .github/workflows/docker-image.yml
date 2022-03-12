@@ -64,8 +64,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-  push-heroku:
-    name: 'Push images to Heroku'
+  release-heroku:
+    name: 'Push/Release images to Heroku'
     runs-on: ubuntu-latest
     needs: build-and-push-docker
     strategy:
@@ -73,10 +73,10 @@ jobs:
       matrix:
         include:
           - image: philkes/movie-land-backend:master
+            app: movieland-backend-server
             type: web
           - image: philkes/movie-land-frontend:master
-            type: web
-          - image: mysql:5.7.29
+            app: movieland-frontend
             type: web
     steps:
       - uses: actions/checkout@v1
@@ -91,17 +91,4 @@ jobs:
           docker pull ${{ matrix.image }}
           docker tag ${{ matrix.image }} registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/${{ matrix.type }}
           docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/${{ matrix.type }}
-  release-heroku:
-    name: 'Release images on Heroku'
-    runs-on: ubuntu-latest
-    needs: push-heroku
-    steps:
-      - uses: actions/checkout@v1
-      - name: Login to Heroku Container registry
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:login
-      - name: Release images on Heroku
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:release -a ${{ secrets.HEROKU_APP_NAME }} web
+          heroku container:release -a ${{ matrix.app }} ${{ matrix.type }}

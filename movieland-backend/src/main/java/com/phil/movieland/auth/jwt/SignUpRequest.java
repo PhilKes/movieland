@@ -1,6 +1,8 @@
 package com.phil.movieland.auth.jwt;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 public class SignUpRequest {
     @NotBlank
@@ -19,6 +21,16 @@ public class SignUpRequest {
     @NotBlank
     @Size(min=6, max=20)
     private String password;
+
+    public SignUpRequest() {
+    }
+
+    public SignUpRequest(String name, String username, String email, String password) {
+        this.name = name;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
 
     public String getName() {
         return name;

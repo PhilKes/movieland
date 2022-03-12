@@ -59,6 +59,18 @@ public class MovieShowService {
         movieShowRepository.save(show);
     }
 
+    public MovieShow saveMovieShowIfNotExists(Long movieId, Date date) {
+        MovieShow show = new MovieShow();
+        show.setMovId(movieId);
+        show.setDate(date);
+        if(!movieShowRepository.findAllByDateAndMovId(date,movieId).isEmpty()){
+            log.info("MovieShow movId='{}' date='{}' already exists", movieId, date);
+            return null;
+        }
+        log.info("Saving MovieShow: movId='{}' date='{}'", movieId, date);
+        return movieShowRepository.save(show);
+    }
+
     public void deleteMovieShow(Long showid) {
         log.info("Deleting MovieShow by showId='{}'", showid);
         movieShowRepository.deleteById(showid);

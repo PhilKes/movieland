@@ -1,3 +1,0 @@
-[mysqld]
-max_allowed_packet=512M
-user=root

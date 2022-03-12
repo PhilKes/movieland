@@ -41,6 +41,16 @@ public class Movie {
     @JsonIgnore
     private MovieDb tmdbMovie;
 
+    public Movie() {
+    }
+
+    public Movie(long movId, String name, Date date, String description) {
+        this.movId = movId;
+        this.name = name;
+        this.date = date;
+        this.description = description;
+    }
+
     public Long getLength() {
         return length;
     }

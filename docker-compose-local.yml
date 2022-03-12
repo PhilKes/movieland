@@ -14,7 +14,7 @@ services:
     depends_on:
       - db # This service depends on mysql. Start that first.
     environment: # Pass environment variables to the service
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
       PORT: 8080
@@ -36,19 +36,18 @@ services:
       PORT: 4000
     networks:
       - frontend
-  # Database Service (Mysql)
+  # Database Service (Postgresql)
   db:
-    image: mysql:5.7.29
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: movieland_db
-      MYSQL_USER: movielandadmin
-      MYSQL_PASSWORD: movielandadmin
-      MYSQL_ROOT_PASSWORD: movielandadmin
-    volumes:
-      - db-data:/var/lib/mysql
-      - ./database:/database
+      image: 'postgres:13.1-alpine'
+      ports:
+        - "5432:5432"
+      environment:
+        - POSTGRES_USER=movielandadmin
+        - POSTGRES_PASSWORD=movielandadmin
+        - POSTGRES_DB=movieland_db
+      volumes:
+        - db-data:/var/lib/postgresql/data
+
     networks:
       - backend
 

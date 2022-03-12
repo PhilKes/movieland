@@ -94,6 +94,15 @@ public class MovieService {
         return movieRepository.save(movie);
     }
 
+    public Movie saveMovieIfNotExists(Movie movie) {
+        if (!movieRepository.findById(movie.getMovId()).isEmpty()) {
+            log.info("Movie '{}' (id: '{}') already exists", movie.getName(), movie.getMovId());
+            return movie;
+        }
+        log.info("Saving Movie: '{}' ", movie.getName());
+        return movieRepository.save(movie);
+    }
+
     public void deleteById(long movieId) {
         log.info("Deleting Movie by id: '{}'", movieId);
         movieRepository.deleteById(movieId);
