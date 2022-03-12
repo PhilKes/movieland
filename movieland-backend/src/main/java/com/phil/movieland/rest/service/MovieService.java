@@ -95,7 +95,7 @@ public class MovieService {
     }
 
     public Movie saveMovieIfNotExists(Movie movie) {
-        if (!movieRepository.findById(movie.getMovId()).isEmpty()) {
+        if (movieRepository.findByName(movie.getName()).isPresent()) {
             log.info("Movie '{}' (id: '{}') already exists", movie.getName(), movie.getMovId());
             return movie;
         }

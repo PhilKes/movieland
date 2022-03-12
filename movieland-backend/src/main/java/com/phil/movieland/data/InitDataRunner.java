@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@Profile("!test")
 public class InitDataRunner implements ApplicationRunner {
     private Logger log = LoggerFactory.getLogger(InitDataRunner.class);
 
@@ -66,7 +68,7 @@ public class InitDataRunner implements ApplicationRunner {
         createUser(adminUser, 1);
         User user = createUser(userUser, 2);
         Calendar showTodayDate = Calendar.getInstance();
-        showTodayDate.set(Calendar.HOUR, 16);
+        showTodayDate.set(Calendar.HOUR_OF_DAY, 16);
         showTodayDate.set(Calendar.MINUTE, 0);
         showTodayDate.set(Calendar.SECOND, 0);
         showTodayDate.set(Calendar.MILLISECOND, 0);
@@ -105,14 +107,14 @@ public class InitDataRunner implements ApplicationRunner {
     }
 
     private User createUser(SignUpWithRoleRequest signUpWithRoleRequest, long id) {
-        Optional<User> existingUser = userRepository.findById(id);
+        Optional<User> existingUser = userRepository.findByUsername(signUpWithRoleRequest.getUsername());
         if (existingUser.isPresent())
             return existingUser.get();
         User user = new User(signUpWithRoleRequest.getName(), signUpWithRoleRequest.getUsername(),
                 signUpWithRoleRequest.getEmail(), signUpWithRoleRequest.getPassword());
         user.setId(id);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Role userRole = roleRepository.findByName(Role.RoleName.ROLE_USER)
+        Role userRole = roleRepository.findByName(Role.RoleName.valueOf(signUpWithRoleRequest.getRoleName()))
                 .orElseThrow(() -> new AppException("User Role not set."));
         user.setRoles(Collections.singleton(userRole));
         return userRepository.save(user);

@@ -3,7 +3,6 @@ package com.phil.movieland.data.repository;
 import com.phil.movieland.data.entity.Movie;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +16,8 @@ public interface MovieRepository extends PagingAndSortingRepository<Movie, Long>
     Slice<Movie> findAllByOrderByName(Pageable pageable);
 
     List<Movie> findAllByNameContainsOrderByName(String queryName);
+
+    Optional<Movie> findByName(String name);
 
     Slice<Movie> findAllByNameContainsOrderByName(String queryName, Pageable pageable);
 

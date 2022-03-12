@@ -89,6 +89,6 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
           docker pull ${{ matrix.image }}
-          docker tag ${{ matrix.image }} registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/${{ matrix.type }}
-          docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/${{ matrix.type }}
+          docker tag ${{ matrix.image }} registry.heroku.com/${{ matrix.app }}/${{ matrix.type }}
+          docker push registry.heroku.com/${{ matrix.app }}/${{ matrix.type }}
           heroku container:release -a ${{ matrix.app }} ${{ matrix.type }}

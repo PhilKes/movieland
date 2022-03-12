@@ -50,18 +50,32 @@ export default {
     ['vuetify-dialog/nuxt', {property: '$dialog'}]
   ],
 
-  proxy: {
-    '/api': {
-      target: process.env.REST_API_URL || 'http://localhost:8080/api',
-      pathRewrite: {
-        '^/api': '/'
-      }
-    }
+  publicRuntimeConfig:{
+    proxy: {
+        '/api': {
+          target: process.env.REST_API_URL || 'http://localhost:8080/api',
+          pathRewrite: {
+            '^/api': '/'
+          }
+        }
+    },
+    axios: {
+        baseURL: process.env.REST_API_URL || 'http://localhost:8080/api',
+    },
   },
 
-  axios: {
-    baseURL: process.env.REST_API_URL || 'http://localhost:8080/api',
-  },
+//  proxy: {
+//    '/api': {
+//      target: process.env.REST_API_URL || 'http://localhost:8080/api',
+//      pathRewrite: {
+//        '^/api': '/'
+//      }
+//    }
+//  },
+//
+//  axios: {
+//    baseURL: process.env.REST_API_URL || 'http://localhost:8080/api',
+//  },
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)
   vuetify: {
