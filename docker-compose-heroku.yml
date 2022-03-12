@@ -1,34 +1,41 @@
-# Docker Compose for entire Full Stack Application running on localhost with Containers pulled from dockerhub/philkes
+# Docker Compose for entire Full Stack Application running on localhost with locally built Docker Containers
 
 version: '3.3'
 services:
   # App backend service
   app-server:
-    image: philkes/movie-land-backend:master
+    # Configuration for building the docker posterUrl for the backend service
+    build:
+      context: movieland-backend # Use an posterUrl built from the specified dockerfile in the `polling-app-server` directory.
+      dockerfile: docker/Dockerfile
+    image: movieland-backend
     ports:
       - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
-    restart: on-failure
     depends_on:
       - db # This service depends on mysql. Start that first.
     environment: # Pass environment variables to the service
-      SPRING_DATASOURCE_URL: jdbc:mysql://db/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
   # Frontend Service
   app-client:
-    image: philkes/movie-land-frontend:master
+    build:
+      context: movieland-frontend # Use an posterUrl built from the specified dockerfile in the `polling-app-client` directory.
+      dockerfile: Dockerfile
+    image: movieland-frontend
     ports:
-      - "80:3000"
+      - "3000:3000"
     depends_on:
       - app-server
     environment: # Pass environment variables to the service
       REST_API_URL: http://app-server:8080/api
-      NUXTJS_HOST_IP: app-client
 
 
   # Database Service (Mysql)
   db:
-    image: mysql:5.7.29
+    build:
+      context: database # Use an posterUrl built from the specified dockerfile in the `polling-app-client` directory.
+      dockerfile: Dockerfile-heroku
     ports:
       - "3306:3306"
     environment:

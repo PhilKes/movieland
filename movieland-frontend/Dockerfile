@@ -11,10 +11,6 @@ RUN ls -la ./*
 
 RUN npm install
 
-
-
-# set app serving to permissive / assigned
-ENV NUXT_HOST=127.0.0.1
 # set app port
 ENV NUXT_PORT=3000
 

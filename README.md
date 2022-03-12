@@ -48,6 +48,7 @@ Full Docker Support with **Docker-compose**
   <a href="http://localhost:3000" target="_blank">http://localhost:3000</a>
 
 ## Deployment - Github Actions <img src="./doc/githubactions.png" width="26">
+* Verify built in Test job
 * Build all docker images from Dockerfiles
 * Push all built images to <a href="https://hub.docker.com/u/philkes" target="_blank">Dockerhub</a>
 

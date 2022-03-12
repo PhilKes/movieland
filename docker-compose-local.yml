@@ -14,10 +14,9 @@ services:
     depends_on:
       - db # This service depends on mysql. Start that first.
     environment: # Pass environment variables to the service
-      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
-    network_mode: host
   # Frontend Service
   app-client:
     build:
@@ -25,12 +24,11 @@ services:
       dockerfile: Dockerfile
     image: movieland-frontend
     ports:
-      - "80:3000" # Map the exposed port 80 on the container to port 9090 on the host machine
+      - "3000:3000"
     depends_on:
       - app-server
     environment: # Pass environment variables to the service
-      REST_API_URL: http://localhost:8080/api
-    network_mode: host
+      REST_API_URL: http://app-server:8080/api
 
 
   # Database Service (Mysql)
@@ -46,7 +44,6 @@ services:
     volumes:
       - db-data:/var/lib/mysql
       - ./database:/database
-    network_mode: host
 
 # Volumes
 volumes:
