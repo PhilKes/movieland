@@ -10,13 +10,17 @@ services:
       dockerfile: docker/Dockerfile
     image: movieland-backend
     ports:
-      - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+      - "8080:8080" # Forward the exposed PORT on the container to port 8080 on the host machine
     depends_on:
       - db # This service depends on mysql. Start that first.
     environment: # Pass environment variables to the service
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
+      PORT: 8080
+    networks:
+      - backend
+      - frontend
   # Frontend Service
   app-client:
     build:
@@ -24,13 +28,14 @@ services:
       dockerfile: Dockerfile
     image: movieland-frontend
     ports:
-      - "3000:3000"
+      - "4000:4000"
     depends_on:
       - app-server
     environment: # Pass environment variables to the service
-      REST_API_URL: http://app-server:8080/api
-
-
+      REST_API_URL: http://localhost:8080/api
+      PORT: 4000
+    networks:
+      - frontend
   # Database Service (Mysql)
   db:
     image: mysql:5.7.29
@@ -44,8 +49,15 @@ services:
     volumes:
       - db-data:/var/lib/mysql
       - ./database:/database
+    networks:
+      - backend
 
 # Volumes
 volumes:
   db-data:
+
+# Networks to be created to facilitate communication between containers
+networks:
+  backend:
+  frontend:
 

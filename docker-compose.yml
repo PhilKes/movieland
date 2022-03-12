@@ -14,18 +14,23 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
+      PORT: 8080
+    networks:
+      - backend
+      - frontend
+
   # Frontend Service
   app-client:
     image: philkes/movie-land-frontend:master
     ports:
-      - "80:3000"
+      - "4000:4000"
     depends_on:
       - app-server
     environment: # Pass environment variables to the service
       REST_API_URL: http://app-server:8080/api
-      NUXTJS_HOST_IP: app-client
-
-
+      PORT: 4000
+    networks:
+      - frontend
   # Database Service (Mysql)
   db:
     image: mysql:5.7.29
@@ -39,8 +44,13 @@ services:
     volumes:
       - db-data:/var/lib/mysql
       - ./database:/database
-
+    networks:
+      - backend
 # Volumes
 volumes:
   db-data:
 
+# Networks to be created to facilitate communication between containers
+networks:
+  backend:
+  frontend:

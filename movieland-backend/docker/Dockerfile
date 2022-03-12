@@ -3,8 +3,8 @@ FROM openjdk:11-oracle as build
 
 # Set the current working directory inside the image
 WORKDIR /app
-
-EXPOSE 8080
+#ENV PORT 8080
+#EXPOSE $PORT
 # Copy maven executable to the image
 COPY mvnw .
 COPY .mvn .mvn
@@ -34,4 +34,4 @@ COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.phil.movieland.MovielandSpringApplication"]
+CMD ["sh","-c","java -Dserver.port=$PORT -cp app:app/lib/* com.phil.movieland.MovielandSpringApplication"]
