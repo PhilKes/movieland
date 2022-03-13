@@ -120,7 +120,7 @@ public class MovieController {
     @PostMapping
     ResponseEntity<?> createMovie(@RequestBody Movie movie) throws URISyntaxException {
         try {
-            Movie result = movieService.saveMovie(movie);
+            Movie result = movieService.saveMovieIfNotExists(movie);
             return ResponseEntity.created(new URI("/api/movie/" + result.getMovId()))
                     .body(result);
         } catch (Exception e) {
@@ -133,7 +133,7 @@ public class MovieController {
     ResponseEntity<Movie> updateMovie(@Valid @RequestBody Movie movie) {
         Movie result = null;
         try {
-            result = movieService.saveMovie(movie);
+            result = movieService.saveMovieIfNotExists(movie);
         } catch (Exception e) {
             e.printStackTrace();
         }

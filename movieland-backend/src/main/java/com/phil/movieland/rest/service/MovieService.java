@@ -79,7 +79,7 @@ public class MovieService {
         }).collect(Collectors.toList());
     }
 
-    public Movie saveMovie(Movie movie) throws Exception {
+    public Movie saveMovieIfNotExists(Movie movie) throws Exception {
         if (movie.getTmdbId() == null) {
             setTmdbData(movie, false);
         }
@@ -89,15 +89,6 @@ public class MovieService {
                 log.warn("Movie '{}' already exists!", movie.getName());
                 throw new Exception(movie.getName() + " is already in the Database!");
             }
-        }
-        log.info("Saving Movie: '{}' ", movie.getName());
-        return movieRepository.save(movie);
-    }
-
-    public Movie saveMovieIfNotExists(Movie movie) {
-        if (movieRepository.findByName(movie.getName()).isPresent()) {
-            log.info("Movie '{}' (id: '{}') already exists", movie.getName(), movie.getMovId());
-            return movie;
         }
         log.info("Saving Movie: '{}' ", movie.getName());
         return movieRepository.save(movie);

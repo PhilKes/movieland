@@ -5,7 +5,6 @@ import com.phil.movieland.auth.jwt.entity.Role;
 import com.phil.movieland.auth.jwt.entity.RoleRepository;
 import com.phil.movieland.auth.jwt.entity.User;
 import com.phil.movieland.auth.jwt.entity.UserRepository;
-import com.phil.movieland.auth.jwt.util.AppException;
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.data.entity.Reservation;
@@ -24,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @Profile("!test")
@@ -62,11 +60,13 @@ public class InitDataRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        log.info("Writing initial data to the database...");
         // Create Roles
         Arrays.stream(Role.RoleName.values()).forEach(role -> createRole(new Role(role)));
         // Create Users with Roles
         createUser(adminUser, 1);
         User user = createUser(userUser, 2);
+        log.info("CREATED USER {} {}",user.getUsername(),user.getId());
         Calendar showTodayDate = Calendar.getInstance();
         showTodayDate.set(Calendar.HOUR_OF_DAY, 16);
         showTodayDate.set(Calendar.MINUTE, 0);
@@ -80,24 +80,29 @@ public class InitDataRunner implements ApplicationRunner {
         // Create Movies
         movies.forEach(movie -> {
             // Create MovieShow for every Movie for Today, Yesterday and Tomorrow
-            Movie createdMovie = movieService.saveMovieIfNotExists(movie);
-            showDateTimes.forEach(showDate -> {
-                MovieShow generatedShow = movieShowService.saveMovieShowIfNotExists(createdMovie.getMovId(), showDate);
-                if (generatedShow != null) {
-                    Reservation reservation = new Reservation(generatedShow.getShowId(), user.getId());
-                    // Reserve first 2 seats in MovieShow
-                    List<Seat> seats = reservationService.getAllSeatsOfShow(generatedShow.getShowId()).stream().limit(2).collect(Collectors.toList());
-                    seats.forEach(seat -> seat.setType(Seat.Seat_Type.ADULT));
-                    reservation.setTotalSum(seats.size()* Seat.getPrice(Seat.Seat_Type.ADULT));
-                    reservation.setValidated(true);
-                    reservation.setMethod(ReservationValidationRequest.PaymentMethod.CASH);
-                    reservationService.saveReservation(reservation, seats);
-                }
-            });
+            try {
+                Movie createdMovie = movieService.saveMovieIfNotExists(movie);
+                showDateTimes.forEach(showDate -> {
+                    MovieShow generatedShow = movieShowService.saveMovieShowIfNotExists(createdMovie.getMovId(), showDate);
+                    if (generatedShow != null) {
+                        Reservation reservation = new Reservation(generatedShow.getShowId(), user.getId());
+                        // Reserve first 2 seats in MovieShow
+                        List<Seat> seats = Arrays.asList(
+                                new Seat(1, Seat.Seat_Type.ADULT),
+                                new Seat(2, Seat.Seat_Type.ADULT)
+                        );
+                        reservation.setTotalSum(seats.size() * Seat.getPrice(Seat.Seat_Type.ADULT));
+                        reservation.setValidated(true);
+                        reservation.setMethod(ReservationValidationRequest.PaymentMethod.CASH);
+                        reservationService.saveReservation(reservation, seats);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         });
-
-        System.out.println();
-
+        log.info("Finished writing initial data to the database");
     }
 
     private void createRole(Role role) {
@@ -114,9 +119,12 @@ public class InitDataRunner implements ApplicationRunner {
                 signUpWithRoleRequest.getEmail(), signUpWithRoleRequest.getPassword());
         user.setId(id);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Role userRole = roleRepository.findByName(Role.RoleName.valueOf(signUpWithRoleRequest.getRoleName()))
-                .orElseThrow(() -> new AppException("User Role not set."));
-        user.setRoles(Collections.singleton(userRole));
+        Set<Role> roles = new HashSet<>(Arrays.asList(
+                roleRepository.findByName(Role.RoleName.valueOf(Role.RoleName.ROLE_USER.name())).get(),
+                roleRepository.findByName(Role.RoleName.valueOf(signUpWithRoleRequest.getRoleName())).get()
+        ));
+        user.setRoles(roles);
+        log.info("Saving User '{}'", signUpWithRoleRequest.getUsername());
         return userRepository.save(user);
     }
 }

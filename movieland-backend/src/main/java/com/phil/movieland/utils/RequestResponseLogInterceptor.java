@@ -19,7 +19,7 @@ public class RequestResponseLogInterceptor extends HandlerInterceptorAdapter {
         Logger log = LoggerFactory.getLogger(((HandlerMethod) handler).getBeanType());
 
         if (request.getQueryString() != null)
-            log.info("Request: {} '{}', query: {}, ", request.getMethod(), request.getRequestURI(), request.getQueryString());
+            log.info("Request: {} '{}', query: {}, client: {}", request.getMethod(), request.getRequestURI(), request.getQueryString(), request.getRemoteHost());
         else
             log.info("Request: {} '{}'", request.getMethod(), request.getRequestURI());
         return true;

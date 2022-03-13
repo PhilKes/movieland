@@ -44,6 +44,14 @@ public class Seat {
     @Column(name="TYPE")
     private Seat_Type type;
 
+    public Seat() {
+    }
+
+    public Seat(int number, Seat_Type type) {
+        this.number = number;
+        this.type = type;
+    }
+
     public Seat_Type getType() {
         return type;
     }
