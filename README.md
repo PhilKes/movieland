@@ -57,8 +57,14 @@ Full Docker Support with **Docker-compose**
 * **Frontend** Container running **NuxtJS UI** client
 * Automatically **released from GithubActions**
 
+You can test out this project on the **Live Preview on Heroku**:
+
+**[movieland-frontend.herokuapp.com](https://movieland-frontend.herokuapp.com/)**
+
+_Note_: Heroku puts the frontend and backend into sleep mode if there haven't been any requests for some time, therefore the initial request to the Live Preview might take about 1 minute to wake up the frontend and backend.
+
 
 ## Attribution
-All Movie Posters, Descriptions, Meta-data is provided by the free TMDB API
+All Movie Posters, Descriptions, Meta-data are provided by the free <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>
 
 <img src="/doc/tmdb.svg" width="400px">

@@ -61,12 +61,17 @@
         <nuxt/>
       </v-container>
     </v-main>
-    <!--    <v-footer
+        <v-footer
           :absolute="!fixed"
+          height="30px"
           app
         >
-          <span>&copy; {{ new Date().getFullYear() }}</span>
-        </v-footer>-->
+          <v-row justify="center">
+            <p style="font-size: small">
+              All Movie Meta-data is provided by the <a href="https://developers.themoviedb.org/3" target="_blank">TMDB API</a>
+            </p>
+          </v-row>
+        </v-footer>
   </v-app>
 </template>
 
