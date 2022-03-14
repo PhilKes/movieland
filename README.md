@@ -11,6 +11,8 @@ This is a showcase project for a **Full Stack Web Application** for a cinema ope
 * Role-based **JWT Token** Authentication
 * Access to <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>
 
+Note: You need to get your own TMDB API Key to run the backend on your local machine.
+Add it to the `application.properties` in the `tmdbApi.apikey` value.
 
 ## Frontend - NuxtJS <img src="./doc/nuxt.png" width="30">
 * Vue **User Interface** with Nuxt.js
@@ -65,6 +67,8 @@ _Note_: Heroku puts the frontend and backend into sleep mode if there haven't be
 
 
 ## Attribution
-All Movie Posters, Descriptions, Meta-data are provided by the free <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>
+All Movie Posters, Descriptions, Meta-data are provided by the free <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>.
+
+This product uses the TMDB API but is not endorsed or certified by
 
 <img src="/doc/tmdb.svg" width="400px">

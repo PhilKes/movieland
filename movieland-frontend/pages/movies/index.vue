@@ -35,7 +35,7 @@
             :movie="movie"
             :show-view="false"
             :key="'movieCard' + i"
-            :loading="loading"
+            :loading="$fetchState.pending"
             class="mb-4"
           />
         </v-list>
@@ -54,7 +54,6 @@
     data() {
       return {
         movies: [],
-        loading: true,
         fetchHint: ""
       };
     },

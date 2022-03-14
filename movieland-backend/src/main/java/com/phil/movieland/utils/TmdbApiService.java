@@ -28,7 +28,6 @@ public class TmdbApiService {
     public static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185/";
     public static final String IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original";
 
-    private final String API_KEY;
 
     private final TmdbApi tmdbApi;
     private final TmdbMovies tmdbMovies;
@@ -47,8 +46,7 @@ public class TmdbApiService {
      */
     @Autowired
     public TmdbApiService(@Value("${tmdbApi.apikey}") String apiKey) {
-        API_KEY = apiKey;
-        tmdbApi = new TmdbApi(API_KEY);
+        tmdbApi = new TmdbApi(apiKey);
         tmdbMovies = tmdbApi.getMovies();
     }
 

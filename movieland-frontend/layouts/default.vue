@@ -63,13 +63,17 @@
     </v-main>
         <v-footer
           :absolute="!fixed"
-          height="30px"
           app
         >
           <v-row justify="center">
-            <p style="font-size: small">
-              All Movie Meta-data is provided by the <a href="https://developers.themoviedb.org/3" target="_blank">TMDB API</a>
-            </p>
+            <span style="font-size: small">
+              <h3>
+                This product uses the TMDB API but is not endorsed or certified by
+                <a href="https://developers.themoviedb.org/3" target="_blank">
+                  <img style="width: 120px" src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg" />
+                </a>
+              </h3>
+            </span>
           </v-row>
         </v-footer>
   </v-app>

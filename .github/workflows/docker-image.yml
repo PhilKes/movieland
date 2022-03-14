@@ -18,7 +18,7 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: 'Backend - Run the Maven verify phase'
-        run: mvn verify
+        run: mvn verify -DtmdbApi.apikey=${{ secrets.TMDB_API_KEY  }}
         working-directory: ./movieland-backend
 
   # Build Docker images and push to Dockerhub
@@ -91,4 +91,5 @@ jobs:
           docker pull ${{ matrix.image }}
           docker tag ${{ matrix.image }} registry.heroku.com/${{ matrix.app }}/${{ matrix.type }}
           docker push registry.heroku.com/${{ matrix.app }}/${{ matrix.type }}
+          heroku config:set tmdbApi.apikey=${{ secrets.TMDB_API_KEY  }} -a ${{ matrix.app }} 
           heroku container:release -a ${{ matrix.app }} ${{ matrix.type }}
