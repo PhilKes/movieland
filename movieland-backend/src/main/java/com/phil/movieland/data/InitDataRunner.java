@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Profile("!test")
@@ -66,39 +67,56 @@ public class InitDataRunner implements ApplicationRunner {
         // Create Users with Roles
         createUser(adminUser, 1);
         User user = createUser(userUser, 2);
-        log.info("CREATED USER {} {}",user.getUsername(),user.getId());
+        log.info("CREATED USER {} {}", user.getUsername(), user.getId());
         Calendar showTodayDate = Calendar.getInstance();
-        showTodayDate.set(Calendar.HOUR_OF_DAY, 16);
+        showTodayDate.set(Calendar.HOUR_OF_DAY, 0);
         showTodayDate.set(Calendar.MINUTE, 0);
         showTodayDate.set(Calendar.SECOND, 0);
         showTodayDate.set(Calendar.MILLISECOND, 0);
 
-        List<Date> showDateTimes = Arrays.asList(showTodayDate.getTime(),
+        List<Date> showDates = Arrays.asList(
+                DateUtils.addDays(showTodayDate.getTime(), -1), //Yesterday
+                showTodayDate.getTime(), //Today
                 DateUtils.addDays(showTodayDate.getTime(), 1), // Tomorrow
-                DateUtils.addDays(showTodayDate.getTime(), -1) //Yesterday
+                DateUtils.addDays(showTodayDate.getTime(), 2),
+                DateUtils.addDays(showTodayDate.getTime(), 3),
+                DateUtils.addDays(showTodayDate.getTime(), 4),
+                DateUtils.addDays(showTodayDate.getTime(), 5),
+                DateUtils.addDays(showTodayDate.getTime(), 6)
         );
-        // Create Movies
-        movies.forEach(movie -> {
-            // Create MovieShow for every Movie for Today, Yesterday and Tomorrow
+        List<Integer> showHours= Arrays.asList(14,17,20);
+
+        // Ensure initial Movies exist
+        List<Movie> moviesWithoutIntials = movieService.getAllMovies().stream().filter(movie -> movies.stream().noneMatch(initMovie -> initMovie.getName().equals(movie.getName()))).collect(Collectors.toList());
+        moviesWithoutIntials.addAll(movies);
+        // Create MovieShow for every Movie for the next 7 days
+        moviesWithoutIntials.forEach(movie -> {
             try {
                 Movie createdMovie = movieService.saveMovieIfNotExists(movie);
-                showDateTimes.forEach(showDate -> {
-                    MovieShow generatedShow = movieShowService.saveMovieShowIfNotExists(createdMovie.getMovId(), showDate);
-                    if (generatedShow != null) {
-                        Reservation reservation = new Reservation(generatedShow.getShowId(), user.getId());
-                        // Reserve first 2 seats in MovieShow
-                        List<Seat> seats = Arrays.asList(
-                                new Seat(1, Seat.Seat_Type.ADULT),
-                                new Seat(2, Seat.Seat_Type.ADULT)
-                        );
-                        reservation.setTotalSum(seats.size() * Seat.getPrice(Seat.Seat_Type.ADULT));
-                        reservation.setValidated(true);
-                        reservation.setMethod(ReservationValidationRequest.PaymentMethod.CASH);
-                        reservationService.saveReservation(reservation, seats);
-                    }
+                showDates.forEach(showDate -> {
+                    showHours.forEach(showHour->{
+                        Date showDateTime= new Date(showDate.getTime());
+                        showDateTime.setHours(showHour);
+                        MovieShow generatedShow = movieShowService.saveMovieShowIfNotExists(createdMovie.getMovId(), showDateTime);
+                        if (generatedShow != null) {
+                            Reservation reservation = new Reservation(generatedShow.getShowId(), user.getId());
+                            // Reserve first 2 seats in MovieShow
+                            List<Seat> seats = Arrays.asList(
+                                    new Seat(70, Seat.Seat_Type.ADULT),
+                                    new Seat(71, Seat.Seat_Type.ADULT),
+                                    new Seat(101, Seat.Seat_Type.STUDENT),
+                                    new Seat(102, Seat.Seat_Type.STUDENT)
+                            );
+                            reservation.setTotalSum(seats.size() * Seat.getPrice(Seat.Seat_Type.ADULT));
+                            reservation.setValidated(true);
+                            reservation.setMethod(ReservationValidationRequest.PaymentMethod.CASH);
+                            reservationService.saveReservation(reservation, seats);
+                        }
+                    });
+
                 });
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn(e.getMessage());
             }
 
         });
