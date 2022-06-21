@@ -2,11 +2,11 @@
 Initializes Database + REST Api + start Webserver on port 8080
 """
 import logging
+from logging.handlers import RotatingFileHandler
 
 from flask import Flask
 from flask_restx import Api
 
-from logger import log_handler
 from rest.controller.movie_controller import api as movieApi
 from db.database import db, ma
 
@@ -26,9 +26,11 @@ api = Api(app, title='MovieLand REST Api')
 api.prefix = '/api'
 
 api.add_namespace(movieApi)
-#app.logger(filename='logs.log', level=logging.INFO, format=f'%(asctime)s %(levelname)s %(filename)s :')
-app.logger.addHandler(log_handler)
+logging.basicConfig(filename='logs.log', level=logging.DEBUG, format=f'%(asctime)s %(levelname)s %(filename)s :')
+rotating_file_handler = RotatingFileHandler(filename="logs.log")
+rotating_file_handler.setLevel(logging.INFO)
 
+app.logger.addHandler(rotating_file_handler)
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

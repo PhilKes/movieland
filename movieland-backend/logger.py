@@ -1,6 +1,5 @@
 import logging
-import sys
 
-log_handler = logging.StreamHandler(sys.stdout)
-log_handler.setFormatter(logging.Formatter(f'%(asctime)s %(levelname)s %(name)s : %(message)s'))
 
+def get_logger():
+    return logging.getLogger('MovieLand')
