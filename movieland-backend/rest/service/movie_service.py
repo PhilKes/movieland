@@ -21,6 +21,12 @@ class MovieService:
     def get_movie_by_id(self, id: int) -> Movie:
         return Movie.query.filter_by(movId=id).first()
 
+    def get_movie_trailer(self, id: int) -> str:
+        movie = self.get_movie_by_id(id)
+        if movie is None:
+            return None
+        return TmdbService.get_trailer(movie.tmdbId)
+
     def get_movie_by_tmdb_id(self, tmdb_id: int) -> Movie:
         return Movie.query.filter_by(tmdbId=tmdb_id).first()
 
@@ -75,3 +81,7 @@ class MovieService:
     def get_tmdb_top_10_movies(self) -> List[Movie]:
         log.info(f"Querying TMDB Top 10 Movies")
         return TmdbService.get_top_10_movies()
+
+    def get_backdrop(self, tmdbId: int) -> str:
+        log.info(f"Querying TMDB backdrop for Movie tmdbId='{tmdbId}'")
+        return TmdbService.get_backdrop(tmdbId)

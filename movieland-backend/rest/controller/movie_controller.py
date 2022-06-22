@@ -39,7 +39,7 @@ class MoviesController(Resource):
 class MovieController(Resource):
 
     def get(self, movId: int):
-        movie = Movie.query.filter_by(movId=movId).first()
+        movie = service.get_movie_by_id(movId)
         if movie is None:
             return {}, 404
         return movie_schema.dump(movie), 200
@@ -54,6 +54,7 @@ class MovieController(Resource):
     def delete(self, movId: int):
         service.delete_by_id(movId)
         return {"msg": f"Movie (movId='{movId}') deleted"}, 200
+
 
 @api.route("/page/<int:page>")
 @api.param('page', 'Page number')
@@ -83,3 +84,23 @@ class MoviesTmdbController(Resource):
 class MoviesTmdbTopController(Resource):
     def get(self):
         return movies_schema.dump(service.get_tmdb_top_10_movies()), 200
+
+
+@api.route("/trailer/<int:movId>")
+@api.param('movId', 'Movie identifier')
+class MovieTrailerController(Resource):
+    def get(self, movId: int):
+        trailer_url = service.get_movie_trailer(movId)
+        if trailer_url is None:
+            return {"msg": f"Movie (movId='{movId}') does not exist"}
+        return trailer_url, 200
+
+
+@api.route("/tmdb/images")
+class MoviesTmdbImagesController(Resource):
+    def get(self):
+        ids = request.args.getlist("ids", type=int)
+        backdrops = {}
+        for id in ids:
+            backdrops[id] = service.get_backdrop(id)
+        return backdrops, 200

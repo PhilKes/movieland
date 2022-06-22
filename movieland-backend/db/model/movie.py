@@ -2,10 +2,9 @@ import datetime
 
 from tmdbv3api.as_obj import AsObj
 
-from db.database import db, ma
+from db.database import db, ma, DATE_FORMAT
 
 POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185/"
-IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original"
 
 class Movie(db.Model):
     movId = db.Column(db.Integer, primary_key=True)
@@ -33,7 +32,7 @@ class Movie(db.Model):
         self.length = tmdb_movie['runtime'] if 'runtime' in tmdb_movie else None
         self.description = tmdb_movie['overview']
         self.description = (self.description[:252] + '..') if len(self.description) > 255 else self.description
-        self.date = datetime.datetime.strptime(tmdb_movie['release_date'], '%Y-%m-%d')
+        self.date = datetime.datetime.strptime(tmdb_movie['release_date'], DATE_FORMAT)
         self.name = tmdb_movie['title']
 
 
