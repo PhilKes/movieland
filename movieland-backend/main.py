@@ -10,6 +10,7 @@ from flask_restx import Api
 from error_handling import add_error_handlers
 from rest.controller.movie_controller import api as movieApi
 from rest.controller.movie_show_controller import api as showApi
+from rest.controller.reservation_controller import api as reservationApi
 from db.database import db, ma
 
 app = Flask('MovieLand')
@@ -29,6 +30,7 @@ api.prefix = '/api'
 
 api.add_namespace(movieApi)
 api.add_namespace(showApi)
+api.add_namespace(reservationApi)
 logging.basicConfig(filename='logs.log', level=logging.DEBUG, format=f'%(asctime)s %(levelname)s %(filename)s :')
 rotating_file_handler = RotatingFileHandler(filename="logs.log")
 rotating_file_handler.setLevel(logging.INFO)
