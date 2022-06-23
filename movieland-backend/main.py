@@ -5,12 +5,13 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask
+from flask_cors import CORS
 from flask_restx import Api
 
 from error_handling import add_error_handlers
 from db.database import db, ma
 
-from rest.controller import movie_api, movie_show_api, reservation_api, user_api
+from rest.controller import movie_api, movie_show_api, reservation_api, user_api, auth_api
 
 app = Flask('MovieLand')
 
@@ -35,12 +36,28 @@ app.logger.addHandler(rotating_file_handler)
 api.add_namespace(movie_api)
 api.add_namespace(movie_show_api)
 api.add_namespace(reservation_api)
+api.add_namespace(auth_api)
 api.add_namespace(user_api)
 
 add_error_handlers(app)
 
 app.config['SECRET_KEY'] = "JWTSuperSecretKey"
+cors = CORS(app,
+            resources=r"/api/*",
+            origins='*', expose_headers='*', allow_headers='*', max_age=3600)
+app.url_map.strict_slashes = True
 
+
+# @app.before_request
+# def add_trailing():
+#     from flask import redirect, request
+#
+#     rp = request.path
+#     if not rp.endswith('/'):
+#         return redirect(rp + '/')
+
+
+logging.getLogger('flask_cors').level = logging.DEBUG
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

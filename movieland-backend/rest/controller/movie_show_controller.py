@@ -7,7 +7,7 @@ from flask_restx import Namespace, Resource
 from db.database import DATE_FORMAT
 from db.model import MovieShow, movie_show_schema, movie_shows_schema, movies_schema, RoleName, User
 from logger import get_logger
-from middleware import authenticated_by_role
+from middleware import authenticated
 from rest.dto.movie_show_info import MovieShowInfo, movie_shows_infos_schema, movie_show_info_schema
 from rest.service.movie_service import MovieService
 from rest.service.movie_show_service import MovieShowService
@@ -19,7 +19,7 @@ movie_service = MovieService()
 log = get_logger()
 
 
-@api.route("/")
+@api.route("")
 class MovieShowsController(Resource):
 
     def get(self):
@@ -27,7 +27,7 @@ class MovieShowsController(Resource):
         date = datetime.strptime(date, DATE_FORMAT)
         return movie_shows_schema.dump(service.get_shows_for_date(date)), 200
 
-    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    @authenticated(RoleName.ROLE_ADMIN)
     def post(self, current_user: User):
         json_data = request.get_json(force=True)
         show = MovieShow()
@@ -39,7 +39,7 @@ class MovieShowsController(Resource):
             return {"msg": str(err)}, 409
         return movie_show_schema.dump(show), 201
 
-    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    @authenticated(RoleName.ROLE_ADMIN)
     def delete(self, current_user: User):
         show_ids = request.args.getlist("showIds", type=int) if 'showIds' in request.args else None
         if show_ids is None:
@@ -82,15 +82,17 @@ class MoviesMovieShowsController(Resource):
 
     def get(self, movId: int):
         """
-        Get all MovieShows of Movie on date
+        Get all MovieShows of Movie of Week
         """
         date = request.args.get("date", default=None, type=str)
-        date = datetime.strptime(date, DATE_FORMAT)
-
+        if date is not None:
+            date = datetime.strptime(date, DATE_FORMAT)
+        else:
+            date = datetime.now()
         movie = movie_service.get_movie_by_id(movId)
         if movie is None:
             return {"msg": f"Movie (movId='{movId}') does not exist"}, 404
-        shows = service.get_shows_for_date(date, movId)
+        shows = service.get_shows_of_week_of_movie(movId, date)
         return movie_shows_schema.dump(shows), 200
 
 
@@ -114,7 +116,7 @@ class MoviesShowController(Resource):
             return {}, 404
         return movie_show_schema.dump(show), 200
 
-    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    @authenticated(RoleName.ROLE_ADMIN)
     def put(self, current_user: User, id: int):
         json_data = request.get_json(force=True)
         show = MovieShow()
@@ -122,7 +124,7 @@ class MoviesShowController(Resource):
         show.showId = id
         return movie_show_schema.dump(service.save_show(show, True)), 200
 
-    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    @authenticated(RoleName.ROLE_ADMIN)
     def delete(self, current_user: User, id: int):
         service.delete_by_ids([id])
         return {"msg": f"MovieShow (showId='{id}') deleted"}, 200

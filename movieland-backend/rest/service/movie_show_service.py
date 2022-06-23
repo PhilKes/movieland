@@ -26,6 +26,13 @@ class MovieShowService:
         log.info(f"Querying MovieShows between: '{start_datetime}' and '{end_datetime}'")
         return MovieShow.query.filter(MovieShow.date >= start_datetime, MovieShow.date <= end_datetime).all()
 
+    def get_shows_of_week_of_movie(self, movId: int, date: datetime.date = datetime.today()) -> List[MovieShow]:
+        start_datetime = date.replace(hour=0, minute=0, second=0)
+        end_datetime = (start_datetime + timedelta(days=7)).replace(hour=23, minute=59, second=59)
+        log.info(f"Querying MovieShows between: '{start_datetime}' and '{end_datetime}'")
+        return MovieShow.query.filter(MovieShow.date >= start_datetime, MovieShow.date <= end_datetime,
+                                      MovieShow.movId == movId).all()
+
     def save_show(self, show: MovieShow, update: bool = False):
         if update:
             db.session.merge(show)

@@ -11,7 +11,7 @@ service = ReservationService()
 log = get_logger()
 
 
-@api.route("/")
+@api.route("")
 class ReservationsController(Resource):
 
     def get(self):

@@ -1,93 +1,107 @@
-import jwt
-from flask import request, current_app
+
+from flask import request
 from flask_restx import Namespace, Resource
 
-from db.model import User, RoleName
+from db.model import User, RoleName, users_schema
 from logger import get_logger
-from middleware import authenticated_by_role
-from rest.service.reservation_service import ReservationService
+from middleware import authenticated
 from rest.service.role_service import RoleService
 from rest.service.user_service import UserService
 
-api = Namespace('auth', path='/auth', description='Authentication')
-service = ReservationService()
+api = Namespace('user', path='/users', description='User')
 
 log = get_logger()
 service = UserService()
 role_service = RoleService()
 
 
-@api.route("/signup")
-class SignUpController(Resource):
+@api.route("/me")
+class UserMeController(Resource):
 
-    def post(self):
+    @authenticated()
+    def get(self, current_user: User):
+        log.info(f"Querying current User '{current_user.username}'")
+        return {"id": current_user.id, "username": current_user.username, "name": current_user.name}, 200
+
+    @authenticated()
+    def put(self, current_user: User):
         json_data = request.get_json(force=True)
-        if service.get_user_by_username(json_data['username']) is not None:
-            return {"message": "Username is already taken!", "success": False}, 400
         user = User()
         user.set_from_json(json_data)
-        user.roles = [role_service.get_role_by_name(RoleName.ROLE_USER.name)]
-        try:
-            service.save_user(user)
-        except FileExistsError as err:
-            return {"msg": str(err)}, 409
-        return {"message": "User registered successfully", "succes": True}, 201
+        log.info(f"Updating current User '{current_user.username}'")
+        before_user = service.get_user_by_id(current_user.id)
+        if user.password is not None:
+            before_user.password = service.encrypt_password(user.password)
+        if user.name is not None:
+            before_user.name = user.name
+        if user.username is not None:
+            before_user.username = user.username
+        if user.email is not None:
+            before_user.email = user.email
+        service.save_user(before_user, True)
+        return "User updated", 200
 
 
-@api.route("/admin/signup")
-class SignUpController(Resource):
 
-    @authenticated_by_role(RoleName.ROLE_ADMIN)
-    def post(self, current_user: User):
+@api.route("/<int:id>")
+@api.param("id", "User identifier")
+class UserController(Resource):
+
+    @authenticated(RoleName.ROLE_ADMIN)
+    def put(self, current_user: User, id: int):
         json_data = request.get_json(force=True)
-        if service.get_user_by_username(json_data['username']) is not None:
-            return {"message": "Username is already taken!", "success": False}, 400
         user = User()
         user.set_from_json(json_data)
-        user.roles = [role_service.get_role_by_name(RoleName.ROLE_USER.name),
-                      role_service.get_role_by_name(RoleName.ROLE_ADMIN.name)]
-        try:
-            service.save_user(user)
-        except FileExistsError as err:
-            return {"msg": str(err)}, 409
-        return {"message": "User registered successfully", "succes": True}, 201
+        log.info(f"Updating User '{user.username}'")
+        before_user = self.fill_user_update(id, user)
+        service.save_user(before_user, True)
+        return "User updated", 200
+
+    @authenticated(RoleName.ROLE_ADMIN)
+    def delete(self, current_user: User, id: int):
+        log.info(f"Deleting User by id='{id}'")
+        service.delete_by_id(id)
+        return f"User (id:{id}) deleted", 200
 
 
-@api.route("/signin")
-class SignUpController(Resource):
+@api.route("/all")
+class UsersAllController(Resource):
 
-    def post(self):
-        json_data = request.get_json(force=True)
-        try:
-            user = service.login_user(
-                json_data["usernameOrEmail"],
-                json_data["password"]
-            )
-            if user:
-                try:
-                    # token should expire after 24 hrs
-                    token = jwt.encode(
-                        {"user_id": user.id},
-                        current_app.config["SECRET_KEY"],
-                        algorithm="HS256"
-                    )
-                    return {
-                               "tokenType": "Bearer",
-                               "accessToken": token
-                           }, 200
-                except Exception as e:
-                    return {
-                               "error": "Something went wrong",
-                               "message": str(e)
-                           }, 500
-            return {
-                       "message": "Error fetching auth token!, invalid email or password",
-                       "data": None,
-                       "error": "Unauthorized"
-                   }, 404
-        except Exception as e:
-            return {
-                       "message": "Something went wrong!",
-                       "error": str(e),
-                       "data": None
-                   }, 500
+    @authenticated(RoleName.ROLE_ADMIN)
+    def get(self, current_user: User):
+        log.info("Querying all Users")
+        return users_schema.dump(service.get_all()), 200
+
+
+@api.route("/users")
+class UsersController(Resource):
+
+    @authenticated(RoleName.ROLE_ADMIN)
+    def get(self, current_user: User):
+        log.info("Querying all Users of Role USER")
+        role = role_service.get_role_by_name(RoleName.ROLE_USER.name)
+        return users_schema.dump(service.get_all_by_role(role)), 200
+
+
+@api.route("/admins")
+class UsersAdminsController(Resource):
+
+    @authenticated(RoleName.ROLE_ADMIN)
+    def get(self, current_user: User):
+        log.info("Querying all Users of Role ADMIN")
+        role = role_service.get_role_by_name(RoleName.ROLE_ADMIN.name)
+        return users_schema.dump(service.get_all_by_role(role)), 200
+
+
+@api.route("/<string:username>")
+@api.param("username", "Username of User")
+class UsernameController(Resource):
+
+    @authenticated(RoleName.ROLE_ADMIN)
+    def get(self, current_user: User, username: str):
+        log.info(f"Querying UserProfile of User '{username}'")
+        user = service.get_user_by_username(username)
+        if user is None:
+            return {"ressourceName": "User", "fieldName": "username", "fieldValue": username}, 404
+        # TODO joinedAt
+        return {"id": user.id, "username": user.username, "name": user.name, "joinedAt": "2022-06-22"}

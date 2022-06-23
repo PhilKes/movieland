@@ -11,12 +11,12 @@ from db.model import RoleName
 from rest.service.user_service import UserService
 
 
-def authenticated_by_role(rolename: RoleName = None):
+def authenticated(rolename: RoleName = None):
     """
     Decorator to check if HTTP Request includes Bearer Token for User Authentication
     :param rolename Optionally check if authenticated User has Role
     """
-    def authenticated(f):
+    def authenticated_wrapper(f):
         @wraps(f)
         def decorated(*args, **kwargs):
             token = None
@@ -52,4 +52,4 @@ def authenticated_by_role(rolename: RoleName = None):
 
         return decorated
 
-    return authenticated
+    return authenticated_wrapper
