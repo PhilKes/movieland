@@ -1,3 +1,8 @@
 """
 REST Controller classes to expose HTTP Mappings
 """
+
+from .movie_controller import api as movie_api
+from .movie_show_controller import api as movie_show_api
+from .reservation_controller import api as reservation_api
+from .user_controller import api as user_api

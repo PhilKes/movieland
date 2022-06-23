@@ -5,8 +5,9 @@ from flask import request
 from flask_restx import Namespace, Resource
 
 from db.database import DATE_FORMAT
-from db.model import MovieShow, movie_show_schema, movie_shows_schema, movies_schema
+from db.model import MovieShow, movie_show_schema, movie_shows_schema, movies_schema, RoleName, User
 from logger import get_logger
+from middleware import authenticated_by_role
 from rest.dto.movie_show_info import MovieShowInfo, movie_shows_infos_schema, movie_show_info_schema
 from rest.service.movie_service import MovieService
 from rest.service.movie_show_service import MovieShowService
@@ -26,7 +27,8 @@ class MovieShowsController(Resource):
         date = datetime.strptime(date, DATE_FORMAT)
         return movie_shows_schema.dump(service.get_shows_for_date(date)), 200
 
-    def post(self):
+    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    def post(self, current_user: User):
         json_data = request.get_json(force=True)
         show = MovieShow()
         show.set_from_json(json_data)
@@ -37,7 +39,8 @@ class MovieShowsController(Resource):
             return {"msg": str(err)}, 409
         return movie_show_schema.dump(show), 201
 
-    def delete(self):
+    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    def delete(self, current_user: User):
         show_ids = request.args.getlist("showIds", type=int) if 'showIds' in request.args else None
         if show_ids is None:
             service.delete_all()
@@ -111,14 +114,15 @@ class MoviesShowController(Resource):
             return {}, 404
         return movie_show_schema.dump(show), 200
 
-    def put(self, id: int):
+    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    def put(self, current_user: User, id: int):
         json_data = request.get_json(force=True)
         show = MovieShow()
         show.set_from_json(json_data)
         show.showId = id
         return movie_show_schema.dump(service.save_show(show, True)), 200
 
-    def delete(self, id: int):
+    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    def delete(self, current_user: User, id: int):
         service.delete_by_ids([id])
         return {"msg": f"MovieShow (showId='{id}') deleted"}, 200
-

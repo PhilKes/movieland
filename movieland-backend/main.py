@@ -8,10 +8,9 @@ from flask import Flask
 from flask_restx import Api
 
 from error_handling import add_error_handlers
-from rest.controller.movie_controller import api as movieApi
-from rest.controller.movie_show_controller import api as showApi
-from rest.controller.reservation_controller import api as reservationApi
 from db.database import db, ma
+
+from rest.controller import movie_api, movie_show_api, reservation_api, user_api
 
 app = Flask('MovieLand')
 
@@ -28,18 +27,22 @@ ma.init_app(app)
 api = Api(app, title='MovieLand REST Api')
 api.prefix = '/api'
 
-api.add_namespace(movieApi)
-api.add_namespace(showApi)
-api.add_namespace(reservationApi)
 logging.basicConfig(filename='logs.log', level=logging.DEBUG, format=f'%(asctime)s %(levelname)s %(filename)s :')
 rotating_file_handler = RotatingFileHandler(filename="logs.log")
 rotating_file_handler.setLevel(logging.INFO)
-
 app.logger.addHandler(rotating_file_handler)
 
+api.add_namespace(movie_api)
+api.add_namespace(movie_show_api)
+api.add_namespace(reservation_api)
+api.add_namespace(user_api)
+
 add_error_handlers(app)
+
+app.config['SECRET_KEY'] = "JWTSuperSecretKey"
 
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+
     app.run(port=8080, debug=True)

@@ -1,8 +1,10 @@
 from flask import request
 from flask_restx import Namespace, Resource
 
+from db.model import RoleName, User
 from db.model.movie import Movie, movies_schema, movie_schema
 from logger import get_logger
+from middleware import authenticated_by_role
 from rest.service.movie_service import MovieService
 
 api = Namespace('movies', path='/movies', description='Movies')
@@ -18,7 +20,8 @@ class MoviesController(Resource):
         query = request.args.get("name", default=None, type=str)
         return movies_schema.dump(service.get_movies(query)), 200
 
-    def post(self):
+    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    def post(self, current_user: User):
         json_data = request.get_json(force=True)
         movie = Movie()
         movie.set_from_json(json_data)
@@ -29,7 +32,8 @@ class MoviesController(Resource):
             return {"msg": str(err)}, 409
         return movie_schema.dump(movie), 201
 
-    def delete(self):
+    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    def delete(self, current_user: User):
         service.delete_all()
         return {"msg": f"All Movies deleted"}, 200
 
@@ -44,14 +48,16 @@ class MovieController(Resource):
             return {}, 404
         return movie_schema.dump(movie), 200
 
-    def put(self, movId: int):
+    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    def put(self, current_user: User, movId: int):
         json_data = request.get_json(force=True)
         movie = Movie()
         movie.set_from_json(json_data)
         movie.movId = movId
         return movie_schema.dump(service.save_movie(movie, True)), 200
 
-    def delete(self, movId: int):
+    @authenticated_by_role(RoleName.ROLE_ADMIN)
+    def delete(self, current_user: User, movId: int):
         service.delete_by_id(movId)
         return {"msg": f"Movie (movId='{movId}') deleted"}, 200
 

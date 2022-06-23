@@ -1,6 +1,3 @@
-from collections import defaultdict
-from datetime import datetime
-
 from flask import request
 from flask_restx import Namespace, Resource
 
