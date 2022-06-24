@@ -1,3 +1,4 @@
+from marshmallow_enum import EnumField
 from sqlalchemy_serializer import SerializerMixin
 
 from db.database import db, ma
@@ -18,6 +19,8 @@ class Seat(db.Model):
 
 
 class SeatSchema(ma.SQLAlchemyAutoSchema):
+    type = EnumField(SeatType)
+
     class Meta:
         model = Seat
         include_fk = True

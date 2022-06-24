@@ -26,8 +26,8 @@ class SignUpController(Resource):
 @api.route("/admin/signup")
 class SignUpController(Resource):
 
-    @authenticated(RoleName.ROLE_ADMIN)
-    def post(self, current_user: User):
+    # @authenticated(RoleName.ROLE_ADMIN)
+    def post(self):
         json_data = request.get_json(force=True)
         return sign_up_user(json_data)
 
@@ -46,6 +46,7 @@ def sign_up_user(json):
     try:
         service.save_user(user)
     except FileExistsError as err:
+        log.error(err)
         return {"msg": str(err)}, 409
     return {"message": "User registered successfully", "succes": True}, 201
 

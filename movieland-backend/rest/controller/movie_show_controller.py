@@ -36,6 +36,7 @@ class MovieShowsController(Resource):
         try:
             service.save_show(show)
         except FileExistsError as err:
+            log.error(err)
             return {"msg": str(err)}, 409
         return movie_show_schema.dump(show), 201
 

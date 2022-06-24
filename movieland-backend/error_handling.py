@@ -11,6 +11,7 @@ log = get_logger()
 
 
 def handle_db_integrity_error(e: sqlalchemy.exc.IntegrityError):
+    log.error(e)
     msg = e.args[0][e.args[0].find("DETAIL"):]
     return {"msg": msg}, 400
 

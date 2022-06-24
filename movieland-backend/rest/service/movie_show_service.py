@@ -15,16 +15,18 @@ class MovieShowService:
 
     def get_shows_for_date(self, date: datetime, movId: int = None) -> List[MovieShow]:
         log.info(f"Querying MovieShows for date='{date}' and movIds='{movId}' ")
-        filters = dict(date=date)
+        start = date.replace(hour=0, minute=0, second=0)
+        end = date.replace(hour=23, minute=59, second=59)
         if movId is not None:
-            filters['movId'] = movId
-        return MovieShow.query.filter_by(**filters).all()
+            return MovieShow.query.filter(MovieShow.date >= start, MovieShow.date <= end,
+                                          MovieShow.movId == movId).all()
+        return MovieShow.query.filter(MovieShow.date >= start, MovieShow.date <= end).all()
 
     def get_shows_of_week(self, date: datetime.date = datetime.today()) -> List[MovieShow]:
-        start_datetime = date.replace(hour=0, minute=0, second=0)
-        end_datetime = (start_datetime + timedelta(days=7)).replace(hour=23, minute=59, second=59)
-        log.info(f"Querying MovieShows between: '{start_datetime}' and '{end_datetime}'")
-        return MovieShow.query.filter(MovieShow.date >= start_datetime, MovieShow.date <= end_datetime).all()
+        start = date.replace(hour=0, minute=0, second=0)
+        end = (start + timedelta(days=7)).replace(hour=23, minute=59, second=59)
+        log.info(f"Querying MovieShows between: '{start}' and '{end}'")
+        return MovieShow.query.filter(MovieShow.date >= start, MovieShow.date <= end).all()
 
     def get_shows_of_week_of_movie(self, movId: int, date: datetime.date = datetime.today()) -> List[MovieShow]:
         start_datetime = date.replace(hour=0, minute=0, second=0)

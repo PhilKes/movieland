@@ -15,6 +15,15 @@ class ReservationService:
     def get_reservation_by_id(self, id: int) -> Reservation:
         return Reservation.query.filter_by(resId=id).first()
 
+    def get_reservation_by_id_and_user(self, id: int, userId: int) -> Reservation:
+        return Reservation.query.filter_by(resId=id, userId=userId).first()
+
+    def get_reservations_by_show_id(self, showId: int) -> List[Reservation]:
+        return Reservation.query.filter_by(showId=showId).all()
+
+    def get_reservations_by_user(self, user_id: int) -> List[Reservation]:
+        return Reservation.query.filter_by(userId=user_id).all()
+
     def get_all(self) -> List[Reservation]:
         return Reservation.query.all()
 
@@ -48,3 +57,9 @@ class ReservationService:
 
     def get_reservations_by_show(self, showId: int) -> List[Reservation]:
         return Reservation.query.filter_by(showId=showId).all()
+
+    def get_seats_of_reservation(self, resId: int) -> List[Seat]:
+        return seats_service.get_seats_of_reservation(resId)
+
+    def get_seats_of_show(self, showId: int) -> List[Seat]:
+        return Seat.query.join(Reservation).join(MovieShow).filter_by(showId=showId).all()

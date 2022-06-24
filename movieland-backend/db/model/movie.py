@@ -14,7 +14,7 @@ class Movie(db.Model):
     posterUrl = db.Column(db.String(1024), nullable=True)
     length = db.Column(db.Integer, nullable=True)
     tmdbId = db.Column(db.Integer, nullable=True)
-    shows = db.relationship('MovieShow', backref='movie', lazy=True)
+    # shows = db.relationship('MovieShow', backref='movie', lazy=True)
 
     def __init__(self, movId: int = None, name: str = None, date: datetime.date = None, description: str = None):
         self.movId = movId

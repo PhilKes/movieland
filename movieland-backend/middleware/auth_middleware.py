@@ -16,6 +16,7 @@ def authenticated(rolename: RoleName = None):
     Decorator to check if HTTP Request includes Bearer Token for User Authentication
     :param rolename Optionally check if authenticated User has Role
     """
+
     def authenticated_wrapper(f):
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -38,7 +39,11 @@ def authenticated(rolename: RoleName = None):
                                "error": "Unauthorized"
                            }, 401
                 if rolename is not None and rolename not in list(map(lambda role: role.name, current_user.roles)):
-                    abort(403)
+                    if rolename is RoleName.ROLE_CASHIER and any(
+                            role == RoleName.ROLE_ADMIN for role in current_user.roles):
+                        pass
+                    else:
+                        abort(403)
                 # if not current_user["active"]:
                 #     abort(403)
             except Exception as e:

@@ -30,6 +30,7 @@ class MoviesController(Resource):
         try:
             service.save_movie(movie)
         except FileExistsError as err:
+            log.error(err)
             return {"msg": str(err)}, 409
         return movie_schema.dump(movie), 201
 
