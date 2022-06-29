@@ -4,12 +4,13 @@
 
 This is a showcase project for a **Full Stack Web Application** for a cinema operator use-case scenario.
 
-## Backend - Spring Boot <img src="./doc/spring.png" width="26">
-* JPA/Hibernate to interact with the database
+## Backend - Python Flask <img src="./doc/spring.png" width="26">
+* SQLAlchemy to interact with the database
 * **REST API** for external access
 * Async REST-Tasks with progress indication
 * Role-based **JWT Token** Authentication
 * Access to <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>
+* Swagger UI
 
 Note: You need to get your own TMDB API Key to run the backend on your local machine.
 Add it to the `application.properties` in the `tmdbApi.apikey` value.

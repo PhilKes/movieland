@@ -3,6 +3,7 @@ from typing import List
 from tmdbv3api import TMDb
 from tmdbv3api.as_obj import AsObj
 
+from config import get_config
 from db.model import Movie
 from tmdbv3api import Movie as TmdbMovie
 
@@ -18,7 +19,7 @@ class _TmdbService:
 
     def __init__(self):
         self.tmdb = TMDb()
-        self.tmdb.api_key = '7034789c8e20ce00ad84dc8661c288bf'
+        self.tmdb.api_key = get_config('tmdbApi.apikey')
 
     def to_movie(self, tmdb_movie) -> Movie:
         movie = Movie()

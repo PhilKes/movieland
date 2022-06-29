@@ -8,6 +8,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_restx import Api
 
+from config import get_config
 from error_handling import add_error_handlers
 from db.database import db, ma
 
@@ -16,12 +17,7 @@ from rest.controller import movie_api, movie_show_api, reservation_api, task_api
 
 app = Flask('MovieLand')
 
-host = "localhost"
-username = "movielandadmin"
-password = "movielandadmin"
-dbname = "movieland_db"
-
-app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{username}:{password}@{host}:5432/{dbname}"
+app.config["SQLALCHEMY_DATABASE_URI"] = get_config('app.datasource.url')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 ma.init_app(app)
@@ -33,7 +29,6 @@ logging.basicConfig(filename='logs.log', level=logging.DEBUG, format=f'%(asctime
 rotating_file_handler = RotatingFileHandler(filename="logs.log")
 rotating_file_handler.setLevel(logging.INFO)
 app.logger.addHandler(rotating_file_handler)
-
 api.add_namespace(movie_api)
 api.add_namespace(movie_show_api)
 api.add_namespace(reservation_api)
@@ -45,7 +40,7 @@ api.add_namespace(stats_api)
 
 add_error_handlers(app)
 
-app.config['SECRET_KEY'] = "JWTSuperSecretKey"
+app.config['SECRET_KEY'] = get_config('app.jwtSecret')
 cors = CORS(app,
             resources=r"/api/*",
             origins='*', expose_headers='*', allow_headers='*', max_age=3600)
