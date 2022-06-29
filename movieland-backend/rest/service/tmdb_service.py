@@ -25,9 +25,13 @@ class _TmdbService:
         movie.set_from_tmdb_movie(tmdb_movie)
         return movie
 
+    def to_detailed_movie(self, tmdb_movie) -> Movie:
+        movie = self.get_tmdb_movie_by_id(tmdb_movie.id)
+        return self.to_movie(movie)
+
     def query_by_name(self, query: str) -> List[Movie]:
         tmdb_movies = TmdbMovie().search(query)
-        movies = list(map(self.tmdb_movie_to_movie, tmdb_movies))
+        movies = list(map(self.to_detailed_movie, tmdb_movies))
         return movies
 
     def get_tmdb_movie_by_id(self, id: int) -> AsObj:
@@ -42,7 +46,7 @@ class _TmdbService:
         if movie.tmdbId is None:
             tmdb_movie = TmdbMovie().search(movie.name)
             if tmdb_movie is not None:
-                return tmdb_movie[0]
+                return self.get_tmdb_movie_by_id(tmdb_movie[0].id)
         return self.get_tmdb_movie_by_id(movie.tmdbId)
 
     def get_backdrop(self, id: int) -> str:

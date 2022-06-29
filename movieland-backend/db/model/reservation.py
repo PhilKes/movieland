@@ -16,6 +16,7 @@ class Reservation(db.Model):
         self.showId = showId
         self.userId = userId
         self.validated = False
+        self.totalSum=0
 
     def set_from_json(self, json):
         self.resId = json['resId'] if 'resId' in json else None

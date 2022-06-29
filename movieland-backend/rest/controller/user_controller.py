@@ -1,7 +1,9 @@
+from datetime import datetime
 
 from flask import request
 from flask_restx import Namespace, Resource
 
+from db.database import DATETIME_FORMAT
 from db.model import User, RoleName, users_schema
 from logger import get_logger
 from middleware import authenticated
@@ -13,6 +15,24 @@ api = Namespace('user', path='/users', description='User')
 log = get_logger()
 service = UserService()
 role_service = RoleService()
+
+
+def fill_user_update(before_user: User, user: User):
+    if user.password is not None:
+        before_user.password = service.encrypt_password(user.password)
+    if user.name is not None:
+        before_user.name = user.name
+    if user.username is not None:
+        before_user.username = user.username
+    if user.email is not None:
+        before_user.email = user.email
+    if user.roles is not None:
+        before_user.roles.clear()
+        for role in user.roles:
+            db_role = role_service.get_role_by_name(role.name.name)
+            before_user.roles.append(db_role)
+
+    return before_user
 
 
 @api.route("/me")
@@ -30,17 +50,9 @@ class UserMeController(Resource):
         user.set_from_json(json_data)
         log.info(f"Updating current User '{current_user.username}'")
         before_user = service.get_user_by_id(current_user.id)
-        if user.password is not None:
-            before_user.password = service.encrypt_password(user.password)
-        if user.name is not None:
-            before_user.name = user.name
-        if user.username is not None:
-            before_user.username = user.username
-        if user.email is not None:
-            before_user.email = user.email
+        before_user = fill_user_update(before_user, user)
         service.save_user(before_user, True)
         return "User updated", 200
-
 
 
 @api.route("/<int:id>")
@@ -53,7 +65,8 @@ class UserController(Resource):
         user = User()
         user.set_from_json(json_data)
         log.info(f"Updating User '{user.username}'")
-        before_user = self.fill_user_update(id, user)
+        before_user = service.get_user_by_id(id)
+        before_user = fill_user_update(before_user, user)
         service.save_user(before_user, True)
         return "User updated", 200
 
@@ -103,5 +116,4 @@ class UsernameController(Resource):
         user = service.get_user_by_username(username)
         if user is None:
             return {"ressourceName": "User", "fieldName": "username", "fieldValue": username}, 404
-        # TODO joinedAt
-        return {"id": user.id, "username": user.username, "name": user.name, "joinedAt": "2022-06-22"}
+        return {"id": user.id, "username": user.username, "name": user.name, "joinedAt": user.created_at.strftime(DATETIME_FORMAT)}

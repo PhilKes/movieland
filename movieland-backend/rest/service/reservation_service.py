@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta
 from typing import List
 
 from db.database import db
 from db.model import MovieShow, Reservation, Seat
 from logger import get_logger
+from rest.service.dto.reservation_with_seats import ReservationWithSeats
 from rest.service.seats_service import SeatsService
 
 log = get_logger()
@@ -39,7 +39,7 @@ class ReservationService:
 
         # Calculate total sum
         if seats is not None:
-            total_sum = sum([Seat.prices[seat.type] for seat in seats])
+            total_sum = sum([Seat.prices[seat.type.name] for seat in seats])
             reservation.totalSum = total_sum
         if update:
             db.session.merge(reservation)
@@ -55,6 +55,9 @@ class ReservationService:
     def delete_all(self):
         Reservation.query.delete()
 
+    def delete_by_ids(self, res_ids: List[int]):
+        Reservation.query.filter(Reservation.resId.in_(res_ids)).delete()
+
     def get_reservations_by_show(self, showId: int) -> List[Reservation]:
         return Reservation.query.filter_by(showId=showId).all()
 
@@ -63,3 +66,24 @@ class ReservationService:
 
     def get_seats_of_show(self, showId: int) -> List[Seat]:
         return Seat.query.join(Reservation).join(MovieShow).filter_by(showId=showId).all()
+
+    def delete_reservations_of_shows(self, show_ids: List[int]):
+        seats_service.delete_by_show_ids(show_ids)
+        return Reservation.query.filter(Reservation.showId.in_(show_ids)).delete()
+
+    def are_seats_available(self, showId: int, seat_list: List[Seat]) -> bool:
+        for seat in seat_list:
+            if not seats_service.is_seat_available(seat.number, showId):
+                return False
+        return True
+
+    def save_reservations_with_seats(self, reservations: List[ReservationWithSeats]):
+        log.info("Saving Reservations List")
+        for reservation in reservations:
+            self.save_reservation(reservation.reservation, reservation.seats)
+
+    def get_reservations_by_shows(self, show_ids: List[int]) -> List[Reservation]:
+        return Reservation.query.filter(Reservation.showId.in_(show_ids)).all()
+
+    def get_seats_of_reservations(self, res_ids: List[int]):
+        return Seat.query.filter(Seat.resId.in_(res_ids)).all()

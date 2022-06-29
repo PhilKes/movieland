@@ -3,6 +3,7 @@ from datetime import datetime
 from flask_marshmallow import fields
 
 from db.database import db, ma, DATETIME_FORMAT
+from rest.dto.util import get_datetime
 
 
 class MovieShow(db.Model):
@@ -14,7 +15,7 @@ class MovieShow(db.Model):
     def set_from_json(self, json):
         self.showId = json['showId'] if 'showId' in json else None
         self.movId = json['movId']
-        self.date = datetime.strptime(json['date'], DATETIME_FORMAT)
+        self.date = get_datetime(json['date'], DATETIME_FORMAT)
 
 
 class MovieShowSchema(ma.SQLAlchemyAutoSchema):

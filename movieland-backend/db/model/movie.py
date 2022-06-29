@@ -3,6 +3,7 @@ import datetime
 from tmdbv3api.as_obj import AsObj
 
 from db.database import db, ma, DATE_FORMAT
+from rest.dto.util import get_datetime
 
 POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185/"
 
@@ -16,7 +17,7 @@ class Movie(db.Model):
     tmdbId = db.Column(db.Integer, nullable=True)
     # shows = db.relationship('MovieShow', backref='movie', lazy=True)
 
-    def __init__(self, movId: int = None, name: str = None, date: datetime.date = None, description: str = None):
+    def __init__(self, movId: int = None, name: str = None, date: datetime = None, description: str = None):
         self.movId = movId
         self.name = name
         self.date = date
@@ -28,11 +29,12 @@ class Movie(db.Model):
             
     def set_from_tmdb_movie(self, tmdb_movie: AsObj):
         self.tmdbId = tmdb_movie['id']
-        self.posterUrl = POSTER_BASE_URL + tmdb_movie['poster_path']
+        if 'poster_path' in tmdb_movie and tmdb_movie['poster_path'] is not None:
+            self.posterUrl = POSTER_BASE_URL + tmdb_movie['poster_path']
         self.length = tmdb_movie['runtime'] if 'runtime' in tmdb_movie else None
         self.description = tmdb_movie['overview']
         self.description = (self.description[:252] + '..') if len(self.description) > 255 else self.description
-        self.date = datetime.datetime.strptime(tmdb_movie['release_date'], DATE_FORMAT)
+        self.date = get_datetime(tmdb_movie['release_date'], DATE_FORMAT)
         self.name = tmdb_movie['title']
 
 

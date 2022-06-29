@@ -4,7 +4,7 @@ from flask import request
 from flask_restx import Namespace, Resource
 
 from db.model import reservation_schema, Reservation, Seat, reservations_schema, RoleName, User, movie_schema, \
-    movie_show_schema
+    movie_show_schema, SeatType
 from logger import get_logger
 from middleware import authenticated
 from rest.service.movie_service import MovieService
@@ -35,7 +35,7 @@ class ReservationsController(Resource):
             return f"MovieShow (showId='{reservation.showId}' does not exist", 404
         reservation.resId = None
         reservation.userId = current_user.id
-        seats = list(map(lambda x: Seat(x['number'], x['type']), json_data['seats']))
+        seats = list(map(lambda x: Seat(x['number'], SeatType[x['type']]), json_data['seats']))
         try:
             reservation = service.save_reservation(reservation, seats)
         except FileExistsError as err:

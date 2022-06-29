@@ -11,9 +11,10 @@ class Seat(db.Model):
     number = db.Column(db.Integer)
     type = db.Column(db.Enum(SeatType))
 
-    prices = {SeatType.CHILD.name: 5.5, SeatType.STUDENT.name: 6.0, SeatType.ADULT.name: 7.0, SeatType.DISABLED.name: 5.5}
+    prices = {SeatType.CHILD.name: 5.5, SeatType.STUDENT.name: 6.0, SeatType.ADULT.name: 7.0,
+              SeatType.DISABLED.name: 5.5}
 
-    def __init__(self, number: int, type: SeatType):
+    def __init__(self, number: int = None, type: SeatType = None):
         self.number = number
         self.type = type
 

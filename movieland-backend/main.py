@@ -11,7 +11,8 @@ from flask_restx import Api
 from error_handling import add_error_handlers
 from db.database import db, ma
 
-from rest.controller import movie_api, movie_show_api, reservation_api, user_api, auth_api, seat_api
+from rest.controller import movie_api, movie_show_api, reservation_api, task_api, user_api, stats_api, auth_api, \
+    seat_api
 
 app = Flask('MovieLand')
 
@@ -39,6 +40,8 @@ api.add_namespace(reservation_api)
 api.add_namespace(auth_api)
 api.add_namespace(user_api)
 api.add_namespace(seat_api)
+api.add_namespace(task_api)
+api.add_namespace(stats_api)
 
 add_error_handlers(app)
 
@@ -51,5 +54,5 @@ app.url_map.strict_slashes = False
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-
+    app.app_context().push()
     app.run(port=8080, debug=True)

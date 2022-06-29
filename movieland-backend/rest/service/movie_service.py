@@ -5,9 +5,16 @@ from flask_sqlalchemy import Pagination
 from db.database import db
 from db.model import Movie
 from logger import get_logger
+from rest.service.movie_show_service import MovieShowService
+from rest.service.reservation_service import ReservationService
+from rest.service.seats_service import SeatsService
 from rest.service.tmdb_service import TmdbService
 
 log = get_logger()
+
+show_service = MovieShowService()
+res_service = ReservationService()
+seat_service = SeatsService()
 
 
 class MovieService:
@@ -34,7 +41,7 @@ class MovieService:
         log.info(f"Querying Movies for '{name}'")
         return Movie.query.filter_by(name=name).first()
 
-    def _set_tmdb_data(self, movie: Movie, update: bool):
+    def __set_tmdb_data__(self, movie: Movie, update: bool):
         if movie.tmdbId is None:
             movie.set_from_tmdb_movie(TmdbService.get_movie_from_tmdb(movie))
             if update:
@@ -43,7 +50,7 @@ class MovieService:
 
     def save_movie(self, movie: Movie, update=False):
         if movie.tmdbId is None:
-            self._set_tmdb_data(movie, False)
+            self.__set_tmdb_data__(movie, False)
         if not update and self.get_movie_by_tmdb_id(movie.tmdbId) is not None:
             msg = f"Movie '{movie.name} already exists!"
             log.warn(msg)
@@ -61,7 +68,18 @@ class MovieService:
         db.session.commit()
 
     def delete_all(self):
-        Movie.query.delete()
+        movies = Movie.query.all()
+        movie_ids = list(map(lambda movie: movie.movId, movies))
+        shows = show_service.get_by_movies(movie_ids)
+        show_ids = list(map(lambda show: show.showId, shows))
+        reservations = res_service.get_reservations_by_shows(show_ids)
+        res_ids = list(map(lambda res: res.resId, reservations))
+        seats = res_service.get_seats_of_reservations(res_ids)
+        seat_ids = list(map(lambda seat: seat.seatId, seats))
+        seat_service.delete_by_ids(seat_ids)
+        res_service.delete_by_ids(res_ids)
+        show_service.delete_by_ids(show_ids)
+        self.delete_by_ids(movie_ids)
         db.session.commit()
 
     def get_movies_by_ids(self, ids: List[int]) -> List[Movie]:
@@ -85,3 +103,9 @@ class MovieService:
     def get_backdrop(self, tmdbId: int) -> str:
         log.info(f"Querying TMDB backdrop for Movie tmdbId='{tmdbId}'")
         return TmdbService.get_backdrop(tmdbId)
+
+    def get_all(self) -> List[Movie]:
+        return Movie.query.all()
+
+    def delete_by_ids(self, movie_ids: List[int]):
+        Movie.query.filter(Movie.movId.in_(movie_ids)).delete()

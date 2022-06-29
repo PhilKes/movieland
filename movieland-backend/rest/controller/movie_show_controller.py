@@ -9,6 +9,7 @@ from db.model import MovieShow, movie_show_schema, movie_shows_schema, movies_sc
 from logger import get_logger
 from middleware import authenticated
 from rest.dto.movie_show_info import MovieShowInfo, movie_shows_infos_schema, movie_show_info_schema
+from rest.dto.util import get_datetime
 from rest.service.movie_service import MovieService
 from rest.service.movie_show_service import MovieShowService
 
@@ -24,7 +25,7 @@ class MovieShowsController(Resource):
 
     def get(self):
         date = request.args.get("date", default=None, type=str)
-        date = datetime.strptime(date, DATE_FORMAT)
+        date = get_datetime(date, DATE_FORMAT)
         return movie_shows_schema.dump(service.get_shows_for_date(date)), 200
 
     @authenticated(RoleName.ROLE_ADMIN)
@@ -58,7 +59,7 @@ class MovieShowsInfoController(Resource):
         Get additional Infos about a MovieShow
         """
         date = request.args.get("date", default=None, type=str)
-        date = datetime.strptime(date, DATE_FORMAT)
+        date = get_datetime(date, DATE_FORMAT)
         shows = service.get_shows_for_date(date)
 
         # Group the MovieShows by movId
@@ -67,14 +68,12 @@ class MovieShowsInfoController(Resource):
         for show in shows:
             show_map[show.movId].append(show)
 
+        show_infos = []
         for mov_id in show_map:
             movie = movie_service.get_movie_by_id(mov_id)
-            show_map[mov_id] = list(
-                map(lambda x: movie_show_info_schema.dump(MovieShowInfo(mov_id, movie.name, x.date, movie.posterUrl,
-                                                                        show_map[mov_id])),
-                    show_map[mov_id]))
-
-        return show_map, 200
+            show_infos.append(movie_show_info_schema.dump(
+                MovieShowInfo(mov_id, movie.name, movie.date, movie.posterUrl, show_map[mov_id])))
+        return show_infos, 200
 
 
 @api.route("/movies/<int:movId>")
@@ -87,7 +86,7 @@ class MoviesMovieShowsController(Resource):
         """
         date = request.args.get("date", default=None, type=str)
         if date is not None:
-            date = datetime.strptime(date, DATE_FORMAT)
+            date = get_datetime(date, DATE_FORMAT)
         else:
             date = datetime.now()
         movie = movie_service.get_movie_by_id(movId)
