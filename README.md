@@ -59,11 +59,9 @@ Full Docker Support with **Docker-compose**
 * **Frontend** Container running **NuxtJS UI** client
 * Automatically **released from GithubActions**
 
-You can test out this project on the **Live Preview on Heroku**:
+~~You can test out this project on the **Live Preview on Heroku**:~~
 
-**[movieland-frontend.herokuapp.com](https://movieland-frontend.herokuapp.com/)**
-
-_Note_: Heroku puts the frontend and backend into sleep mode if there haven't been any requests for some time, therefore the initial request to the Live Preview might take about 1 minute to wake up the frontend and backend.
+_Since Heroku no longer has a free plan to host an application, the live preview is not available anymore_
 
 
 ## Attribution
