@@ -1,5 +1,4 @@
 from marshmallow_enum import EnumField
-from sqlalchemy_serializer import SerializerMixin
 
 from db.database import db, ma
 from db.model.seat_type import SeatType

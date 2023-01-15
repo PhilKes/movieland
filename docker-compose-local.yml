@@ -4,9 +4,9 @@ version: '3.3'
 services:
   # App backend service
   app-server:
-    # Configuration for building the docker posterUrl for the backend service
+    # Configuration for building the docker for the backend service
     build:
-      context: movieland-backend # Use an posterUrl built from the specified dockerfile in the `polling-app-server` directory.
+      context: movieland-backend
       dockerfile: docker/Dockerfile
     image: movieland-backend
     ports:
@@ -14,10 +14,9 @@ services:
     depends_on:
       - db # This service depends on mysql. Start that first.
     environment: # Pass environment variables to the service
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
-      SPRING_DATASOURCE_USERNAME: movielandadmin
-      SPRING_DATASOURCE_PASSWORD: movielandadmin
-      PORT: 8080
+      - APP_HOST=0.0.0.0
+      - APP_DATASOURCE_URL=postgresql://movielandadmin:movielandadmin@db:5432/movieland_db
+      - APP_PORT=8080
     networks:
       - backend
       - frontend
@@ -38,22 +37,20 @@ services:
       - frontend
   # Database Service (Postgresql)
   db:
-      image: 'postgres:13.1-alpine'
-      ports:
-        - "5432:5432"
-      environment:
-        - POSTGRES_USER=movielandadmin
-        - POSTGRES_PASSWORD=movielandadmin
-        - POSTGRES_DB=movieland_db
-      volumes:
-        - db-data:/var/lib/postgresql/data
 
+    image: 'postgres:13.1-alpine'
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=movielandadmin
+      - POSTGRES_PASSWORD=movielandadmin
+      - POSTGRES_DB=movieland_db
+    volumes:
+      #- db-data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - backend
 
-# Volumes
-volumes:
-  db-data:
 
 # Networks to be created to facilitate communication between containers
 networks:

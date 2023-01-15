@@ -4,16 +4,16 @@
 
 This is a showcase project for a **Full Stack Web Application** for a cinema operator use-case scenario.
 
-## Backend - Python Flask <img src="./doc/spring.png" width="26">
+## Backend - Python Flask <img src="./doc/flask.png" width="28">
 * SQLAlchemy to interact with the database
 * **REST API** for external access
 * Async REST-Tasks with progress indication
 * Role-based **JWT Token** Authentication
 * Access to <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>
-* Swagger UI
+* Swagger UI (http://localhost:8080/)
 
 Note: You need to get your own TMDB API Key to run the backend on your local machine.
-Add it to the `application.properties` in the `tmdbApi.apikey` value.
+Add it to the `application.ini` in the `tmdbApi.apikey` value.
 
 ## Frontend - NuxtJS <img src="./doc/nuxt.png" width="30">
 * Vue **User Interface** with Nuxt.js
@@ -55,16 +55,8 @@ Full Docker Support with **Docker-compose**
 * **Build** all docker images from **Dockerfiles**
 * **Push** all built images **to <a href="https://hub.docker.com/u/philkes" target="_blank">Dockerhub</a>**
 
-## Release - Heroku <img src="./doc/heroku.png" width="26">
-* **Backend** Container running **Spring Boot** with [Postgres Addon](https://elements.heroku.com/addons/heroku-postgresql)
-* **Frontend** Container running **NuxtJS UI** client
-* Automatically **released from GithubActions**
-
-You can test out this project on the **Live Preview on Heroku**:
-
-**[movieland-frontend.herokuapp.com](https://movieland-frontend.herokuapp.com/)**
-
-_Note_: Heroku puts the frontend and backend into sleep mode if there haven't been any requests for some time, therefore the initial request to the Live Preview might take about 1 minute to wake up the frontend and backend.
+## Release
+The Python Flask backend version it not yet released on Heroku.
 
 
 ## Attribution

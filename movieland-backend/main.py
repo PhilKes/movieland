@@ -2,6 +2,7 @@
 Initializes Database + REST Api + start Webserver on port 8080
 """
 import logging
+import os
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask
@@ -10,14 +11,14 @@ from flask_restx import Api
 
 from config import get_config
 from error_handling import add_error_handlers
-from db.database import db, ma
+from db.database import db, ma, check_initial_data
 
 from rest.controller import movie_api, movie_show_api, reservation_api, task_api, user_api, stats_api, auth_api, \
     seat_api
 
 app = Flask('MovieLand')
 
-app.config["SQLALCHEMY_DATABASE_URI"] = get_config('app.datasource.url')
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('APP_DATASOURCE_URL', get_config('app.datasource.url'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 ma.init_app(app)
@@ -49,5 +50,7 @@ app.url_map.strict_slashes = False
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        check_initial_data()
     app.app_context().push()
-    app.run(port=8080, debug=True)
+    app.run(host=os.getenv('APP_HOST', get_config('app.host')), port=int(os.getenv('APP_PORT', get_config('app.port'))),
+            debug=True)
