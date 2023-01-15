@@ -64,32 +64,32 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-  release-heroku:
-    name: 'Push/Release images to Heroku'
-    runs-on: ubuntu-latest
-    needs: build-and-push-docker
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - image: philkes/movie-land-backend:master
-            app: movieland-backend-server
-            type: web
-          - image: philkes/movie-land-frontend:master
-            app: movieland-frontend
-            type: web
-    steps:
-      - uses: actions/checkout@v1
-      - name: Login to Heroku Container registry
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:login
-      - name: Push ${{ matrix.image }} to Heroku
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          docker pull ${{ matrix.image }}
-          docker tag ${{ matrix.image }} registry.heroku.com/${{ matrix.app }}/${{ matrix.type }}
-          docker push registry.heroku.com/${{ matrix.app }}/${{ matrix.type }}
-          heroku config:set tmdbApi.apikey=${{ secrets.TMDB_API_KEY  }} -a ${{ matrix.app }} 
-          heroku container:release -a ${{ matrix.app }} ${{ matrix.type }}
+#  release-heroku:
+#    name: 'Push/Release images to Heroku'
+#    runs-on: ubuntu-latest
+#    needs: build-and-push-docker
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        include:
+#          - image: philkes/movie-land-backend:master
+#            app: movieland-backend-server
+#            type: web
+#          - image: philkes/movie-land-frontend:master
+#            app: movieland-frontend
+#            type: web
+#    steps:
+#      - uses: actions/checkout@v1
+#      - name: Login to Heroku Container registry
+#        env:
+#          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+#        run: heroku container:login
+#      - name: Push ${{ matrix.image }} to Heroku
+#        env:
+#          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+#        run: |
+#          docker pull ${{ matrix.image }}
+#          docker tag ${{ matrix.image }} registry.heroku.com/${{ matrix.app }}/${{ matrix.type }}
+#          docker push registry.heroku.com/${{ matrix.app }}/${{ matrix.type }}
+#          heroku config:set tmdbApi.apikey=${{ secrets.TMDB_API_KEY  }} -a ${{ matrix.app }}
+#          heroku container:release -a ${{ matrix.app }} ${{ matrix.type }}

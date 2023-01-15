@@ -63,6 +63,12 @@ Full Docker Support with **Docker-compose**
 
 _Since Heroku no longer has a free plan to host an application, the live preview is not available anymore_
 
+## TODO
+* Update Backend to Spring Boot 3
+* Refactor Backend into Microservices
+* Add Spring Boot Admin, Prometheus, Grafana to the Stack
+* (Add Spring Cloud Config, Zipking Tracing, Eureka Discovery Server)
+
 
 ## Attribution
 All Movie Posters, Descriptions, Meta-data are provided by the free <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>.
