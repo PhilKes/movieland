@@ -53,26 +53,27 @@ public class MovielandSpringConfiguration {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/",
-                        "/favicon.ico",
-                        "/*/*.png",
-                        "/*/*.gif",
-                        "/*/*.svg",
-                        "/*/*.jpg",
-                        "/*/*.html",
-                        "/*/*.css",
-                        "/*/*.js")
-                .permitAll()
-                .requestMatchers("/*swagger*", "/swagger-resources/configuration/*")
-                .permitAll()
-                .requestMatchers("/api/*", "/api/*/*", "/api/shows/week", "/v2/*")
-                .permitAll()
-                .requestMatchers("/api/users/checkUsernameAvailability", "/api/users/checkEmailAvailability")
-                .permitAll()
-                .requestMatchers("/actuator/*","/actuator/*/*")
-                .permitAll()
+//                .requestMatchers("/",
+//                        "/favicon.ico",
+//                        "/*/*.png",
+//                        "/*/*.gif",
+//                        "/*/*.svg",
+//                        "/*/*.jpg",
+//                        "/*/*.html",
+//                        "/*/*.css",
+//                        "/*/*.js")
+//                .permitAll()
+//                .requestMatchers("/*swagger**")
+//                .permitAll()
+//                .requestMatchers("/api/**", "/v2/*")
+//                .permitAll()
+//                .requestMatchers("/api/users/checkUsernameAvailability", "/api/users/checkEmailAvailability")
+//                .permitAll()
+//                .requestMatchers("/actuator","/actuator/**")
+//                .permitAll()
                 .anyRequest()
-                .authenticated();
+                .permitAll();
+//                .authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
