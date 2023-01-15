@@ -1,11 +1,11 @@
 package com.phil.movieland.auth.jwt.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
 @JsonIgnoreProperties(

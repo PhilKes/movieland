@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.phil.movieland.utils.DateUtils;
 import com.phil.movieland.utils.TmdbApiService;
 import info.movito.themoviedbapi.model.MovieDb;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.util.Date;
 
 @Entity

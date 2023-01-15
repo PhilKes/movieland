@@ -4,7 +4,7 @@
 
 This is a showcase project for a **Full Stack Web Application** for a cinema operator use-case scenario.
 
-## Backend - Spring Boot <img src="./doc/spring.png" width="26">
+## Backend - Spring Boot 3 <img src="./doc/spring.png" width="26">
 * JPA/Hibernate to interact with the database
 * **REST API** for external access
 * Async REST-Tasks with progress indication
@@ -64,7 +64,6 @@ Full Docker Support with **Docker-compose**
 _Since Heroku no longer has a free plan to host an application, the live preview is not available anymore_
 
 ## TODO
-* Update Backend to Spring Boot 3
 * Refactor Backend into Microservices
 * Add Spring Boot Admin, Prometheus, Grafana to the Stack
 * (Add Spring Cloud Config, Zipking Tracing, Eureka Discovery Server)

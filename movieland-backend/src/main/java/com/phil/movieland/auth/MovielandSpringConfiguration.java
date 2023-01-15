@@ -7,16 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -25,7 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         jsr250Enabled=true,
         prePostEnabled=true
 )
-public class MovielandSpringConfiguration extends WebSecurityConfigurerAdapter {
+public class MovielandSpringConfiguration {
     @Autowired
     CustomUserDetailsService customUserDetailsService;
 
@@ -37,31 +38,10 @@ public class MovielandSpringConfiguration extends WebSecurityConfigurerAdapter {
         return new JwtAuthenticationFilter();
     }
 
-    @Override
-    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder
-                .userDetailsService(customUserDetailsService)
-                .passwordEncoder(passwordEncoder());
-    }
-
-    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                //.requiresChannel()
-                //.anyRequest()
-                //.requiresSecure()
-                //.and()
+                .httpBasic(withDefaults())
                 .cors()
                 .and()
                 .csrf()
@@ -72,29 +52,45 @@ public class MovielandSpringConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests()
-                .antMatchers("/",
+                .authorizeHttpRequests()
+                .requestMatchers("/",
                         "/favicon.ico",
-                        "/**/*.png",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.jpg",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js")
+                        "/*/*.png",
+                        "/*/*.gif",
+                        "/*/*.svg",
+                        "/*/*.jpg",
+                        "/*/*.html",
+                        "/*/*.css",
+                        "/*/*.js")
                 .permitAll()
-                .antMatchers("/**swagger**", "/swagger-resources/configuration/**")
+                .requestMatchers("/*swagger*", "/swagger-resources/configuration/*")
                 .permitAll()
-                .antMatchers("/api/**", "/api/shows/week", "/v2/**")
+                .requestMatchers("/api/*", "/api/*/*", "/api/shows/week", "/v2/*")
                 .permitAll()
-                .antMatchers("/api/users/checkUsernameAvailability", "/api/users/checkEmailAvailability")
+                .requestMatchers("/api/users/checkUsernameAvailability", "/api/users/checkEmailAvailability")
                 .permitAll()
-                .antMatchers("/actuator/**")
+                .requestMatchers("/actuator/*","/actuator/*/*")
                 .permitAll()
                 .anyRequest()
                 .authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
+        return http.build();
     }
+
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder
+                .userDetailsService(customUserDetailsService)
+                .passwordEncoder(passwordEncoder());
+        return authenticationManagerBuilder.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 }

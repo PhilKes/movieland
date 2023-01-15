@@ -1,7 +1,8 @@
 package com.phil.movieland.data.entity;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.util.HashMap;
 
 import static com.phil.movieland.data.entity.Seat.Seat_Type.*;

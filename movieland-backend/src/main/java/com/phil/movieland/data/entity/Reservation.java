@@ -1,9 +1,7 @@
 package com.phil.movieland.data.entity;
 
 import com.phil.movieland.rest.request.ReservationValidationRequest;
-
-import javax.persistence.*;
-
+import jakarta.persistence.*;
 
 @Entity
 @Table(name="RESERVATION")
