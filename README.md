@@ -64,7 +64,6 @@ Full Docker Support with **Docker-compose**
 _Since Heroku no longer has a free plan to host an application, the live preview is not available anymore_
 
 ## TODO
-* Refactor Backend into Microservices
 * Add Spring Boot Admin, Prometheus, Grafana to the Stack
 * (Add Spring Cloud Config, Zipking Tracing, Eureka Discovery Server)
 

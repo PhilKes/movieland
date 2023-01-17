@@ -30,8 +30,8 @@ FROM openjdk:17-alpine
 ARG DEPENDENCY=/app/target/dependency
 
 # Copy project dependencies from the build stage
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
+# COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
+# COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
+# COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 
-CMD ["sh","-c","java -Dserver.port=$PORT -cp app:app/lib/* com.phil.movieland.MovielandSpringApplication"]
+CMD ["sh","-c","java -Dserver.port=$PORT -cp app:app/lib/* com.philkes.movieland.spring.admin.SpringBootAdminApplication"]

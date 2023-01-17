@@ -3,17 +3,17 @@
 version: '3.3'
 services:
   # App backend service
-  app-server:
-    # Configuration for building the docker posterUrl for the backend service
+  movieland-backend:
+    container_name: movieland-backend
     build:
-      context: movieland-backend # Use an posterUrl built from the specified dockerfile in the `polling-app-server` directory.
+      context: movieland-backend
       dockerfile: docker/Dockerfile
     image: movieland-backend
     ports:
-      - "8080:8080" # Forward the exposed PORT on the container to port 8080 on the host machine
+      - "8080:8080"
     depends_on:
       - db # This service depends on mysql. Start that first.
-    environment: # Pass environment variables to the service
+    environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
@@ -21,32 +21,47 @@ services:
     networks:
       - backend
       - frontend
-  # Frontend Service
-  app-client:
+  # App backend service
+  movieland-spring-admin:
+    container_name: movieland-spring-admin
     build:
-      context: movieland-frontend # Use an posterUrl built from the specified dockerfile in the `polling-app-client` directory.
+      context: movieland-spring-admin
+      dockerfile: docker/Dockerfile
+    image: movieland-spring-admin
+    ports:
+      - "8081:8081"
+    environment:
+      PORT: 8081
+    networks:
+      - backend
+  # Frontend Service
+  movieland-frontend:
+    container_name: movieland-frontend
+    build:
+      context: movieland-frontend
       dockerfile: Dockerfile
     image: movieland-frontend
     ports:
       - "4000:4000"
     depends_on:
-      - app-server
-    environment: # Pass environment variables to the service
+      - movieland-backend
+    environment:
       REST_API_URL: http://localhost:8080/api
       PORT: 4000
     networks:
       - frontend
   # Database Service (Postgresql)
   db:
-      image: 'postgres:13.1-alpine'
-      ports:
-        - "5432:5432"
-      environment:
-        - POSTGRES_USER=movielandadmin
-        - POSTGRES_PASSWORD=movielandadmin
-        - POSTGRES_DB=movieland_db
-      volumes:
-        - db-data:/var/lib/postgresql/data
+    container_name: movieland-db
+    image: 'postgres:13.1-alpine'
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=movielandadmin
+      - POSTGRES_PASSWORD=movielandadmin
+      - POSTGRES_DB=movieland_db
+    volumes:
+      - db-data:/var/lib/postgresql/data
 
     networks:
       - backend

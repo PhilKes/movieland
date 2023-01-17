@@ -29,8 +29,8 @@ public class TmdbApiService {
     public static final String IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original";
 
 
-    private final TmdbApi tmdbApi;
-    private final TmdbMovies tmdbMovies;
+    private TmdbApi tmdbApi;
+    private TmdbMovies tmdbMovies;
 
     private Logger log = LoggerFactory.getLogger(TmdbApiService.class);
 
@@ -46,8 +46,12 @@ public class TmdbApiService {
      */
     @Autowired
     public TmdbApiService(@Value("${tmdbApi.apikey}") String apiKey) {
-        tmdbApi = new TmdbApi(apiKey);
-        tmdbMovies = tmdbApi.getMovies();
+        try {
+            tmdbApi = new TmdbApi(apiKey);
+            tmdbMovies = tmdbApi.getMovies();
+        } catch (Exception e) {
+            log.error("Error occurred while initializing TmdbApi", e);
+        }
     }
 
     public MovieDb getMovieFromTmdb(Movie movie) {
