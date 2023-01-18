@@ -3,27 +3,6 @@
 version: '3.3'
 services:
   # App backend service
-  movieland-backend:
-    container_name: movieland-backend
-    build:
-      context: movieland-backend
-      dockerfile: docker/Dockerfile
-    image: movieland-backend
-    ports:
-      - "8080:8080"
-    depends_on:
-      - movieland-db # This service depends on mysql. Start that first.
-      - movieland-loki
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://movieland-db:5432/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
-      SPRING_DATASOURCE_USERNAME: movielandadmin
-      SPRING_DATASOURCE_PASSWORD: movielandadmin
-      SPRING_BOOT_ADMIN_CLIENT_URL: http://movieland-spring-admin:8081
-      PORT: 8080
-    networks:
-      - backend
-      - frontend
-  # App backend service
   movieland-spring-admin:
     container_name: movieland-spring-admin
     build:
@@ -34,9 +13,6 @@ services:
       - "8081:8081"
     environment:
       PORT: 8081
-
-    networks:
-      - backend
   # Frontend Service
   movieland-frontend:
     container_name: movieland-frontend
@@ -46,13 +22,9 @@ services:
     image: movieland-frontend
     ports:
       - "4000:4000"
-    depends_on:
-      - movieland-backend
     environment:
       REST_API_URL: http://localhost:8080/api
       PORT: 4000
-    networks:
-      - frontend
   # Database Service (Postgresql)
   movieland-db:
     container_name: movieland-db
@@ -65,8 +37,6 @@ services:
       - POSTGRES_DB=movieland_db
     volumes:
       - db-data:/var/lib/postgresql/data
-    networks:
-      - backend
 
   movieland-prometheus:
     image: prom/prometheus:v2.41.0
@@ -78,8 +48,6 @@ services:
       - "9090:9090"
     healthcheck:
       test: [ "CMD", "nc", "-z", "localhost", "9090" ]
-    networks:
-      - backend
 
   movieland-grafana:
     image: grafana/grafana:9.3.2
@@ -97,12 +65,18 @@ services:
     healthcheck:
       test: [ "CMD", "nc", "-z", "localhost", "3000" ]
     user: "1000"
-    networks:
-      - backend
+
+  movieland-promtail:
+    image: grafana/promtail:2.7.1
+    container_name: promtail
+    volumes:
+      - ./monitoring/promtail/promtail-local.yml:/etc/promtail/promtail.yml
+    command: -config.file=/etc/promtail/promtail.yml
+
   # Source: https://github.com/marcingrzejszczak/observability-boot-blog-post
   movieland-tempo:
     container_name: tempo
-    image: grafana/tempo
+    image: grafana/tempo:1.5.0
     extra_hosts: ['host.docker.internal:host-gateway']
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
@@ -114,24 +88,18 @@ services:
 
   movieland-loki:
     container_name: loki
-    image: grafana/loki
+    image: grafana/loki:2.7.1
     extra_hosts: ['host.docker.internal:host-gateway']
     command: [ "-config.file=/etc/loki/local-config.yaml" ]
     ports:
       - "3100:3100"                                   # loki needs to be exposed so it receives logs
     environment:
       - JAEGER_AGENT_HOST=tempo
-      - JAEGER_ENDPOINT=http://movieland-tempo:14268/api/traces # send traces to Tempo
+      - JAEGER_ENDPOINT=http://localhost:14268/api/traces # send traces to Tempo
       - JAEGER_SAMPLER_TYPE=const
       - JAEGER_SAMPLER_PARAM=1
-
 # Volumes
 volumes:
   db-data:
   tempo-data:
-
-# Networks to be created to facilitate communication between containers
-networks:
-  backend:
-  frontend:
-
+  promtail-data:

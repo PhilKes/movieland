@@ -4,7 +4,7 @@ import com.phil.movieland.auth.jwt.*;
 import com.phil.movieland.auth.jwt.entity.*;
 import com.phil.movieland.auth.jwt.util.AppException;
 import com.phil.movieland.auth.jwt.util.CurrentUser;
-import com.phil.movieland.rest.controller.UserController;
+import io.micrometer.observation.annotation.Observed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +49,13 @@ public class AuthenticationController {
     JwtTokenProvider tokenProvider;
 
     @PostMapping("/signin")
+    // Example of using an annotation to observe methods
+    // <user.name> will be used as a metric name
+    // <getting-user-name> will be used as a span  name
+    // <userType=userType2> will be set as a tag for both metric & span
+    @Observed(name = "auth.signin",
+            contextualName = "sign-in-user",
+            lowCardinalityKeyValues = {"userType", "userType2"})
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         log.info("Authenticating User '{}'", loginRequest.getUsernameOrEmail());
         Authentication authentication = authenticationManager.authenticate(
