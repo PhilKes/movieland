@@ -46,6 +46,8 @@ docker-compose up -f docker-compose-local.yml --build
 
   <a href="http://localhost:8080/api" target="_blank">http://localhost:8080/api</a>
 
+  For Swagger-UI: <a href="http://localhost:8080/swagger-ui.html" target="_blank">http://localhost:8080/swagger-ui.html</a>
+
 * Starts **Spring Admin** exposed to
 
   <a href="http://localhost:8081" target="_blank">http://localhost:8081</a>

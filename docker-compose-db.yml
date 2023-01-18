@@ -3,7 +3,8 @@ version: '2'
 # Define services
 services:
 # Database Service (Postgresql)
-  db:
+  movieland-db:
+    container_name: movieland-db
     image: 'postgres:13.1-alpine'
     ports:
       - "5432:5432"
@@ -12,9 +13,4 @@ services:
       - POSTGRES_PASSWORD=movielandadmin
       - POSTGRES_DB=movieland_db
     volumes:
-      - db-data:/var/lib/postgresql/data
-      - ./resetTestDB.sql:/docker-entrypoint-initdb.d/init.sql
-
-# Volumes
-volumes:
-  db-data:
+      - ./database:/var/lib/postgresql/data
