@@ -12,9 +12,9 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db # This service depends on mysql. Start that first.
+      - movieland-db # This service depends on mysql. Start that first.
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
+      SPRING_DATASOURCE_URL: jdbc:postgresql://movieland-db:5432/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
       SPRING_BOOT_ADMIN_CLIENT_URL: http://movieland-spring-admin:8081
@@ -53,7 +53,7 @@ services:
     networks:
       - frontend
   # Database Service (Postgresql)
-  db:
+  movieland-db:
     container_name: movieland-db
     image: 'postgres:13.1-alpine'
     ports:
@@ -64,7 +64,38 @@ services:
       - POSTGRES_DB=movieland_db
     volumes:
       - db-data:/var/lib/postgresql/data
+    networks:
+      - backend
 
+  movieland-prometheus:
+    image: prom/prometheus:v2.41.0
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "9090" ]
+    networks:
+      - backend
+
+  movieland-grafana:
+    image: grafana/grafana:9.3.2
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - "GF_SECURITY_ADMIN_USER=admin"
+      - "GF_SECURITY_ADMIN_PASSWORD=admin"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - movieland-prometheus
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "3000" ]
+    user: "1000"
     networks:
       - backend
 

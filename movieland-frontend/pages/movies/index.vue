@@ -58,7 +58,7 @@
       };
     },
     async fetch() {
-      setTimeout(() => (this.fetchHint = "Hint: The Backend was probably put in sleep mode by Heroku, it takes additional time to wake it up"), 6000);
+      setTimeout(() => (this.fetchHint = "Hint: The Backend was probably put in sleep mode, it takes additional time to wake it up"), 6000);
       this.movies = await this.$repos.movies.all();
       console.log("movies", this.movies);
       this.fetchHint="";

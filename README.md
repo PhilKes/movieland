@@ -26,13 +26,22 @@ Add it to the `application.properties` in the `tmdbApi.apikey` value.
 * PostgreSQL image from <a href="https://hub.docker.com/_/postgres" target="_blank">Dockerhub</a>
 * Persistent **Data layer** for Movies, Shows, User etc.
 
+## Monitoring
+### Prometheus <img src="./doc/prometheus.png" width="30">
+<a href="http://localhost:9090" target="_blank">http://localhost:9090/</a>
+
+### Grafana <img src="./doc/grafana.png" width="30">
+<a href="http://localhost:3000" target="_blank">http://localhost:3000/</a>
+#### Dashboards:
+* https://grafana.com/grafana/dashboards/6756-spring-boot-statistics/
+
 ## Docker <img src="./doc/docker.png" width="32">
 Full Docker Support with **Docker-compose**
 
 * To build and run the Fullstack Application from local Dockerfiles:
 ```shell
 mvn clean install
-docker-compose up -f docker-compose-local.yml --build
+docker-compose -f docker-compose-local.yml up --build
 ```
 
 * To run the Fullstack Application from latest <a href="https://hub.docker.com/u/philkes" target="_blank">Dockerhub images</a>:
@@ -60,15 +69,6 @@ docker-compose up -f docker-compose-local.yml --build
 * Verify built in **Test** job
 * **Build** all docker images from **Dockerfiles**
 * **Push** all built images **to <a href="https://hub.docker.com/u/philkes" target="_blank">Dockerhub</a>**
-
-## Release - Heroku <img src="./doc/heroku.png" width="26">
-* **Backend** Container running **Spring Boot** with [Postgres Addon](https://elements.heroku.com/addons/heroku-postgresql)
-* **Frontend** Container running **NuxtJS UI** client
-* Automatically **released from GithubActions**
-
-~~You can test out this project on the **Live Preview on Heroku**:~~
-
-_Since Heroku no longer has a free plan to host an application, the live preview is not available anymore_
 
 ## TODO
 * Add Spring Boot Admin, Prometheus, Grafana to the Stack

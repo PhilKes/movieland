@@ -1,38 +1,41 @@
 # Docker Compose for entire Full Stack Application running on localhost with Containers pulled from dockerhub/philkes
-
 version: '3.3'
 services:
   # App backend service
-  app-server:
+  movieland-backend:
+    container_name: movieland-backend
     image: philkes/movie-land-backend:master
     ports:
-      - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+      - "8080:8080"
     restart: on-failure
     depends_on:
-      - db # This service depends on mysql. Start that first.
+      - movieland-db
     environment: # Pass environment variables to the service
-      SPRING_DATASOURCE_URL: jdbc:mysql://db/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
+      SPRING_DATASOURCE_URL: jdbc:postgresql://movieland-db:5432/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
+      SPRING_BOOT_ADMIN_CLIENT_URL: http://movieland-spring-admin:8081
       PORT: 8080
     networks:
       - backend
       - frontend
 
   # Frontend Service
-  app-client:
+  movieland-frontend:
+    container_name: movieland-frontend
     image: philkes/movie-land-frontend:master
     ports:
       - "4000:4000"
     depends_on:
       - app-server
     environment: # Pass environment variables to the service
-      REST_API_URL: http://app-server:8080/api
+      REST_API_URL: http://movieland-backend:8080/api
       PORT: 4000
     networks:
       - frontend
   # Database Service (Postgresql)
-  db:
+  movieland-db:
+    container_name: movieland-db
     image: 'postgres:13.1-alpine'
     ports:
       - "5432:5432"
@@ -44,6 +47,49 @@ services:
       - db-data:/var/lib/postgresql/data
     networks:
       - backend
+  # App backend service
+  movieland-spring-admin:
+    container_name: movieland-spring-admin
+    image: philkes/movie-land-spring-admin:master
+    ports:
+      - "8081:8081"
+    environment:
+      PORT: 8081
+    networks:
+      - backend
+
+  movieland-prometheus:
+    image: prom/prometheus:v2.41.0
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "9090" ]
+    networks:
+      - backend
+
+  movieland-grafana:
+    image: grafana/grafana:9.3.2
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - "GF_SECURITY_ADMIN_USER=admin"
+      - "GF_SECURITY_ADMIN_PASSWORD=admin"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - movieland-prometheus
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "3000" ]
+    user: "1000"
+    networks:
+      - backend
+
 # Volumes
 volumes:
   db-data:

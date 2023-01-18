@@ -13,4 +13,8 @@ services:
       - POSTGRES_PASSWORD=movielandadmin
       - POSTGRES_DB=movieland_db
     volumes:
-      - ./database:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
+
+# Volumes
+volumes:
+  db-data:
