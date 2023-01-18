@@ -30,9 +30,10 @@ Add it to the `application.properties` in the `tmdbApi.apikey` value.
 Full Docker Support with **Docker-compose**
 
 * To build and run the Fullstack Application from local Dockerfiles:
-
-    `docker-compose up -f docker-compose-local.yml --build`
-
+```shell
+mvn clean install
+docker-compose up -f docker-compose-local.yml --build
+```
 
 * To run the Fullstack Application from latest <a href="https://hub.docker.com/u/philkes" target="_blank">Dockerhub images</a>:
 
@@ -44,6 +45,10 @@ Full Docker Support with **Docker-compose**
 * Starts **Spring** REST API exposed to
 
   <a href="http://localhost:8080/api" target="_blank">http://localhost:8080/api</a>
+
+* Starts **Spring Admin** exposed to
+
+  <a href="http://localhost:8081" target="_blank">http://localhost:8081</a>
 
 * Starts **Vue** Frontend exposed to
 
