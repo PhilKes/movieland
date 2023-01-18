@@ -13,13 +13,13 @@ jobs:
       - uses: actions/checkout@v2
         name: 'Checkout repository'
       - uses: actions/setup-java@v2
-        name: 'Backend - Setup Java 11'
+        name: 'Backend - Setup Java 17'
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'adopt'
       - name: 'Backend - Run the Maven verify phase'
         run: mvn verify -DtmdbApi.apikey=${{ secrets.TMDB_API_KEY  }}
-        working-directory: ./movieland-backend
+        working-directory: ./
 
   # Build Docker images and push to Dockerhub
   build-and-push-docker:
@@ -32,6 +32,9 @@ jobs:
         include:
           - dockerfile: ./movieland-backend/docker/Dockerfile
             image: philkes/movie-land-backend
+            context: ./movieland-backend
+          - dockerfile: ./movieland-spring-admin/docker/Dockerfile
+            image: philkes/movie-land-spring-admin
             context: ./movieland-backend
           - dockerfile: ./movieland-frontend/Dockerfile
             image: philkes/movie-land-frontend
@@ -64,32 +67,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-#  release-heroku:
-#    name: 'Push/Release images to Heroku'
-#    runs-on: ubuntu-latest
-#    needs: build-and-push-docker
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        include:
-#          - image: philkes/movie-land-backend:master
-#            app: movieland-backend-server
-#            type: web
-#          - image: philkes/movie-land-frontend:master
-#            app: movieland-frontend
-#            type: web
-#    steps:
-#      - uses: actions/checkout@v1
-#      - name: Login to Heroku Container registry
-#        env:
-#          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-#        run: heroku container:login
-#      - name: Push ${{ matrix.image }} to Heroku
-#        env:
-#          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-#        run: |
-#          docker pull ${{ matrix.image }}
-#          docker tag ${{ matrix.image }} registry.heroku.com/${{ matrix.app }}/${{ matrix.type }}
-#          docker push registry.heroku.com/${{ matrix.app }}/${{ matrix.type }}
-#          heroku config:set tmdbApi.apikey=${{ secrets.TMDB_API_KEY  }} -a ${{ matrix.app }}
-#          heroku container:release -a ${{ matrix.app }} ${{ matrix.type }}
