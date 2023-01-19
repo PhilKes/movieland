@@ -7,7 +7,7 @@ services:
     container_name: movieland-backend
     build:
       context: movieland-backend
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     image: movieland-backend
     ports:
       - "8080:8080"
@@ -19,6 +19,8 @@ services:
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
       SPRING_BOOT_ADMIN_CLIENT_URL: http://movieland-spring-admin:8081
+      ZIPKIN_SERVER: movieland-tempo:9411
+      LOKI_SERVER: movieland-loki:3100
       PORT: 8080
     networks:
       - backend
@@ -28,7 +30,7 @@ services:
     container_name: movieland-spring-admin
     build:
       context: movieland-spring-admin
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     image: movieland-spring-admin
     ports:
       - "8081:8081"
@@ -73,13 +75,23 @@ services:
     container_name: prometheus
     restart: unless-stopped
     volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus/prometheus-docker.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     healthcheck:
       test: [ "CMD", "nc", "-z", "localhost", "9090" ]
     networks:
       - backend
+
+  movieland-promtail:
+    image: grafana/promtail:2.7.1
+    container_name: promtail
+    volumes:
+      - ./monitoring/promtail/promtail-docker.yml:/etc/promtail/promtail.yml
+    command: -config.file=/etc/promtail/promtail.yml
+    networks:
+      - backend
+
 
   movieland-grafana:
     image: grafana/grafana:9.3.2
@@ -88,8 +100,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - "GF_SECURITY_ADMIN_USER=admin"
-      - "GF_SECURITY_ADMIN_PASSWORD=admin"
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      PROMETHEUS_SERVER: http://movieland-prometheus:9090
+      TEMPO_SERVER: http://movieland-tempo:3200
+      LOKI_SERVER: http://movieland-loki:3100
     volumes:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
     depends_on:
@@ -103,7 +118,6 @@ services:
   movieland-tempo:
     container_name: tempo
     image: grafana/tempo
-    extra_hosts: ['host.docker.internal:host-gateway']
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
       - ./monitoring/tempo/tempo-local.yaml:/etc/tempo.yaml:ro
@@ -111,11 +125,12 @@ services:
     ports:
       - "14268"  # jaeger ingest
       - "9411:9411" # zipkin
+    networks:
+      - backend
 
   movieland-loki:
     container_name: loki
     image: grafana/loki
-    extra_hosts: ['host.docker.internal:host-gateway']
     command: [ "-config.file=/etc/loki/local-config.yaml" ]
     ports:
       - "3100:3100"                                   # loki needs to be exposed so it receives logs
@@ -124,6 +139,8 @@ services:
       - JAEGER_ENDPOINT=http://movieland-tempo:14268/api/traces # send traces to Tempo
       - JAEGER_SAMPLER_TYPE=const
       - JAEGER_SAMPLER_PARAM=1
+    networks:
+      - backend
 
 # Volumes
 volumes:

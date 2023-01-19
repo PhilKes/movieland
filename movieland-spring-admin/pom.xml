@@ -60,8 +60,12 @@
                 <executions>
                     <execution>
                         <goals>
+                            <goal>repackage</goal>
                             <goal>build-info</goal>
                         </goals>
+                        <configuration>
+                            <mainClass>com.philkes.movieland.spring.admin.SpringBootAdminApplication</mainClass>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

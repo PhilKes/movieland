@@ -17,7 +17,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
-      - name: 'Backend - Run the Maven verify phase'
+      - name: 'Backend - Run Tests'
         run: mvn verify -DtmdbApi.apikey=${{ secrets.TMDB_API_KEY  }}
         working-directory: ./
 
@@ -30,12 +30,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - dockerfile: ./movieland-backend/docker/Dockerfile
+          - dockerfile: ./movieland-backend/Dockerfile
             image: philkes/movie-land-backend
             context: ./movieland-backend
-          - dockerfile: ./movieland-spring-admin/docker/Dockerfile
+          - dockerfile: ./movieland-spring-admin/Dockerfile
             image: philkes/movie-land-spring-admin
-            context: ./movieland-backend
+            context: ./movieland-spring-admin
           - dockerfile: ./movieland-frontend/Dockerfile
             image: philkes/movie-land-frontend
             context: ./movieland-frontend

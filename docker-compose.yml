@@ -7,7 +7,6 @@ services:
     image: philkes/movie-land-backend:master
     ports:
       - "8080:8080"
-    restart: on-failure
     depends_on:
       - movieland-db
     environment: # Pass environment variables to the service
@@ -15,6 +14,8 @@ services:
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
       SPRING_BOOT_ADMIN_CLIENT_URL: http://movieland-spring-admin:8081
+      ZIPKIN_SERVER: movieland-tempo:9411
+      LOKI_SERVER: movieland-loki:3100
       PORT: 8080
     networks:
       - backend
@@ -27,7 +28,7 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      - app-server
+      - movieland-backend
     environment: # Pass environment variables to the service
       REST_API_URL: http://movieland-backend:8080/api
       PORT: 4000
@@ -63,11 +64,48 @@ services:
     container_name: prometheus
     restart: unless-stopped
     volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus/prometheus-docker.yml:/etc/prometheus/prometheus-docker.yml
     ports:
       - "9090:9090"
     healthcheck:
       test: [ "CMD", "nc", "-z", "localhost", "9090" ]
+    networks:
+      - backend
+
+  movieland-promtail:
+    image: grafana/promtail:2.7.1
+    container_name: promtail
+    volumes:
+      - ./monitoring/promtail/promtail-docker.yml:/etc/promtail/promtail.yml
+    command: -config.file=/etc/promtail/promtail.yml
+    networks:
+      - backend
+
+  # Source: https://github.com/marcingrzejszczak/observability-boot-blog-post
+  movieland-tempo:
+    container_name: tempo
+    image: grafana/tempo:1.5.0
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./monitoring/tempo/tempo-local.yaml:/etc/tempo.yaml:ro
+      - tempo-data:/tmp/tempo
+    ports:
+      - "14268"  # jaeger ingest
+      - "9411:9411" # zipkin
+    networks:
+      - backend
+
+  movieland-loki:
+    container_name: loki
+    image: grafana/loki:2.7.1
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    ports:
+      - "3100:3100"                                   # loki needs to be exposed so it receives logs
+    environment:
+      - JAEGER_AGENT_HOST=tempo
+      - JAEGER_ENDPOINT=http://localhost:14268/api/traces # send traces to Tempo
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
     networks:
       - backend
 
@@ -78,8 +116,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - "GF_SECURITY_ADMIN_USER=admin"
-      - "GF_SECURITY_ADMIN_PASSWORD=admin"
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      PROMETHEUS_SERVER: http://movieland-prometheus:9090
+      TEMPO_SERVER: http://movieland-tempo:3200
+      LOKI_SERVER: http://movieland-loki:3100
     volumes:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
     depends_on:
@@ -93,6 +134,8 @@ services:
 # Volumes
 volumes:
   db-data:
+  tempo-data:
+  prom-data:
 
 # Networks to be created to facilitate communication between containers
 networks:

@@ -2,10 +2,11 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml" />
     <springProperty scope="context" name="appName" source="spring.application.name"/>
+    <springProperty name="lokiServer" source="loki.server"/>
 
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
         <http>
-            <url>http://localhost:3100/loki/api/v1/push</url>
+            <url>http://${lokiServer}/loki/api/v1/push</url>
         </http>
         <format>
             <label>

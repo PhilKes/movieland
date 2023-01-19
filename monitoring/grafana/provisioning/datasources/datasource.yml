@@ -4,7 +4,7 @@ datasources:
     - name: Prometheus
       type: prometheus
       access: proxy
-      url: http://movieland-prometheus:9090
+      url: $PROMETHEUS_SERVER
       editable: false
       jsonData:
         httpMethod: POST
@@ -15,7 +15,7 @@ datasources:
       type: tempo
       access: proxy
       orgId: 1
-      url: http://movieland-tempo:3200
+      url: $TEMPO_SERVER
       basicAuth: false
       isDefault: true
       version: 1
@@ -31,7 +31,7 @@ datasources:
       uid: loki
       access: proxy
       orgId: 1
-      url: http://movieland-loki:3100
+      url: $LOKI_SERVER
       basicAuth: false
       isDefault: false
       version: 1

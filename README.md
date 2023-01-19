@@ -28,10 +28,10 @@ Add it to the `application.properties` in the `tmdbApi.apikey` value.
 
 ## Monitoring
 ### Prometheus <img src="./doc/prometheus.png" width="30">
-<a href="http://localhost:9090" target="_blank">http://localhost:9090/</a>
+<a href="http://localhost:9090" target="_blank">http://localhost:9090</a>
 
 ### Grafana <img src="./doc/grafana.png" width="30">
-<a href="http://localhost:3000" target="_blank">http://localhost:3000/</a>
+<a href="http://localhost:3000" target="_blank">http://localhost:3000</a>
 #### Dashboards:
 * https://grafana.com/grafana/dashboards/6756-spring-boot-statistics/
 
@@ -64,6 +64,17 @@ docker-compose -f docker-compose-local.yml up --build
 * Starts **Vue** Frontend exposed to
 
   <a href="http://localhost:3000" target="_blank">http://localhost:3000</a>
+
+## Development
+To start all services to develop the Backend:
+```shell
+docker-compose -f docker-compose-dev.yml up --build
+```
+
+To test and build all services from local build (including backend):
+```shell
+docker-compose -f docker-compose-local.yml up --build
+```
 
 ## Deployment - Github Actions <img src="./doc/githubactions.png" width="26">
 * Verify built in **Test** job

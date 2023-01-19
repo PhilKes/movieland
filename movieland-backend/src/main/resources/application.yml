@@ -2,6 +2,9 @@ info:
   application:
     name: MovieLand Backend
 management:
+  zipkin:
+    tracing:
+      endpoint: http://${zipkin-server}/api/v2/spans
   info:
     java:
       enabled: true
@@ -48,6 +51,8 @@ logging:
   group:
     tomcat: org.apache.catalina, org.apache.coyote, org.apache.tomcat
 spring:
+  zipkin:
+    base-url: ${zipkin-server}
   application:
     name: MovieLand Backend
   datasource:
@@ -89,3 +94,5 @@ app:
   jwtSecret: JWTSuperSecretKey
 tmdbApi:
   apikey: 7034789c8e20ce00ad84dc8661c288bf
+loki:
+  server: ${loki-server}
