@@ -22,11 +22,11 @@
     </appender>
 
     <root level="INFO">
-       <!-- <if condition='property("lokiEnabled").equals("true")'>
+        <if condition='property("lokiEnabled").equals("true")'>
             <then>
                 <appender-ref ref="LOKI"/>
             </then>
-        </if>-->
+        </if>
         <appender-ref ref="CONSOLE" />
     </root>
 </configuration>

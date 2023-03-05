@@ -3,9 +3,8 @@ info:
     name: MovieLand Backend
 management:
   zipkin:
-    enabled: ${zipkin-enabled}
     tracing:
-      endpoint: http://${zipkin-server:localhost}/api/v2/spans
+      endpoint: http://${zipkin-server:localhost:9411}/api/v2/spans
   info:
     java:
       enabled: true
@@ -20,6 +19,7 @@ management:
     enabled: false
   # All traces should be sent to latency analysis tool
   tracing:
+    enabled: ${tracing-enabled}
     sampling:
       probability: 1.0
   metrics:
@@ -53,7 +53,7 @@ logging:
     tomcat: org.apache.catalina, org.apache.coyote, org.apache.tomcat
 spring:
   zipkin:
-    base-url: ${zipkin-server:localhost}
+    base-url: ${zipkin-server:http://localhost:9411}
   application:
     name: MovieLand Backend
   datasource:
@@ -97,4 +97,4 @@ tmdbApi:
   apikey: 7034789c8e20ce00ad84dc8661c288bf
 loki:
   enabled: ${loki-enabled}
-  server: ${loki-server:localhost}
+  server: ${loki-server:localhost:3100}

@@ -24,7 +24,6 @@ services:
     ports:
       - "4000:4000"
     environment:
-      REST_API_URL: http://localhost:8080/api
       PORT: 4000
     network_mode: host
   # Database Service (Postgresql)

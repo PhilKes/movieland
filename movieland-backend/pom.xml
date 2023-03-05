@@ -169,6 +169,13 @@
             <version>3.0.1</version>
         </dependency>
 
+        <!-- For conditions in logback-spring.xml -->
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+            <version>3.1.9</version>
+        </dependency>
+
 
     </dependencies>
 
