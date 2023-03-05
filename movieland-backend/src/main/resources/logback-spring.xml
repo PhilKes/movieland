@@ -3,6 +3,7 @@
     <include resource="org/springframework/boot/logging/logback/base.xml" />
     <springProperty scope="context" name="appName" source="spring.application.name"/>
     <springProperty name="lokiServer" source="loki.server"/>
+    <springProperty name="useLoki" source="loki.enabled"/>
 
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
         <http>
@@ -20,6 +21,8 @@
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="LOKI"/>
+        <if condition='property("useLoki").equals("true")'>
+            <then><appender-ref ref="LOKI"/></then>
+        </if>
     </root>
 </configuration>

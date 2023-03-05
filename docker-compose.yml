@@ -14,7 +14,9 @@ services:
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
       SPRING_BOOT_ADMIN_CLIENT_URL: http://movieland-spring-admin:8081
+      ZIPKIN_ENABLED: true
       ZIPKIN_SERVER: movieland-tempo:9411
+      LOKI_ENABLED: true
       LOKI_SERVER: movieland-loki:3100
       PORT: 8080
     networks:
