@@ -1,38 +1,54 @@
-# Docker Compose for entire Full Stack Application running on localhost with Containers pulled from dockerhub/philkes
 version: '3.3'
 services:
   # App backend service
   movieland-backend:
     container_name: movieland-backend
-    image: philkes/movie-land-backend:master
+    build:
+      context: movieland-backend
+      dockerfile: Dockerfile
+    image: movieland-backend
     ports:
       - "8080:8080"
     depends_on:
-      - movieland-db
-    environment: # Pass environment variables to the service
+      - movieland-db # This service depends on mysql. Start that first.
+    environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://movieland-db:5432/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
       SPRING_DATASOURCE_PASSWORD: movielandadmin
       SPRING_BOOT_ADMIN_CLIENT_URL: http://movieland-spring-admin:8081
-      ZIPKIN_ENABLED: true
-      ZIPKIN_SERVER: movieland-tempo:9411
-      LOKI_ENABLED: true
-      LOKI_SERVER: movieland-loki:3100
+      ZIPKIN_ENABLED: false
+      LOKI_ENABLED: false
       PORT: 8080
     networks:
       - backend
       - frontend
+  # App backend service
+  movieland-spring-admin:
+    container_name: movieland-spring-admin
+    build:
+      context: movieland-spring-admin
+      dockerfile: Dockerfile
+    image: movieland-spring-admin
+    ports:
+      - "8081:8081"
+    environment:
+      PORT: 8081
 
+    networks:
+      - backend
   # Frontend Service
   movieland-frontend:
     container_name: movieland-frontend
-    image: philkes/movie-land-frontend:master
+    build:
+      context: movieland-frontend
+      dockerfile: Dockerfile
+    image: movieland-frontend
     ports:
       - "4000:4000"
     depends_on:
       - movieland-backend
-    environment: # Pass environment variables to the service
-      REST_API_URL: http://movieland-backend:8080/api
+    environment:
+      REST_API_URL: https://movieland-backend-philkes.cloud.okteto.net/api
       PORT: 4000
     networks:
       - frontend
@@ -50,96 +66,13 @@ services:
       - db-data:/var/lib/postgresql/data
     networks:
       - backend
-  # App backend service
-  movieland-spring-admin:
-    container_name: movieland-spring-admin
-    image: philkes/movie-land-spring-admin:master
-    ports:
-      - "8081:8081"
-    environment:
-      PORT: 8081
-    networks:
-      - backend
-
-  movieland-prometheus:
-    image: prom/prometheus:v2.41.0
-    container_name: prometheus
-    restart: unless-stopped
-    volumes:
-      - ./monitoring/prometheus/prometheus-docker.yml:/etc/prometheus/prometheus-docker.yml
-    ports:
-      - "9090:9090"
-    healthcheck:
-      test: [ "CMD", "nc", "-z", "localhost", "9090" ]
-    networks:
-      - backend
-
-  movieland-promtail:
-    image: grafana/promtail:2.7.1
-    container_name: promtail
-    volumes:
-      - ./monitoring/promtail/promtail-docker.yml:/etc/promtail/promtail.yml
-    command: -config.file=/etc/promtail/promtail.yml
-    networks:
-      - backend
-
-  # Source: https://github.com/marcingrzejszczak/observability-boot-blog-post
-  movieland-tempo:
-    container_name: tempo
-    image: grafana/tempo:1.5.0
-    command: [ "-config.file=/etc/tempo.yaml" ]
-    volumes:
-      - ./monitoring/tempo/tempo-local.yaml:/etc/tempo.yaml:ro
-      - tempo-data:/tmp/tempo
-    ports:
-      - "14268"  # jaeger ingest
-      - "9411:9411" # zipkin
-    networks:
-      - backend
-
-  movieland-loki:
-    container_name: loki
-    image: grafana/loki:2.7.1
-    command: [ "-config.file=/etc/loki/local-config.yaml" ]
-    ports:
-      - "3100:3100"                                   # loki needs to be exposed so it receives logs
-    environment:
-      - JAEGER_AGENT_HOST=tempo
-      - JAEGER_ENDPOINT=http://localhost:14268/api/traces # send traces to Tempo
-      - JAEGER_SAMPLER_TYPE=const
-      - JAEGER_SAMPLER_PARAM=1
-    networks:
-      - backend
-
-  movieland-grafana:
-    image: grafana/grafana:9.3.2
-    container_name: grafana
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
-      PROMETHEUS_SERVER: http://movieland-prometheus:9090
-      TEMPO_SERVER: http://movieland-tempo:3200
-      LOKI_SERVER: http://movieland-loki:3100
-    volumes:
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
-    depends_on:
-      - movieland-prometheus
-    healthcheck:
-      test: [ "CMD", "nc", "-z", "localhost", "3000" ]
-    user: "1000"
-    networks:
-      - backend
 
 # Volumes
 volumes:
   db-data:
-  tempo-data:
-  prom-data:
 
 # Networks to be created to facilitate communication between containers
 networks:
   backend:
   frontend:
+
