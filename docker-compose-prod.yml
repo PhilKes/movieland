@@ -9,7 +9,7 @@ services:
       file: docker-compose.yml
       service: movieland-frontend
     environment:
-      REST_API_URL: ${BACKEND_HOST:-http://localhost:8080}/api
+      REST_API_URL: https://movieland-backend-philkes.cloud.okteto.net/api
       PORT: 4000
   movieland-db:
     extends:
