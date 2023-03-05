@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+  movieland-backend:
+    extends:
+      file: docker-compose.yml
+      service: movieland-backend
+  movieland-frontend:
+    extends:
+      file: docker-compose.yml
+      service: movieland-frontend
+    environment:
+      REST_API_URL: ${BACKEND_HOST:-http://localhost:8080}/api
+      PORT: 4000
+  movieland-db:
+    extends:
+      file: docker-compose.yml
+      service: movieland-db
+  movieland-spring-admin:
+    extends:
+      file: docker-compose.yml
+      service: movieland-spring-admin
