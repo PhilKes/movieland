@@ -1,0 +1,78 @@
+version: '3.3'
+services:
+  # App backend service
+  movieland-backend:
+    container_name: movieland-backend
+    build:
+      context: movieland-backend
+      dockerfile: Dockerfile
+    image: movieland-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - movieland-db # This service depends on mysql. Start that first.
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://movieland-db:5432/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
+      SPRING_DATASOURCE_USERNAME: movielandadmin
+      SPRING_DATASOURCE_PASSWORD: movielandadmin
+      SPRING_BOOT_ADMIN_CLIENT_URL: http://movieland-spring-admin:8081
+      TRACING_ENABLED: false
+      LOKI_ENABLED: false
+      PORT: 8080
+    networks:
+      - backend
+      - frontend
+  # App backend service
+  movieland-spring-admin:
+    container_name: movieland-spring-admin
+    build:
+      context: movieland-spring-admin
+      dockerfile: Dockerfile
+    image: movieland-spring-admin
+    ports:
+      - "8081:8081"
+    environment:
+      PORT: 8081
+
+    networks:
+      - backend
+  # Frontend Service
+  movieland-frontend:
+    container_name: movieland-frontend
+    build:
+      context: movieland-frontend
+      dockerfile: Dockerfile
+    image: movieland-frontend
+    ports:
+      - "4000:4000"
+    depends_on:
+      - movieland-backend
+    environment:
+      REST_API_URL: https://movieland-backend-philkes.cloud.okteto.net/api
+      PORT: 4000
+    networks:
+      - frontend
+  # Database Service (Postgresql)
+  movieland-db:
+    container_name: movieland-db
+    image: 'postgres:13.1-alpine'
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=movielandadmin
+      - POSTGRES_PASSWORD=movielandadmin
+      - POSTGRES_DB=movieland_db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+# Volumes
+volumes:
+  db-data:
+
+# Networks to be created to facilitate communication between containers
+networks:
+  backend:
+  frontend:
+

@@ -81,11 +81,6 @@ docker-compose -f docker-compose-local.yml up --build
 * **Build** all docker images from **Dockerfiles**
 * **Push** all built images **to <a href="https://hub.docker.com/u/philkes" target="_blank">Dockerhub</a>**
 
-## TODO
-* Add Spring Boot Admin, Prometheus, Grafana to the Stack
-* (Add Spring Cloud Config, Zipking Tracing, Eureka Discovery Server)
-
-
 ## Attribution
 All Movie Posters, Descriptions, Meta-data are provided by the free <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>.
 
