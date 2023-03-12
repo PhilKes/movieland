@@ -63,7 +63,7 @@ docker-compose -f docker-compose-local.yml up --build
 
 * Starts **Vue** Frontend exposed to
 
-  <a href="http://localhost:3000" target="_blank">http://localhost:3000</a>
+  <a href="http://localhost:4000" target="_blank">http://localhost:4000</a>
 
 ## Development
 To start all services to develop the Backend:
@@ -76,10 +76,16 @@ To test and build all services from local build (including backend):
 docker-compose -f docker-compose-local.yml up --build
 ```
 
-## Deployment - Github Actions <img src="./doc/githubactions.png" width="26">
+## Deployment - Github Pages + Okteto Kubernetes <img src="./doc/okteto.png" width="26"> <img src="./doc/github.png" width="26">
 * Verify built in **Test** job
 * **Build** all docker images from **Dockerfiles**
 * **Push** all built images **to <a href="https://hub.docker.com/u/philkes" target="_blank">Dockerhub</a>**
+* **Deploy** NuxtJS frontend to Github Pages
+* **Deploy** Spring Boot backend to [Okteto Cloud](https://www.okteto.com/)
+
+A preview version is deployed at https://philkes.github.io/movieland/
+
+_Note: Okteto puts the backend pod into sleep mode after an inactivity timeout, therefore the initial load of the preview can sometimes take a minute or two._
 
 ## Attribution
 All Movie Posters, Descriptions, Meta-data are provided by the free <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>.

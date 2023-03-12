@@ -7,5 +7,5 @@ Make sure a Postgres database is running on `localhost:5432` with:
 ```bash
 # build for production and launch server
 mvn clean package
-java -jar target/movieland-spring-0.0.1-SNAPSHOT.jar 
+java -jar target/movieland-backend.jar 
 ```
