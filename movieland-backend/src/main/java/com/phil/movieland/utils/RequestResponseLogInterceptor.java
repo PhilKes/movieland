@@ -13,10 +13,14 @@ import org.springframework.web.servlet.HandlerInterceptor;
  */
 @Component
 public class RequestResponseLogInterceptor implements HandlerInterceptor {
+    private static final Logger logger = LoggerFactory.getLogger(RequestResponseLogInterceptor.class);
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        Logger log = LoggerFactory.getLogger(((HandlerMethod) handler).getBeanType());
-
+        Logger log = logger;
+        if (handler instanceof HandlerMethod handlerMethod) {
+            log = LoggerFactory.getLogger(handlerMethod.getBeanType());
+        }
         if (request.getQueryString() != null)
             log.info("Request: {} '{}', query: {}, client: {}", request.getMethod(), request.getRequestURI(), request.getQueryString(), request.getRemoteHost());
         else
@@ -26,7 +30,10 @@ public class RequestResponseLogInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        Logger log = LoggerFactory.getLogger(((HandlerMethod) handler).getBeanType());
+        Logger log = logger;
+        if (handler instanceof HandlerMethod handlerMethod) {
+            log = LoggerFactory.getLogger(handlerMethod.getBeanType());
+        }
         log.info("Response: Code {} to '{}', type: {}", response.getStatus(), request.getRequestURI(), response.getContentType());
     }
 }
