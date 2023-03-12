@@ -6,7 +6,8 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate"
+    "generate": "nuxt generate",
+    "deploy": "push-dir --dir=dist --branch=gh-pages --cleanup"
   },
   "dependencies": {
     "@nuxtjs/auth": "^4.9.1",
@@ -28,6 +29,7 @@
     "@fortawesome/fontawesome-free": "^5.15.1",
     "@nuxtjs/vuetify": "^1.11.2",
     "moment": "^2.29.0",
+    "push-dir": "^0.4.1",
     "vue-async-computed": "^3.9.0",
     "vue-ctk-date-time-picker": "^2.5.0"
   }

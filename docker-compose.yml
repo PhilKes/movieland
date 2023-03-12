@@ -22,50 +22,21 @@ services:
     networks:
       - backend
       - frontend
-  # App backend service
-  movieland-spring-admin:
-    container_name: movieland-spring-admin
-    build:
-      context: movieland-spring-admin
-      dockerfile: Dockerfile
-    image: movieland-spring-admin
-    ports:
-      - "8081:8081"
-    environment:
-      PORT: 8081
 
-    networks:
-      - backend
-  # Frontend Service
+  movieland-spring-admin:
+    extends:
+      file: docker-compose-dev.yml
+      service: movieland-spring-admin
+
   movieland-frontend:
-    container_name: movieland-frontend
-    build:
-      context: movieland-frontend
-      dockerfile: Dockerfile
-    image: movieland-frontend
-    ports:
-      - "4000:4000"
-    depends_on:
-      - movieland-backend
-    environment:
-      REST_API_URL: ${BACKEND_HOST:-http://localhost:8080}/api
-      PORT: 4000
-    networks:
-      - frontend
-  # Database Service (Postgresql)
+    extends:
+      file: docker-compose-dev.yml
+      service: movieland-frontend
+
   movieland-db:
-    container_name: movieland-db
-    image: 'postgres:13.1-alpine'
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=movielandadmin
-      - POSTGRES_PASSWORD=movielandadmin
-      - POSTGRES_DB=movieland_db
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - backend
+    extends:
+      file: docker-compose-dev.yml
+      service: movieland-db
 
 # Volumes
 volumes:

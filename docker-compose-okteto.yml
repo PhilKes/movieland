@@ -21,7 +21,6 @@ services:
       PORT: 8080
     networks:
       - backend
-      - frontend
   # App backend service
   movieland-spring-admin:
     container_name: movieland-spring-admin
@@ -36,22 +35,6 @@ services:
 
     networks:
       - backend
-  # Frontend Service
-  movieland-frontend:
-    container_name: movieland-frontend
-    build:
-      context: movieland-frontend
-      dockerfile: Dockerfile
-    image: movieland-frontend
-    ports:
-      - "4000:4000"
-    depends_on:
-      - movieland-backend
-    environment:
-      REST_API_URL: https://movieland-backend-philkes.cloud.okteto.net/api
-      PORT: 4000
-    networks:
-      - frontend
   # Database Service (Postgresql)
   movieland-db:
     container_name: movieland-db
@@ -74,5 +57,4 @@ volumes:
 # Networks to be created to facilitate communication between containers
 networks:
   backend:
-  frontend:
 
