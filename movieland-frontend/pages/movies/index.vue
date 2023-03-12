@@ -48,27 +48,37 @@
 <script>
   import MovieCard from "../../components/cards/MovieCard";
 
-  export default {
-    name: "index.vue",
-    components: {MovieCard},
-    data() {
-      return {
-        movies: [],
-        fetchHint: ""
-      };
+export default {
+  name: "index.vue",
+  components: { MovieCard },
+  data() {
+    return {
+      movies: [],
+      fetchHint: "",
+    };
+  },
+  methods: {
+    async refresh() {
+      return await this.$repos.movies.all().catch((err) => {
+        console.error("Error fetching movies: ", err.response);
+        this.fetchHint =
+          "Hint: The Backend was probably put into sleep mode, it takes additional time to wake it up. Will try to reload automatically...";
+        return new Promise((resolve) => setTimeout(resolve, 6000)).then(() =>
+          this.refresh()
+        );
+      });
     },
-    async fetch() {
-      setTimeout(() => (this.fetchHint = "Hint: The Backend was probably put in sleep mode, it takes additional time to wake it up"), 6000);
-      this.movies = await this.$repos.movies.all();
-      console.log("movies", this.movies);
-      this.fetchHint="";
-    },
-    head() {
-      return {
-        title: "Movies",
-      };
-    },
-  };
+  },
+  async fetch() {
+    this.movies = await this.refresh();
+    console.log("movies", this.movies);
+  },
+  head() {
+    return {
+      title: "Movies",
+    };
+  },
+};
 </script>
 
 <style scoped>
