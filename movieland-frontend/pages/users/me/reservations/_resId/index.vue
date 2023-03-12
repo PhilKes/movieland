@@ -61,7 +61,8 @@
 
 <script>
   import MovieCard from "../../../../../components/cards/MovieCard";
-  import {DialogConfirm, QrCodeView} from "../../../../../.nuxt/components";
+  import QrCodeView from "../../../../../components/misc/qr-code-view";
+  import DialogConfirm from "../../../../../components/cards/DialogConfirm";
   import BackButton from "../../../../../components/buttons/BackButton";
   import QrcodeVue from 'qrcode.vue'
 
