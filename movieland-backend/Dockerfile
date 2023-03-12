@@ -4,5 +4,4 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn clean package
-COPY target/movieland-backend.jar ./app.jar
-ENTRYPOINT ["java", "-jar", "./app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/target/movieland-backend.jar"]
