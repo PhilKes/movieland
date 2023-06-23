@@ -1,22 +1,28 @@
 package main
 
 import (
+	"os"
+
 	"github.com/PhilKes/movieland/api"
+	"github.com/PhilKes/movieland/model"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
-func test(api api.Api) {
-
-}
-
 var apis []api.Api = []api.Api{
-	&api.TodosApi{},
+	&api.MoviesApi{},
 }
 
 func main() {
-	router := gin.Default()
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+
+	log.Info().Msg("Starting Server")
+	var router *gin.Engine = gin.Default()
+	model.ConnectDatabase()
+
 	for _, api := range apis {
 		api.Bind(router)
 	}
-	router.Run("localhost:8080")
+	router.Run(":8080")
 }
