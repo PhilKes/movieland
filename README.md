@@ -1,8 +1,7 @@
 # MovieLand - Full Stack Cinema Web App <img src="https://i.imgur.com/MHO0XoY.png" width="76"> 
+This is a showcase project for a **Full Stack Web Application** for a cinema operator use-case scenario, to learn different frontend/backend frameworks.
 
-<p align="center"><img src="/doc/admin.gif" width="400px" >   <img src="/doc/reservation.gif" width="400px"></p>
-
-This is a showcase project for a **Full Stack Web Application** for a cinema operator use-case scenario.
+<p align="left"><img src="/doc/admin.gif" width="400px" >   <img src="/doc/reservation.gif" width="400px"></p>
 
 ## Backend - Spring Boot 3 <img src="./doc/spring.png" width="26">
 * JPA/Hibernate to interact with the database
@@ -14,7 +13,7 @@ This is a showcase project for a **Full Stack Web Application** for a cinema ope
 Note: You need to get your own TMDB API Key to run the backend on your local machine.
 Add it to the `application.properties` in the `tmdbApi.apikey` value.
 
-## Frontend - NuxtJS <img src="./doc/nuxt.png" width="30">
+## Frontend - Vue <img src="./doc/nuxt.png" width="30">
 * Vue **User Interface** with Nuxt.js
 * Axios as REST-Client
 * Webpages for **User Login/Registration, Reservations**
@@ -25,15 +24,6 @@ Add it to the `application.properties` in the `tmdbApi.apikey` value.
 ## Database - PostgreSQL <img src="./doc/postgresql.png" width="26">
 * PostgreSQL image from <a href="https://hub.docker.com/_/postgres" target="_blank">Dockerhub</a>
 * Persistent **Data layer** for Movies, Shows, User etc.
-
-## Monitoring
-### Prometheus <img src="./doc/prometheus.png" width="30">
-<a href="http://localhost:9090" target="_blank">http://localhost:9090</a>
-
-### Grafana <img src="./doc/grafana.png" width="30">
-<a href="http://localhost:3000" target="_blank">http://localhost:3000</a>
-#### Dashboards:
-* https://grafana.com/grafana/dashboards/6756-spring-boot-statistics/
 
 ## Docker <img src="./doc/docker.png" width="32">
 Full Docker Support with **Docker-compose**
@@ -65,6 +55,17 @@ docker-compose -f docker-compose-local.yml up --build
 
   <a href="http://localhost:4000" target="_blank">http://localhost:4000</a>
 
+## Deployment - Github Pages + Okteto Kubernetes <img src="./doc/okteto.png" width="26"> <img src="./doc/github.png" width="26">
+* Verify built in **Test** job
+* **Build** all docker images from **Dockerfiles**
+* **Push** all built images **to <a href="https://hub.docker.com/u/philkes" target="_blank">Dockerhub</a>**
+* **Deploy** NuxtJS frontend to Github Pages
+* **Deploy** Spring Boot backend to [Okteto Cloud](https://www.okteto.com/)
+
+A preview version is deployed at https://philkes.github.io/movieland/
+
+_Note: Okteto puts the backend pod into sleep mode after an inactivity timeout, therefore the initial load of the preview can sometimes take a minute or two._
+
 ## Development
 To start all services to develop the Backend:
 ```shell
@@ -76,16 +77,16 @@ To test and build all services from local build (including backend):
 docker-compose -f docker-compose-local.yml up --build
 ```
 
-## Deployment - Github Pages + Okteto Kubernetes <img src="./doc/okteto.png" width="26"> <img src="./doc/github.png" width="26">
-* Verify built in **Test** job
-* **Build** all docker images from **Dockerfiles**
-* **Push** all built images **to <a href="https://hub.docker.com/u/philkes" target="_blank">Dockerhub</a>**
-* **Deploy** NuxtJS frontend to Github Pages
-* **Deploy** Spring Boot backend to [Okteto Cloud](https://www.okteto.com/)
+Overtime I implemented the frontend and backend in different frameworks/languages, check out other branches for other implementations.
 
-A preview version is deployed at https://philkes.github.io/movieland/
+## Monitoring
+### Prometheus <img src="./doc/prometheus.png" width="30">
+<a href="http://localhost:9090" target="_blank">http://localhost:9090</a>
 
-_Note: Okteto puts the backend pod into sleep mode after an inactivity timeout, therefore the initial load of the preview can sometimes take a minute or two._
+### Grafana <img src="./doc/grafana.png" width="30">
+<a href="http://localhost:3000" target="_blank">http://localhost:3000</a>
+#### Dashboards:
+* https://grafana.com/grafana/dashboards/6756-spring-boot-statistics/
 
 ## Attribution
 All Movie Posters, Descriptions, Meta-data are provided by the free <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>.
