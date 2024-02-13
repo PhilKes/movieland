@@ -27,17 +27,17 @@ services:
       PORT: 4000
     network_mode: host
   # Database Service (Postgresql)
-  movieland-db:
-    container_name: movieland-db
-    image: 'postgres:13.1-alpine'
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=movielandadmin
-      - POSTGRES_PASSWORD=movielandadmin
-      - POSTGRES_DB=movieland_db
-    volumes:
-      - db-data:/var/lib/postgresql/data
+#  movieland-db:
+#    container_name: movieland-db
+#    image: 'postgres:13.1-alpine'
+#    ports:
+#      - "5432:5432"
+#    environment:
+#      - POSTGRES_USER=movielandadmin
+#      - POSTGRES_PASSWORD=movielandadmin
+#      - POSTGRES_DB=movieland_db
+#    volumes:
+#      - db-data:/var/lib/postgresql/data
 
 
   movieland-prometheus:

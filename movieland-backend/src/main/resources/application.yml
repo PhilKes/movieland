@@ -57,10 +57,10 @@ spring:
   application:
     name: MovieLand Backend
   datasource:
-    driverClassName: org.postgresql.Driver
-    password: movielandadmin
-    username: movielandadmin
-    url: jdbc:postgresql://localhost:5432/movieland_db
+    driverClassName: org.h2.Driver
+    password: sa
+    username: password
+    url: jdbc:h2:mem:movieland_db
   security:
     user:
       password: admin
@@ -68,10 +68,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
   sql:
     init:
       mode: never

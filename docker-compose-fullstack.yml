@@ -7,8 +7,8 @@ services:
     image: philkes/movie-land-backend:master
     ports:
       - "8080:8080"
-    depends_on:
-      - movieland-db
+#    depends_on:
+#      - movieland-db
     environment: # Pass environment variables to the service
       SPRING_DATASOURCE_URL: jdbc:postgresql://movieland-db:5432/movieland_db?useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
       SPRING_DATASOURCE_USERNAME: movielandadmin
@@ -37,19 +37,19 @@ services:
     networks:
       - frontend
   # Database Service (Postgresql)
-  movieland-db:
-    container_name: movieland-db
-    image: 'postgres:13.1-alpine'
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=movielandadmin
-      - POSTGRES_PASSWORD=movielandadmin
-      - POSTGRES_DB=movieland_db
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - backend
+#  movieland-db:
+#    container_name: movieland-db
+#    image: 'postgres:13.1-alpine'
+#    ports:
+#      - "5432:5432"
+#    environment:
+#      - POSTGRES_USER=movielandadmin
+#      - POSTGRES_PASSWORD=movielandadmin
+#      - POSTGRES_DB=movieland_db
+#    volumes:
+#      - db-data:/var/lib/postgresql/data
+#    networks:
+#      - backend
   # App backend service
   movieland-spring-admin:
     container_name: movieland-spring-admin
