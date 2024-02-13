@@ -1,5 +1,9 @@
 name: Docker Image CI
 
+env:
+  AZURE_WEBAPP_NAME: movieland-backend   # set this to your application's name
+  AZURE_WEBAPP_PACKAGE_PATH: './movieland-backend'      # set this to the path to your web app project, defaults to the repository root
+
 on:
   push:
     branches: [ master ]
@@ -90,3 +94,20 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: movieland-frontend/dist # The folder the action should deploy.
+
+  deploy-azure:
+    runs-on: ubuntu-latest
+    needs: build-and-push-docker
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: 'production'
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: 'philkes/movie-land-backend:master'
