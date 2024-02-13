@@ -55,16 +55,14 @@ docker-compose -f docker-compose-local.yml up --build
 
   <a href="http://localhost:4000" target="_blank">http://localhost:4000</a>
 
-## Deployment - Github Pages + Okteto Kubernetes <img src="./doc/okteto.png" width="26"> <img src="./doc/github.png" width="26">
+## Deployment - Github Pages + Azure App Service <img src="./doc/github.png" width="26"> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Microsoft_Azure.svg/1200px-Microsoft_Azure.svg.png" width="26">
 * Verify built in **Test** job
 * **Build** all docker images from **Dockerfiles**
 * **Push** all built images **to <a href="https://hub.docker.com/u/philkes" target="_blank">Dockerhub</a>**
 * **Deploy** NuxtJS frontend to Github Pages
-* **Deploy** Spring Boot backend to [Okteto Cloud](https://www.okteto.com/)
+* **Deploy** Spring Boot backend to [Azure App Service](https://azure.microsoft.com/en-us/products/app-service)
 
 A preview version is deployed at https://philkes.github.io/movieland/
-
-_Note: Okteto puts the backend pod into sleep mode after an inactivity timeout, therefore the initial load of the preview can sometimes take a minute or two._
 
 ## Development
 To start all services to develop the Backend:
