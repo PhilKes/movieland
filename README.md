@@ -21,9 +21,9 @@ Add it to the `application.properties` in the `tmdbApi.apikey` value.
 * QRCode Scanning of Reservation to validate tickets
 
 
-## Database - PostgreSQL <img src="./doc/postgresql.png" width="26">
-* PostgreSQL image from <a href="https://hub.docker.com/_/postgres" target="_blank">Dockerhub</a>
-* Persistent **Data layer** for Movies, Shows, User etc.
+## Database - H2
+* In-memory **Data layer** for Movies, Shows, User etc.
+* (Postgresql was replaced with H2 to be able to user Free Tier on Azure)
 
 ## Docker <img src="./doc/docker.png" width="32">
 Full Docker Support with **Docker-compose**
@@ -31,15 +31,12 @@ Full Docker Support with **Docker-compose**
 * To build and run the Fullstack Application from local Dockerfiles:
 ```shell
 mvn clean install
-docker-compose -f docker-compose-local.yml up --build
+docker compose -f docker-compose-local.yml up --build
 ```
 
 * To run the Fullstack Application from latest <a href="https://hub.docker.com/u/philkes" target="_blank">Dockerhub images</a>:
 
   `docker-compose up --build`
-
-
-* Starts and initializes **MySQL** database
 
 * Starts **Spring** REST API exposed to
 
