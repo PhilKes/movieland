@@ -39,17 +39,16 @@ public class MovieControllerTest {
     @MockBean
     private MovieService movieService;
 
-    private List<Movie> testMovies = Arrays.asList(createMovie("Movie 1"),
-        createMovie("Movie 2"),
-        createMovie("Movie 3"),
-        createMovie("Movie 4"));
+    private List<Movie> testMovies = Arrays.asList(createMovie("Movie 1", 1L),
+        createMovie("Movie 2", 2L),
+        createMovie("Movie 3", 3L),
+        createMovie("Movie 4", 4L));
 
-    private static long movieIdCounter = 1;
 
-    private static Movie createMovie(String name) {
+    private static Movie createMovie(String name, Long id) {
         Movie movie = new Movie();
         movie.setDate(new Date());
-        movie.setMovId(movieIdCounter++);
+        movie.setMovId(id);
         movie.setName(name);
         movie.setLength(100L);
         movie.setDescription("A Movie");
