@@ -19,7 +19,7 @@ management:
     enabled: false
   # All traces should be sent to latency analysis tool
   tracing:
-    enabled: ${tracing-enabled}
+    enabled: ${tracing-enabled:false}
     sampling:
       probability: 1.0
   metrics:
@@ -76,6 +76,7 @@ spring:
     admin:
       client:
         url: http://localhost:8081
+        enabled: ${sb-admin-enabled:false}
   output:
     ansi:
       enabled: ALWAYS
@@ -93,5 +94,5 @@ app:
 tmdbApi:
   apikey: 7034789c8e20ce00ad84dc8661c288bf
 loki:
-  enabled: ${loki-enabled}
+  enabled: ${loki-enabled:false}
   server: ${loki-server:localhost:3100}
