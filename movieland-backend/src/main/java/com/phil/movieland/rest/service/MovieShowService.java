@@ -5,13 +5,16 @@ import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.data.repository.MovieShowRepository;
 import com.phil.movieland.utils.DateUtils;
 import com.phil.movieland.utils.Utils;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 /**
  * Service to interface movieShowRepository
@@ -76,7 +79,7 @@ public class MovieShowService {
         movieShowRepository.deleteById(showid);
     }
 
-    public void deleteAllMovieShows() {
+    public void deleteAll() {
         log.info("Deleting all MovieShows");
         movieShowRepository.deleteAll();
     }

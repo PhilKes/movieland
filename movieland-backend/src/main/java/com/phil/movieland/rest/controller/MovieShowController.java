@@ -1,11 +1,21 @@
 package com.phil.movieland.rest.controller;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import static java.util.stream.Collectors.groupingBy;
+
 import com.phil.movieland.data.entity.Movie;
 import com.phil.movieland.data.entity.MovieShow;
 import com.phil.movieland.rest.service.MovieService;
 import com.phil.movieland.rest.service.MovieShowService;
 import com.phil.movieland.utils.DateUtils;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +23,15 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
-
-import static java.util.stream.Collectors.groupingBy;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST Controller for MovieShows
@@ -183,7 +194,7 @@ public class MovieShowController {
     @DeleteMapping
     public ResponseEntity<?> deleteShows(@RequestParam(value="showIds", required=false) List<Long> showIds) {
         if(showIds==null) {
-            movieShowService.deleteAllMovieShows();
+            movieShowService.deleteAll();
         }else{
             movieShowService.deleteShowsByIds(showIds);
         }
