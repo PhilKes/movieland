@@ -10,8 +10,7 @@ This is a showcase project for a **Full Stack Web Application** for a cinema ope
 * Role-based **JWT Token** Authentication
 * Access to <a href="https://developers.themoviedb.org/3" target="_blank">TMDB Movie Database API</a>
 
-Note: You need to get your own TMDB API Key to run the backend on your local machine.
-Add it to the `application.properties` in the `tmdbApi.apikey` value.
+__Note: You need to get your own TMDB API Key to run the backend on your local machine, add it to the `application.properties` in the `tmdbApi.apikey` value.__
 
 ## Frontend - Vue <img src="./doc/nuxt.png" width="30">
 * Vue **User Interface** with Nuxt.js
@@ -60,6 +59,8 @@ docker compose -f docker-compose-local.yml up --build
 * **Deploy** Spring Boot backend to [Azure App Service](https://azure.microsoft.com/en-us/products/app-service)
 
 A preview version is deployed at https://philkes.github.io/movieland/
+
+__Note: The backend API calls can be slow, since it is deployed on the free tier of Azure__
 
 ## Development
 To start all services to develop the Backend:
